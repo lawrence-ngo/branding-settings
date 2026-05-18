@@ -4171,14 +4171,13 @@ function eeUpdateProfileUI() {
   var clickHint       = document.getElementById('eeClickToCustomizeHint');
 
   if (eeProfile.customized) {
-    // ── Custom profile — canvas editable, customize row hidden ─
+    // ── Custom profile is currently active — canvas editable ──
     if (card)   card.className = 'ee-profile-setting-card custom';
     if (name)   { name.className = 'ee-profile-setting-name custom'; name.textContent = 'Custom'; }
     if (sub)    sub.textContent = 'Based on ' + eeProfile.name + ' · this experience only';
     if (swatch) swatch.style.background = 'linear-gradient(135deg,' + (eeProfileSwatches[eeProfile.id]||'#3d3d3d') + ' 40%,#3D57FF)';
     var displayName = eeProfile.customName || 'Custom Profile';
     if (profileName) profileName.textContent = displayName;
-    if (customizeRow) customizeRow.style.display = 'none';
     if (canvas) canvas.classList.remove('preview-mode');
     if (clickHint) clickHint.style.display = 'flex';
 
@@ -4186,13 +4185,12 @@ function eeUpdateProfileUI() {
     eeShowProfileSettings();
 
   } else {
-    // ── Shared profile — canvas locked, customize row visible ──
+    // ── Shared profile is currently active — canvas locked ──
     if (card)   card.className = 'ee-profile-setting-card';
     if (name)   { name.className = 'ee-profile-setting-name'; name.textContent = eeProfile.name; }
     if (sub)    sub.textContent = eeProfile.count + ' experiences' + (eeProfile.id === 'classic' || eeProfile.id === 'default' ? ' · account default' : '');
     if (swatch) swatch.style.background = eeProfileSwatches[eeProfile.id] || '#3d3d3d';
     if (profileName) profileName.textContent = eeProfile.name;
-    if (customizeRow) customizeRow.style.display = '';
     if (canvas) canvas.classList.add('preview-mode');
     if (clickHint) clickHint.style.display = 'none';
 
@@ -4200,6 +4198,15 @@ function eeUpdateProfileUI() {
     var panel = document.getElementById('eeCustomizePanel');
     if (panel) { panel.classList.remove('persistent'); panel.classList.remove('open'); }
     eeCurrentSection = null;
+  }
+
+  // DECISION: The "Customize for this experience" row hides whenever a custom profile EXISTS
+  // for this experience — not just when it's currently the active profile. Once created, the
+  // custom profile is the only one for this experience; the operator must never be offered
+  // the option to create a second one. Switching back to a shared profile keeps the custom
+  // in the switcher list (for re-selection) but the create-another CTA stays gone.
+  if (customizeRow) {
+    customizeRow.style.display = eeProfile.customProfileId ? 'none' : '';
   }
 }
 
