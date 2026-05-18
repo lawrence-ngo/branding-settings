@@ -5121,7 +5121,7 @@ var TUT_STEPS = [
   },
   {
     title: 'The Brand Kit Editor',
-    body: 'The right panel is where you configure the kit. Set the kit name, header background color, logo, primary button color, and link color. Every change previews instantly on the canvas.',
+    body: 'The right panel is where you configure the brand kit. Set the brand kit name, header background color, logo, primary button color, and link color. Every change previews instantly on the canvas.',
     navPath: ['Settings', 'Branding', 'Brand Kits', 'Edit kit'],
     // DECISION: Target #bkPanel (right settings panel) with position 'left' so the card
     // appears to the left of the panel. before() handles backward navigation.
@@ -5131,7 +5131,7 @@ var TUT_STEPS = [
   },
   {
     title: 'Live Preview Tabs',
-    body: 'The canvas previews your brand across three page types: <strong>Experience Details</strong>, <strong>Checkout</strong>, and <strong>Confirmation</strong>. Switch tabs to check how the kit looks at each stage of the booking flow.',
+    body: 'The canvas previews your brand across three page types: <strong>Experience Details</strong>, <strong>Checkout</strong>, and <strong>Confirmation</strong>. Switch tabs to check how the brand kit looks at each stage of the booking flow.',
     navPath: ['Settings', 'Branding', 'Brand Kits', 'Edit kit'],
     // DECISION: Target #bpPageTabs (tab bar above canvas) with position 'bottom'.
     // nextHandler carries the save-button interstitial: fades card, spotlights Save,
@@ -5194,8 +5194,8 @@ var TUT_STEPS = [
   {
     isInterstitial: true,
     autoPlay: function() {
-      var menuBtn = document.getElementById('kit-menu-classic');
-      var editBtn = document.getElementById('kitPopoverEdit');
+      var menuBtn = document.getElementById('profile-menu-classic');
+      var editBtn = document.getElementById('profilePopoverEdit');
       var pop     = document.getElementById('profileCardPopover');
       var spot    = document.getElementById('tutSpotlight');
 
@@ -5262,7 +5262,7 @@ var TUT_STEPS = [
     // to reinforce the save action, then navigates back to the Content Profiles list.
     isInterstitial: true,
     autoPlay: function() {
-      var saveBtn = document.getElementById('kitSaveProfileBtn');
+      var saveBtn = document.getElementById('profileSaveBtn');
       var spot    = document.getElementById('tutSpotlight');
 
       // Phase 1: spotlight Save Profile button
@@ -5389,7 +5389,7 @@ var TUT_STEPS = [
       'Brand Kits control the visual layer (logo, colors, font, button shape)',
       'Content Profiles control the structural layer (flow, fields, CTA)',
       'Both are set up in Branding Settings and applied per experience',
-      'Shared profiles are locked in the canvas and edited via the kit editor',
+      'Shared profiles are locked in the canvas and edited via the profile editor',
       'Custom profiles unlock inline editing with no blast radius'
     ],
     actionLabel: 'Done',
