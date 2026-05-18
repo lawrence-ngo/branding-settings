@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Branding — System Guide</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --blue: #3D57FF;
+  --blue-light: #eef0fd;
+  --blue-mid: #c7d2fe;
+  --text: #1a1f36;
+  --sub: #697386;
+  --border: #e3e8ee;
+  --bg: #f7f8fc;
+  --white: #ffffff;
+  --amber: #d97706;
+  --amber-bg: #fffbeb;
+  --green: #059669;
+  --green-bg: #ecfdf5;
+  --purple: #7c3aed;
+  --purple-bg: #f5f3ff;
+  --nav-w: 240px;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: var(--nav-w);
+  flex-shrink: 0;
+  background: #1b2037;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding-bottom: 24px;
+}
+.sidebar-header {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 8px;
+}
+.sidebar-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 4px;
+}
+.sidebar-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+}
+.nav-chapter {
+  padding: 0 10px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: rgba(255,255,255,0.55);
+  font-size: 12.5px;
+  font-weight: 500;
+  transition: background 0.12s, color 0.12s;
+  user-select: none;
+}
+.nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); }
+.nav-item.active { background: rgba(61,87,255,0.25); color: #fff; }
+.nav-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.nav-item.active .nav-dot { background: #3D57FF; }
+.nav-item.done .nav-dot { background: #34d399; }
+.nav-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 10px 18px; }
+
+/* ── Main ── */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+.chapter {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 56px 48px 80px;
+  border-bottom: 1px solid var(--border);
+}
+.chapter:last-child { border-bottom: none; }
+
+/* ── Typography ── */
+.chapter-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 8px;
+}
+.chapter-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+.chapter-intro {
+  font-size: 15px;
+  color: var(--sub);
+  line-height: 1.65;
+  max-width: 640px;
+  margin-bottom: 40px;
+}
+h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 36px 0 10px;
+}
+h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 24px 0 8px;
+}
+p { color: var(--sub); line-height: 1.65; margin-bottom: 14px; }
+p:last-child { margin-bottom: 0; }
+strong { color: var(--text); font-weight: 600; }
+code {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  background: #f0f1f5;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--text);
+}
+
+/* ── Cards / callouts ── */
+.callout {
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout.info { background: var(--blue-light); border: 1px solid var(--blue-mid); }
+.callout.warning { background: var(--amber-bg); border: 1px solid #fde68a; }
+.callout.tip { background: var(--green-bg); border: 1px solid #6ee7b7; }
+.callout-icon { flex-shrink: 0; margin-top: 1px; }
+.callout-body { font-size: 13px; color: var(--text); line-height: 1.6; }
+.callout-body strong { color: var(--text); }
+
+/* ── Two-layer diagram ── */
+.layer-diagram {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 28px 0;
+}
+.layer-row {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+}
+.layer-label {
+  width: 120px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--sub);
+}
+.layer-card {
+  flex: 1;
+  border-radius: 10px;
+  padding: 16px 20px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+}
+.layer-card.brand { border-color: #a78bfa; background: #faf8ff; }
+.layer-card.content { border-color: var(--blue-mid); background: var(--blue-light); }
+.layer-card-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.layer-card-desc { font-size: 12.5px; color: var(--sub); line-height: 1.5; }
+.layer-card-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.layer-pill {
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(0,0,0,0.05);
+  color: var(--sub);
+}
+.layer-pill.brand { background: rgba(124,58,237,0.1); color: #7c3aed; }
+.layer-pill.content { background: rgba(61,87,255,0.1); color: var(--blue); }
+
+/* ── Profile grid ── */
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 24px 0;
+}
+.profile-card {
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  overflow: hidden;
+  background: var(--white);
+}
+.profile-card-header {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.9);
+}
+.profile-card-body { padding: 14px 16px; }
+.profile-card-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.profile-card-desc { font-size: 12px; color: var(--sub); line-height: 1.5; margin-bottom: 10px; }
+.profile-card-meta { font-size: 11px; color: #9aa5b4; }
+.profile-badge {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #dce6fd;
+  color: var(--blue);
+  margin-left: 6px;
+}
+
+/* ── State machine ── */
+.state-machine {
+  margin: 28px 0;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--white);
+}
+.sm-header {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sub);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.sm-body { display: flex; gap: 0; }
+.sm-state {
+  flex: 1;
+  padding: 20px;
+  border-right: 1px solid var(--border);
+}
+.sm-state:last-child { border-right: none; }
+.sm-state-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sub);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+.sm-state-value {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.sm-state-items { font-size: 12px; color: var(--sub); line-height: 1.9; }
+.sm-state-items li { list-style: none; padding-left: 0; }
+.sm-state-items li::before { content: '→ '; color: var(--blue); font-weight: 600; }
+.sm-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
+  font-size: 12px;
+  color: var(--sub);
+  gap: 6px;
+}
+.sm-trigger {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--sub);
+}
+
+/* ── Flow diagram ── */
+.flow {
+  margin: 28px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.flow-step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  position: relative;
+  padding-bottom: 24px;
+}
+.flow-step:last-child { padding-bottom: 0; }
+.flow-step-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 32px;
+}
+.flow-num {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.flow-line {
+  flex: 1;
+  width: 2px;
+  background: var(--border);
+  margin-top: 4px;
+}
+.flow-step:last-child .flow-line { display: none; }
+.flow-content { flex: 1; padding-top: 5px; padding-bottom: 8px; }
+.flow-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.flow-desc { font-size: 13px; color: var(--sub); line-height: 1.6; }
+.flow-code {
+  margin-top: 8px;
+  background: #1e2235;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  color: #c9d1e0;
+  overflow-x: auto;
+  line-height: 1.7;
+}
+.flow-code .kw { color: #7ec8e3; }
+.flow-code .str { color: #98d982; }
+.flow-code .cm { color: #697386; }
+.flow-code .fn { color: #f0c674; }
+
+/* ── Data model ── */
+.data-model {
+  background: #1e2235;
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin: 20px 0;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  color: #c9d1e0;
+  overflow-x: auto;
+}
+.dm-key { color: #7ec8e3; }
+.dm-type { color: #f0c674; }
+.dm-val { color: #98d982; }
+.dm-cm { color: #697386; }
+.dm-obj { color: #e5c07b; }
+
+/* ── Comparison table ── */
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 13px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.compare-table th {
+  background: var(--bg);
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--sub);
+  border-bottom: 1px solid var(--border);
+}
+.compare-table td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--sub);
+  vertical-align: top;
+  line-height: 1.5;
+}
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
+.compare-table tr:nth-child(even) td { background: var(--bg); }
+.check { color: #059669; font-size: 15px; }
+.cross { color: #dc2626; font-size: 15px; }
+
+/* ── Interactive demo ── */
+.demo-area {
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--white);
+  margin: 24px 0;
+}
+.demo-bar {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--sub);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.demo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); }
+.demo-body { padding: 24px; }
+
+/* Design bar mockup — mirrors the prototype's .ee-design-bar */
+.mock-design-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 0 20px;
+  height: 54px;
+  font-size: 13px;
+  overflow: hidden;
+}
+/* DECISION: Both pills use neutral gray (#f4f5f7). Matches the prototype's `.ee-design-profile-group` and the "Design bar pills are neutral gray" rule. Avoid blue — it implies selection state. */
+.mock-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f4f5f7;
+  border-radius: 8px;
+  padding: 6px 10px 6px 12px;
+  cursor: pointer;
+  transition: background 0.12s;
+  user-select: none;
+}
+.mock-pill:hover { background: #e3e8ee; }
+.mock-swatch {
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  background: #3d3d3d;
+  flex-shrink: 0;
+}
+.mock-profile-icon {
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  background: #e3e8ee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.mock-info { display: flex; flex-direction: column; }
+.mock-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #9aa5b4; line-height: 1.2; }
+.mock-name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.mock-chevron { color: #9aa5b4; flex-shrink: 0; }
+.mock-div { width: 1px; height: 30px; background: var(--border); margin: 0 20px; }
+.mock-spacer { flex: 1; }
+
+/* State toggle */
+.state-toggle {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0 20px;
+}
+.state-btn {
+  padding: 7px 16px;
+  border-radius: 7px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--sub);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.state-btn.active { border-color: var(--blue); background: var(--blue-light); color: var(--blue); }
+.state-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--sub);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 10px;
+}
+.state-desc {
+  font-size: 12.5px;
+  color: var(--sub);
+  line-height: 1.6;
+  padding: 12px 14px;
+  background: var(--bg);
+  border-radius: 8px;
+  margin-top: 14px;
+  border: 1px solid var(--border);
+}
+
+/* ── Glossary ── */
+.glossary-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.glossary-item:last-child { border-bottom: none; }
+.glossary-term {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+.glossary-def { font-size: 13px; color: var(--sub); line-height: 1.6; }
+
+/* ── Scroll spy ── */
+.chapter { scroll-margin-top: 0; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-label">AnyRoad · Internal</div>
+    <div class="sidebar-title">Branding<br>System Guide</div>
+  </div>
+  <div class="nav-chapter">
+    <div class="nav-item active" onclick="scrollTo('ch-overview')">
+      <div class="nav-dot"></div>System Overview
+    </div>
+    <div class="nav-item" onclick="scrollTo('ch-brand-kits')">
+      <div class="nav-dot"></div>Brand Kits
+    </div>
+    <div class="nav-item" onclick="scrollTo('ch-content-profiles')">
+      <div class="nav-dot"></div>Content Profiles
+    </div>
+    <div class="nav-item" onclick="scrollTo('ch-experience-editor')">
+      <div class="nav-dot"></div>Experience Editor
+    </div>
+    <div class="nav-item" onclick="scrollTo('ch-customization-flow')">
+      <div class="nav-dot"></div>Customization Flow
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-item" onclick="scrollTo('ch-dev-ref')">
+      <div class="nav-dot"></div>Developer Reference
+    </div>
+    <div class="nav-item" onclick="scrollTo('ch-decisions')">Design Decisions</div>
+    <div class="nav-item" onclick="scrollTo('ch-glossary')">
+      <div class="nav-dot"></div>Glossary
+    </div>
+  </div>
+</nav>
+
+<!-- Main content -->
+<main class="main" id="main">
+
+  <!-- ① Overview -->
+  <section class="chapter" id="ch-overview">
+    <div class="chapter-eyebrow">Chapter 1</div>
+    <div class="chapter-title">System Overview</div>
+    <div class="chapter-intro">
+      The Branding system gives operators control over how their booking pages look and behave. It separates visual identity from content structure, letting each layer be managed independently.
+    </div>
+
+    <h3>The Two-Layer Model</h3>
+    <p>Every booking page is shaped by two independent layers. They can be mixed and matched freely — switching one doesn't affect the other.</p>
+
+    <div class="layer-diagram">
+      <div class="layer-row">
+        <div class="layer-label">Layer 1</div>
+        <div class="layer-card brand">
+          <div class="layer-card-title">🎨 Brand Kit</div>
+          <div class="layer-card-desc">Controls the visual identity of the booking page. Defines how the page <em>looks</em>.</div>
+          <div class="layer-card-items">
+            <span class="layer-pill brand">Logo</span>
+            <span class="layer-pill brand">Brand name</span>
+            <span class="layer-pill brand">Header color</span>
+            <span class="layer-pill brand">Button color</span>
+            <span class="layer-pill brand">Link color</span>
+          </div>
+        </div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-label">Layer 2</div>
+        <div class="layer-card content">
+          <div class="layer-card-title">📄 Content Profile</div>
+          <div class="layer-card-desc">Controls the booking flow structure. Defines how the page <em>works</em>.</div>
+          <div class="layer-card-items">
+            <span class="layer-pill content">CTA label</span>
+            <span class="layer-pill content">Field visibility</span>
+            <span class="layer-pill content">Description length</span>
+            <span class="layer-pill content">Add-on display</span>
+            <span class="layer-pill content">Date selector style</span>
+            <span class="layer-pill content">Checkout layout</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-icon">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" stroke="#3D57FF" stroke-width="1.3"/><path d="M8 7v4M8 5v.5" stroke="#3D57FF" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </div>
+      <div class="callout-body">
+        <strong>Key principle:</strong> Brand Kits and Content Profiles are independent. An experience can use the "Acme Corp" brand kit with the "Premium" content profile, or the "Acme Corp" brand kit with a custom content profile — any combination works.
+      </div>
+    </div>
+
+    <h3>Scope: Account vs Experience</h3>
+    <p>Both layers can be configured at the account level or per-experience.</p>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Scope</th>
+          <th>Brand Kit</th>
+          <th>Content Profile</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Account-level</td>
+          <td>Named kits in Branding Settings. Can be assigned to multiple experiences. Edits affect all assigned experiences.</td>
+          <td>Named shared profiles created by the operator (e.g. "Classic," "Premium"). Edits affect all assigned experiences.</td>
+        </tr>
+        <tr>
+          <td>Experience-level</td>
+          <td>Each experience selects which brand kit to use.</td>
+          <td>Each experience can have its own private content profile. Edits affect only that experience.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ② Brand Kits -->
+  <section class="chapter" id="ch-brand-kits">
+    <div class="chapter-eyebrow">Chapter 2</div>
+    <div class="chapter-title">Brand Kits</div>
+    <div class="chapter-intro">
+      A Brand Kit is a named collection of visual settings that controls the look and feel of the booking page. An account can have multiple brand kits — useful for operators running multiple brands.
+    </div>
+
+    <h3>What Brand Kits Control</h3>
+    <table class="compare-table">
+      <thead>
+        <tr><th>Setting</th><th>What it affects</th><th>Example</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Logo</td><td>Center of the booking page header</td><td>Uploaded SVG or PNG</td></tr>
+        <tr><td>Brand name</td><td>Wordmark shown in the header when no logo is uploaded</td><td><code>Acme Corp</code></td></tr>
+        <tr><td>Header color</td><td>Background of the top navigation bar</td><td><code>#1A1A2E</code></td></tr>
+        <tr><td>Button color</td><td>Fill color for CTA buttons</td><td><code>#3D57FF</code></td></tr>
+        <tr><td>Link color</td><td>Inline text links</td><td><code>#3D57FF</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Brand Kit Cards</h3>
+    <p>Brand kits are listed in Branding Settings as cards. Each card shows the kit name, a preview of the header color swatch, and whether it's the account default. A three-dot menu on each card exposes <strong>Edit</strong> and <strong>Archive</strong> actions.</p>
+
+    <div class="callout warning">
+      <div class="callout-icon">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 2L14.9 14H1.1L8 2Z" stroke="#d97706" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6.5v3.5M8 11.5v.5" stroke="#d97706" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="callout-body">
+        <strong>Scope warning:</strong> Editing a shared brand kit affects every experience using that kit. The kit editor shows how many experiences will be affected before saving.
+      </div>
+    </div>
+
+    <h3>The Brand Kit Editor</h3>
+    <p>The brand kit editor uses a split-panel layout: a live canvas preview on the left (switchable between mobile and desktop viewports) and a settings panel on the right. The canvas is divided into three tabs: <strong>Details</strong>, <strong>Checkout</strong>, and <strong>Confirmation</strong> — mirroring the actual booking flow steps.</p>
+
+    <p>The settings panel is a single accordion of Brand Kit settings: kit name and brand name, header color and logo, button color, link color. There is no section-level navigation inside the brand kit editor — all controls live in the one panel.</p>
+  </section>
+
+  <!-- ③ Content Profiles -->
+  <section class="chapter" id="ch-content-profiles">
+    <div class="chapter-eyebrow">Chapter 3</div>
+    <div class="chapter-title">Content Profiles</div>
+    <div class="chapter-intro">
+      A Content Profile defines the structure and behavior of the booking flow. Unlike Brand Kits which are purely visual, Content Profiles determine what information is shown, how it's organized, and what actions are available to the guest.
+    </div>
+
+    <h3>Shared Profiles</h3>
+    <p>A new account starts with a single blank default profile. The operator names it and configures it, and every experience points to it until something else is created. From there, operators can create additional shared profiles in Branding Settings — useful when different experience tiers warrant distinct booking flows.</p>
+
+    <p>The illustrative examples below show what shared profiles an operator <em>might</em> create. They aren't shipped defaults — the names, copy, and styling are entirely up to the operator.</p>
+
+    <div class="profile-grid">
+      <div class="profile-card">
+        <div class="profile-card-header" style="background:#3d3d3d">
+          Classic <span style="font-size:10px;font-weight:400;opacity:0.6;margin-left:4px">· Default</span>
+        </div>
+        <div class="profile-card-body">
+          <div class="profile-card-name">Classic <span class="profile-badge">Default</span></div>
+          <div class="profile-card-desc">Standard booking flow. Full description, all fields visible, "Request Booking" CTA.</div>
+          <div class="profile-card-meta">4 experiences</div>
+        </div>
+      </div>
+      <div class="profile-card">
+        <div class="profile-card-header" style="background:#3D57FF">Premium</div>
+        <div class="profile-card-body">
+          <div class="profile-card-name">Premium</div>
+          <div class="profile-card-desc">High-touch feel, expanded CTA, pill-shaped buttons. "Reserve Your Spot."</div>
+          <div class="profile-card-meta">2 experiences</div>
+        </div>
+      </div>
+      <div class="profile-card">
+        <div class="profile-card-header" style="background:#1a1f36">Minimal</div>
+        <div class="profile-card-body">
+          <div class="profile-card-name">Minimal</div>
+          <div class="profile-card-desc">Simplified flow, fewer fields, sharp-cornered buttons. "Book Now."</div>
+          <div class="profile-card-meta">1 experience</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Custom (Experience-Scoped) Profiles</h3>
+    <p>An experience can opt out of a shared profile and get its own private content profile. This is called a <strong>custom profile</strong>. Custom profiles:</p>
+    <ul style="margin:10px 0 16px 18px;color:var(--sub);line-height:2">
+      <li>Are created from within the Experience Editor (not from Branding Settings)</li>
+      <li>Are private to that experience — not assignable to other experiences</li>
+      <li>Can be edited freely without any scope warning (no blast radius)</li>
+      <li>Do <em>not</em> appear in the account-level Content Profiles list</li>
+    </ul>
+
+    <div class="callout tip">
+      <div class="callout-icon">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" stroke="#059669" stroke-width="1.3"/><path d="M5 8l2 2 4-4" stroke="#059669" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="callout-body">
+        <strong>Design decision:</strong> Custom profiles are intentionally kept experience-scoped to make iteration frictionless. Since they only affect one experience, operators can experiment without worrying about unintended side effects.
+      </div>
+    </div>
+
+    <h3>Shared vs Custom Profiles</h3>
+    <table class="compare-table">
+      <thead>
+        <tr><th>Property</th><th>Shared Profile</th><th>Custom Profile</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Created in</td><td>Branding Settings</td><td>Experience Editor</td></tr>
+        <tr><td>Assignable to multiple experiences</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
+        <tr><td>Appears in account-level list</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
+        <tr><td>Edit shows scope warning</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
+        <tr><td>Canvas editable inline</td><td><span class="cross">✗</span> (read-only preview)</td><td><span class="check">✓</span> (always unlocked)</td></tr>
+        <tr><td>Can be renamed</td><td><span class="check">✓</span> (from profile editor)</td><td><span class="cross">✗</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ④ Experience Editor -->
+  <section class="chapter" id="ch-experience-editor">
+    <div class="chapter-eyebrow">Chapter 4</div>
+    <div class="chapter-title">The Experience Editor</div>
+    <div class="chapter-intro">
+      The Experience Editor is where operators configure individual experiences. The Design bar at the top is the primary control surface for Brand Kit and Content Profile settings.
+    </div>
+
+    <h3>The Design Bar</h3>
+    <p>A horizontal bar below the experience title that shows the currently active Brand Kit and Content Profile. It provides quick access to switch either without leaving the editor.</p>
+
+    <div class="demo-area">
+      <div class="demo-bar">
+        <div class="demo-dot"></div>
+        Design bar — shared profile state (interactive)
+      </div>
+      <div class="demo-body">
+        <div class="state-label">Current state</div>
+        <div class="state-toggle">
+          <button class="state-btn active" id="btn-shared" onclick="setDemoState('shared')">Shared profile</button>
+          <button class="state-btn" id="btn-custom" onclick="setDemoState('custom')">Custom profile</button>
+        </div>
+
+        <div class="mock-design-bar" id="mockDesignBar">
+          <!-- Brand Kit pill — whole pill is clickable -->
+          <div class="mock-pill">
+            <div class="mock-swatch"></div>
+            <div class="mock-info">
+              <div class="mock-label">Brand Kit</div>
+              <div class="mock-name">Acme Corp</div>
+            </div>
+            <svg class="mock-chevron" width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+
+          <div class="mock-div"></div>
+
+          <!-- Content Profile pill — whole pill is clickable -->
+          <div class="mock-pill" id="mockPill">
+            <div class="mock-profile-icon">
+              <svg width="12" height="12" fill="none" viewBox="0 0 14 14"><rect x="2" y="1" width="10" height="12" rx="1.5" stroke="#3D57FF" stroke-width="1.3"/><path d="M4.5 5h5M4.5 7.5h5M4.5 10h3" stroke="#3D57FF" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+            <div class="mock-info">
+              <div class="mock-label">Content Profile</div>
+              <div class="mock-name" id="mockProfileName">Classic</div>
+            </div>
+            <svg class="mock-chevron" width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+
+          <div class="mock-spacer"></div>
+        </div>
+
+        <div class="state-desc" id="stateDesc">
+          <strong>Shared profile active.</strong> The canvas is in read-only preview mode. The operator can see how the profile looks but can't edit content blocks directly. The "Customize for this experience" CTA is visible in the profile switcher.
+        </div>
+      </div>
+    </div>
+
+    <h3>Canvas Modes</h3>
+    <p>The experience canvas has two modes depending on whether a custom profile is active:</p>
+    <table class="compare-table">
+      <thead>
+        <tr><th>Mode</th><th>When active</th><th>Behavior</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Preview mode <code>.preview-mode</code></td>
+          <td>Shared profile assigned</td>
+          <td>Canvas sections are visible but not clickable/editable. Acts as a passive preview of the shared profile.</td>
+        </tr>
+        <tr>
+          <td>Edit mode</td>
+          <td>Custom profile assigned</td>
+          <td>Canvas sections are fully interactive. Clicking opens the right-hand settings panel for that section.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Panel System</h3>
+    <p>The right-hand panel in the experience editor shows different views depending on context. The key views are:</p>
+    <ul style="margin:10px 0 16px 18px;color:var(--sub);line-height:2">
+      <li><strong>custom</strong> — the default editor view with canvas sections</li>
+      <li><strong>branding</strong> — the brand kit switcher</li>
+      <li><strong>profile</strong> — the content profile switcher</li>
+    </ul>
+    <p>Navigation between views is handled by <code>eeSetView(name)</code>. When the canvas is in preview mode, clicking any section is blocked by a JS guard — <code>eeOpenPanel()</code> checks for the <code>.preview-mode</code> class before opening a panel.</p>
+  </section>
+
+  <!-- ⑤ Customization Flow -->
+  <section class="chapter" id="ch-customization-flow">
+    <div class="chapter-eyebrow">Chapter 5</div>
+    <div class="chapter-title">The Customization Flow</div>
+    <div class="chapter-intro">
+      When an experience operator wants to customize the content profile specifically for their experience, they go through a simple one-time flow. After that, they iterate directly on the canvas with no friction.
+    </div>
+
+    <h3>Step-by-Step</h3>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-step-left">
+          <div class="flow-num">1</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <div class="flow-title">Operator clicks "Customize for this experience"</div>
+          <div class="flow-desc">The design bar shows this CTA only when a shared profile is active. It's the entry point for per-experience customization.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-left">
+          <div class="flow-num">2</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <div class="flow-title">Confirmation modal appears</div>
+          <div class="flow-desc">A lightweight modal explains what's about to happen: "This creates a profile built just for this experience. Edits here won't affect any other experiences." No naming required — the profile is always named "Custom", regardless of which shared profile it was created from or which experience it belongs to. The operator can rename it later from inside the profile editor.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-left">
+          <div class="flow-num">3</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <div class="flow-title">Profile is created and applied</div>
+          <div class="flow-desc">A new experience-scoped profile is registered. The design bar updates to show the new profile name. The canvas exits preview mode and becomes fully editable.</div>
+          <div class="flow-code">
+<span class="cm">// createProfileConfirm() does four things:</span>
+<span class="kw">var</span> profileName = <span class="str">'Custom'</span>;  <span class="cm">// always "Custom", never derived from the experience name</span>
+<span class="kw">var</span> autoDesc = <span class="str">'Customized from '</span> + baseName + <span class="str">' for '</span> + expName + <span class="str">'.'</span>;
+profileConfigs[newProfileId] = { name: profileName, desc: autoDesc, <span class="cm">/* ...inherited settings */</span> };
+eeProfile.customized = <span class="kw">true</span>;
+eeProfile.customName = profileName;
+<span class="fn">eeUpdateProfileUI</span>();  <span class="cm">// updates design bar + canvas mode</span>
+          </div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-left">
+          <div class="flow-num">4</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <div class="flow-title">Operator edits directly on the canvas</div>
+          <div class="flow-desc">No separate profile editor journey needed. Clicking any section opens the settings panel for that section. Changes are experience-only — no scope warnings, no blast radius.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-left">
+          <div class="flow-num">5</div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <div class="flow-title">Operator can switch profiles at any time</div>
+          <div class="flow-desc">The "Switch" button in the design bar opens the profile switcher. The switcher lists shared profiles plus the custom one for this experience. Selecting a different profile replaces the current one (the custom profile remains in the switcher for re-selection).</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>State Machine</h3>
+    <p>The entire design bar + canvas behavior is driven by the <code>eeProfile</code> object. Two boolean states determine everything:</p>
+
+    <div class="state-machine">
+      <div class="sm-header">eeProfile state → UI behavior</div>
+      <div class="sm-body">
+        <div class="sm-state">
+          <div class="sm-state-name">State A</div>
+          <div class="sm-state-value">customized: false</div>
+          <ul class="sm-state-items">
+            <li>Canvas in preview mode (locked)</li>
+            <li>"Customize" CTA visible</li>
+            <li>Profile pill has background</li>
+            <li>Design bar name = shared profile name</li>
+          </ul>
+        </div>
+        <div class="sm-state">
+          <div class="sm-state-name">State B</div>
+          <div class="sm-state-value">customized: true</div>
+          <ul class="sm-state-items">
+            <li>Canvas editable (preview mode off)</li>
+            <li>"Customize" CTA hidden</li>
+            <li>Profile pill background removed</li>
+            <li>Design bar name = customName</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-icon">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" stroke="#3D57FF" stroke-width="1.3"/><path d="M8 7v4M8 5v.5" stroke="#3D57FF" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </div>
+      <div class="callout-body">
+        <strong>No copy proliferation:</strong> The first time an operator customizes, a profile is created. Every subsequent edit goes directly to the canvas — no new profile is ever created. This was a deliberate design choice to prevent endless copies accumulating.
+      </div>
+    </div>
+
+    <h3>Profile Switcher</h3>
+    <p>Accessible via the "Switch" button in the design bar. Lists all available profiles for the experience:</p>
+    <ul style="margin:10px 0 16px 18px;color:var(--sub);line-height:2">
+      <li>The "Use default" option (follows account default automatically)</li>
+      <li>Any shared profiles in the account (e.g. "Classic," "Premium," "Minimal" if the operator has created profiles by those names)</li>
+      <li>The experience's custom profile (if one exists) — always named "Custom", shown with "Custom for this experience" sub-label</li>
+    </ul>
+    <p>Shared profiles in the switcher have a hover-revealed pencil icon that navigates to the profile editor for that profile, with a scope warning noting how many experiences will be affected.</p>
+  </section>
+
+  <!-- ⑥ Developer Reference -->
+  <section class="chapter" id="ch-dev-ref">
+    <div class="chapter-eyebrow">Chapter 6</div>
+    <div class="chapter-title">Developer Reference</div>
+    <div class="chapter-intro">
+      Key data structures, functions, and CSS conventions used in the prototype. This section is intended for engineers implementing or extending the system.
+    </div>
+
+    <h3>Core State Object</h3>
+    <p>The <code>eeProfile</code> object tracks the current experience's brand kit and content profile state. It's the single source of truth for the design bar and canvas mode.</p>
+    <div class="data-model">
+<span class="dm-obj">var</span> <span class="dm-key">eeProfile</span> = {
+  <span class="dm-key">id</span>:          <span class="dm-val">'classic'</span>,   <span class="dm-cm">// current profile id: 'classic' | 'premium' | 'minimal' | 'default'</span>
+  <span class="dm-key">name</span>:        <span class="dm-val">'Classic'</span>,   <span class="dm-cm">// display name of active shared profile</span>
+  <span class="dm-key">shared</span>:      <span class="dm-type">true</span>,        <span class="dm-cm">// whether a shared (account-level) profile is active</span>
+  <span class="dm-key">count</span>:       <span class="dm-type">4</span>,           <span class="dm-cm">// number of experiences using this shared profile</span>
+  <span class="dm-key">customized</span>:  <span class="dm-type">false</span>,       <span class="dm-cm">// true = experience has its own custom profile</span>
+  <span class="dm-key">customName</span>:  <span class="dm-type">null</span>         <span class="dm-cm">// display name of the custom profile — always 'Custom' when set</span>
+};
+    </div>
+
+    <h3>Content Profile Config Store</h3>
+    <p>All content profile settings are stored in <code>profileConfigs</code>, keyed by a string that matches the navigate route. (Variable and route names use the <code>kit</code> prefix for historical reasons — they refer to content profiles, not Brand Kits. Renaming these is a candidate follow-up.)</p>
+    <div class="data-model">
+<span class="dm-obj">var</span> <span class="dm-key">profileConfigs</span> = {
+  <span class="dm-val">'profile-editor-classic'</span>: {
+    <span class="dm-key">name</span>:         <span class="dm-val">'Classic'</span>,
+    <span class="dm-key">desc</span>:         <span class="dm-val">'Standard booking flow for most experiences'</span>,
+    <span class="dm-key">btnLabel</span>:    <span class="dm-val">'Request Booking'</span>,
+    <span class="dm-key">headerColor</span>: <span class="dm-val">'#3d3d3d'</span>,
+    <span class="dm-key">btnColor</span>:    <span class="dm-val">'#3D57FF'</span>,
+    <span class="dm-key">btnRadius</span>:   <span class="dm-type">8</span>,
+    <span class="dm-key">experiences</span>: [<span class="dm-val">'Painted Ladies Tour'</span>, <span class="dm-val">'Culinary Adventures'</span>, ...]
+  },
+  <span class="dm-cm">// 'profile-editor-premium', 'profile-editor-minimal', 'profile-editor-new'</span>
+  <span class="dm-cm">// Custom profiles are registered here dynamically on creation:</span>
+  <span class="dm-val">'profile-editor-custom-painted-ladies'</span>: { <span class="dm-cm">/* ...inherited from classic */</span> }
+};
+    </div>
+
+    <h3>Key Functions</h3>
+
+    <div class="glossary-item">
+      <div class="glossary-term">navigate(page)</div>
+      <div class="glossary-def">Central router. Hides all pages, shows the target page, sets active nav state. Handles all page keys including <code>profile-editor-*</code>, <code>brand-editor-*</code>, <code>experience-edit</code>, <code>branding</code>, <code>kits</code>, etc.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">eeUpdateProfileUI()</div>
+      <div class="glossary-def">Reads <code>eeProfile</code> and syncs every UI element — design bar name, CTA visibility, pill background, canvas class. Called after any state change to <code>eeProfile</code>. This is the single re-render function for the design bar.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">eeSetView(name)</div>
+      <div class="glossary-def">Switches panels inside the experience editor: <code>'custom'</code> (editor), <code>'branding'</code> (brand kit switcher), <code>'profile'</code> (content profile switcher). Does not navigate away from the experience editor page.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">createProfileConfirm()</div>
+      <div class="glossary-def">Handles the modal confirm action. Auto-generates a profile name and description, registers the new profile in <code>profileConfigs</code>, inserts a card into the profile switcher, sets <code>eeProfile.customized = true</code>, calls <code>eeUpdateProfileUI()</code>.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">kitReturnToGlobal()</div>
+      <div class="glossary-def">Renders the "Profile Settings" panel in the profile editor — name field, description textarea. Reads from <code>profileCurrentCfg</code>. Called on profile editor load and when navigating back from a section panel.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">eeSelectProfile(el, id)</div>
+      <div class="glossary-def">Called when a profile card is selected in the switcher. Updates visual selection, syncs <code>eeProfile</code> fields, calls <code>eeUpdateProfileUI()</code> and <code>eeApplyContentProfile()</code>.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">eeOpenPanel(key)</div>
+      <div class="glossary-def">Opens a settings section panel in the experience editor. Guards against preview mode — if the canvas has the <code>.preview-mode</code> class (the CSS implementation of preview mode), the call is a no-op (shared profile is active, canvas is locked).</div>
+    </div>
+
+    <h3>Important CSS Classes</h3>
+    <table class="compare-table">
+      <thead>
+        <tr><th>Class</th><th>Element</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>.preview-mode</code></td><td><code>#eeCanvas</code></td><td>Canvas is in passive preview mode. Section clicks are blocked.</td></tr>
+        <tr><td><code>.ee-profile-setting-card.custom</code></td><td>Design bar content profile card</td><td>Experience has a custom profile; card gets indigo border + background.</td></tr>
+        <tr><td><code>.ee-brand-card.sel</code></td><td>Profile switcher cards</td><td>Currently selected profile card. Shows checkmark in radio slot.</td></tr>
+        <tr><td><code>.cs-active</code></td><td>Canvas section</td><td>Section is currently selected/expanded in the editor.</td></tr>
+        <tr><td><code>.profile-scope-note</code></td><td>Profile editor header</td><td>Amber warning banner showing how many experiences a profile edit affects.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Page / Route Keys</h3>
+    <div class="data-model">
+<span class="dm-cm">// navigate() accepts these keys:</span>
+<span class="dm-val">'experience-edit'</span>        <span class="dm-cm">// main experience editor</span>
+<span class="dm-val">'branding'</span>               <span class="dm-cm">// branding settings (brand kits tab)</span>
+<span class="dm-val">'kits'</span>                   <span class="dm-cm">// branding settings (content profiles tab)</span>
+<span class="dm-val">'profile-editor-classic'</span>      <span class="dm-cm">// content profile editor — Classic</span>
+<span class="dm-val">'profile-editor-premium'</span>      <span class="dm-cm">// content profile editor — Premium</span>
+<span class="dm-val">'profile-editor-minimal'</span>      <span class="dm-cm">// content profile editor — Minimal</span>
+<span class="dm-val">'profile-editor-new'</span>          <span class="dm-cm">// blank new profile</span>
+<span class="dm-val">'profile-editor-custom-*'</span>     <span class="dm-cm">// dynamically created experience-scoped profiles</span>
+<span class="dm-val">'brand-editor-acme'</span>       <span class="dm-cm">// brand kit editor — Acme Corp</span>
+<span class="dm-val">'brand-editor-something'</span>  <span class="dm-cm">// brand kit editor — Something Hideous</span>
+    </div>
+  </section>
+
+  <!-- ⑧ Design Decisions -->
+  <section class="chapter" id="ch-decisions">
+  <h2>Design Decisions</h2>
+  <p>This section records the reasoning behind key UI and design decisions in the Branding prototype. The goal is to give future contributors — human or AI — enough context to maintain consistency without relitigating resolved questions.</p>
+
+  <h3>One Panel, Two States</h3>
+  <p><strong>Decision:</strong> The experience editor uses a single panel element (<code>#eeCustomizePanel</code>) that serves two purposes: the "Profile Settings" home state when a custom profile is active, and the section editor state when a canvas section is clicked.</p>
+  <p><strong>Why:</strong> An earlier implementation added a separate <code>&lt;aside&gt;</code> panel alongside the canvas. This broke the layout (the panel started above the topbar) and created inconsistency with the account-level profile editor, which uses one persistent panel throughout. The unified approach was adopted to match that pattern exactly.</p>
+  <p><strong>Rule:</strong> Never add a second panel element. Sections navigate "into" the single panel; the back button returns to Profile Settings.</p>
+
+  <h3>Neutral Gray Pills in the Design Bar</h3>
+  <p><strong>Decision:</strong> Design bar pills use neutral gray (<code>#f4f5f7</code>) backgrounds, not blue or indigo.</p>
+  <p><strong>Why:</strong> Blue pills implied an "active selection" state that confused users — it read as "this item is selected/active" rather than "this is the current value." Gray reads as an informational chip. Hover states use a slightly darker gray to signal interactivity.</p>
+
+  <h3>Whole Pill Is Clickable (Not a Button Inside)</h3>
+  <p><strong>Decision:</strong> The entire design bar pill is the click target, not a small "Switch" button embedded inside it.</p>
+  <p><strong>Why:</strong> An earlier version had a separate "Switch" button inside each pill, which reduced the click target and added visual noise. Making the whole pill clickable is cleaner and more consistent with how chips work in the rest of the app. A chevron icon signals interactivity.</p>
+
+  <h3>"Customize for this Experience" Lives in the Switcher</h3>
+  <p><strong>Decision:</strong> The "Customize for this experience" CTA is inside the profile switcher panel, not in the design bar itself.</p>
+  <p><strong>Why:</strong> Putting it in the design bar cluttered the bar and exposed the action too prominently. The switcher is the right context — the user is already browsing profiles when they decide to customize. It also disappears naturally once a custom profile exists, without needing to manage a separate visible/hidden state in the bar.</p>
+
+  <h3>Content Profile Cards Are Not Clickable</h3>
+  <p><strong>Decision:</strong> Content profile cards in Branding Settings are static — clicking the card does nothing. Actions (Edit, Set as Default, Delete) are exposed via a ··· menu.</p>
+  <p><strong>Why:</strong> An earlier version made the entire card a clickable link to the kit editor. This caused accidental navigation and was inconsistent with brand kit cards, which use the same ··· pattern. Standardizing on the menu pattern makes both sections feel like one coherent system.</p>
+
+  <h3>Custom Profile Naming: Always "Custom"</h3>
+  <p><strong>Decision:</strong> Experience-scoped custom profiles are always named "Custom", not derived from the experience name.</p>
+  <p><strong>Why:</strong> Experience names change over time. A name like "Custom (Painted Ladies Picnic &amp; Architecture Tour)" would become stale immediately if the operator renames the experience. "Custom" is always accurate regardless of what the experience is called. The backend can use stable key identifiers for association; the display name stays simple.</p>
+
+  <h3>Canvas Locking in Preview Mode</h3>
+  <p><strong>Decision:</strong> When a shared profile is active, the canvas enters preview mode — implemented by adding the CSS class <code>.preview-mode</code> to <code>#eeCanvas</code>. This hides edit affordances and makes <code>eeOpenPanel()</code> a no-op.</p>
+  <p><strong>Why:</strong> Shared profiles are used by multiple experiences. Allowing direct canvas edits would give no indication of scope — the user could unknowingly change a profile affecting dozens of experiences. The locked canvas forces the operator through the profile editor, where the scope warning (amber banner) is always visible.</p>
+
+  <h3>State Restoration Uses profileConfigs, Not eeProfile</h3>
+  <p><strong>Decision:</strong> On re-entry to the experience editor, <code>eeInit()</code> checks <code>profileConfigs</code> to determine whether a custom profile exists — not the <code>eeProfile</code> state object.</p>
+  <p><strong>Why:</strong> <code>eeProfile</code> is session state that was being reset to defaults on every navigation. This caused the "Customize" button to reappear after the user created a custom profile, navigated away, and came back. <code>profileConfigs</code> persists within the JS session and is the authoritative record of what profiles exist.</p>
+
+  <h3>Topbar Layout Matches Account Level</h3>
+  <p><strong>Decision:</strong> The experience editor topbar has the viewport toggle on the left, hint text on the right, and no "Open full preview" link.</p>
+  <p><strong>Why:</strong> An earlier version had the viewport toggle on the right with a preview link, and a pill badge for profile context. The account-level profile editor has a cleaner layout with the toggle on the left. Matching it exactly creates a consistent experience across both editors and removes UI elements that users found confusing or unnecessary.</p>
+
+  <h3>Brand Kit Wordmark Styling</h3>
+  <p><strong>Decision:</strong> Brand kit cards that have no logo uploaded display the kit name as plain text — <code>font-weight: 600</code> only. No uppercase, no letter-spacing, no italic, no decorative font.</p>
+  <p><strong>Why:</strong> Heavy styling (italic Georgia, uppercase with letter-spacing) implied the text itself was a designed logotype. It is not — it is a placeholder shown when no logo exists. Plain text makes the absence of a logo obvious and avoids creating a false impression that the styling is intentional brand design.</p>
+</section>
+
+  <!-- ⑦ Glossary -->
+  <section class="chapter" id="ch-glossary">
+    <div class="chapter-eyebrow">Chapter 7</div>
+    <div class="chapter-title">Glossary</div>
+    <div class="chapter-intro">
+      Quick reference for terminology used across this system.
+    </div>
+
+    <div class="glossary-item">
+      <div class="glossary-term">Brand Kit</div>
+      <div class="glossary-def">A named set of visual settings (logo, brand name, header color, button color, link color) that controls the appearance of the booking page. Account-level, shareable across experiences.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Content Profile</div>
+      <div class="glossary-def">A named configuration that controls the structure and behavior of the booking flow (CTA label, field visibility, layout). Can be shared or experience-scoped.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Shared profile</div>
+      <div class="glossary-def">A content profile managed in Branding Settings, assignable to multiple experiences. Editing affects all assigned experiences.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Custom profile</div>
+      <div class="glossary-def">An experience-scoped content profile created from the Experience Editor. Only affects the experience it belongs to. Does not appear in the account-level list.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Preview mode</div>
+      <div class="glossary-def">The state of the experience editor canvas when a shared profile is active. Canvas sections are visible but not editable. Implemented via the <code>.preview-mode</code> CSS class on <code>#eeCanvas</code>.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Design bar</div>
+      <div class="glossary-def">The horizontal control bar in the Experience Editor showing the active Brand Kit and Content Profile, with quick actions to switch either.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Profile switcher</div>
+      <div class="glossary-def">The panel opened by clicking "Switch" in the design bar's Content Profile section. Lists all available profiles for the experience.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Scope warning</div>
+      <div class="glossary-def">The amber banner shown in the profile editor indicating how many experiences will be affected by a save action.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">eeProfile</div>
+      <div class="glossary-def">The JS state object tracking the current experience's active profile state. The single source of truth for the design bar and canvas mode.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">profileConfigs</div>
+      <div class="glossary-def">The JS data store containing all content profile configurations, keyed by route string (e.g., <code>'profile-editor-classic'</code>).</div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// Scroll spy
+var chapters = ['ch-overview','ch-brand-kits','ch-content-profiles','ch-experience-editor','ch-customization-flow','ch-dev-ref','ch-decisions','ch-glossary'];
+var navItems = document.querySelectorAll('.nav-item');
+
+function scrollTo(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+}
+
+document.getElementById('main').addEventListener('scroll', function() {
+  var scrollTop = this.scrollTop;
+  var active = 0;
+  chapters.forEach(function(id, i) {
+    var el = document.getElementById(id);
+    if (el && el.offsetTop - 80 <= scrollTop) active = i;
+  });
+  navItems.forEach(function(item, i) {
+    item.classList.toggle('active', i === active);
+    item.classList.toggle('done', i < active);
+  });
+});
+
+// Interactive demo — toggling shared/custom only changes the profile name text and the state description.
+// The design bar itself looks identical in both modes (per the current prototype): both pills stay neutral gray,
+// the whole pill is the click target, and there is no Customize CTA in the bar (it lives in the profile switcher).
+function setDemoState(state) {
+  var btnShared = document.getElementById('btn-shared');
+  var btnCustom = document.getElementById('btn-custom');
+  var nameEl = document.getElementById('mockProfileName');
+  var desc = document.getElementById('stateDesc');
+
+  btnShared.classList.toggle('active', state === 'shared');
+  btnCustom.classList.toggle('active', state === 'custom');
+
+  if (state === 'shared') {
+    nameEl.textContent = 'Classic';
+    desc.innerHTML = '<strong>Shared profile active.</strong> The canvas is in read-only preview mode. The operator can see how the profile looks but can\'t edit content blocks directly. The "Customize for this experience" row is visible in the profile switcher (open via the chevron on the Content Profile pill).';
+  } else {
+    nameEl.textContent = 'Custom';
+    desc.innerHTML = '<strong>Custom profile active.</strong> The canvas is fully editable — clicking any section opens its settings panel. The Content Profile pill still looks the same; only the name changes to "Custom." The "Customize for this experience" row in the profile switcher is hidden.';
+  }
+}
+</script>
+</body>
+</html>
