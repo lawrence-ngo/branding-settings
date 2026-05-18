@@ -5516,19 +5516,28 @@ function tutPositionCard(el, position) {
 }
 
 function tutUpdateProgress() {
-  var total = TUT_STEPS.length;
-  var pct = ((TUT.step + 1) / total) * 100;
+  // DECISION: Progress percentage uses the same filtered count as the step badge —
+  // exclude modal (welcome/done) and interstitial (autoPlay) steps so the bar advances
+  // in sync with the visible step number rather than the raw array index.
+  var contentTotal = TUT_STEPS.filter(function(x) { return x.type !== 'modal' && !x.isInterstitial; }).length;
+  var contentIdx = 0;
+  for (var i = 0; i <= TUT.step; i++) {
+    if (TUT_STEPS[i] && TUT_STEPS[i].type !== 'modal' && !TUT_STEPS[i].isInterstitial) contentIdx++;
+  }
+  var pct = (contentIdx / contentTotal) * 100;
   document.getElementById('tutProgress').style.width = pct + '%';
 }
 
 function tutUpdateDots() {
   var dotsEl = document.getElementById('tutDots');
-  var contentSteps = TUT_STEPS.filter(function(s) { return s.type !== 'modal'; });
+  // DECISION: Exclude both modal and interstitial steps from the count so the displayed
+  // position matches the badge in tutShowStep and never jumps when an interstitial plays.
+  var contentSteps = TUT_STEPS.filter(function(s) { return s.type !== 'modal' && !s.isInterstitial; });
   var contentTotal = contentSteps.length;
   var currentContentIdx = 0;
   var ci = 0;
   for (var i = 0; i < TUT_STEPS.length; i++) {
-    if (TUT_STEPS[i].type !== 'modal') {
+    if (TUT_STEPS[i].type !== 'modal' && !TUT_STEPS[i].isInterstitial) {
       if (i === TUT.step) currentContentIdx = ci;
       ci++;
     }
@@ -5627,10 +5636,13 @@ function tutShowStep(step) {
     return;
   }
 
-  // Count non-modal steps
-  var contentTotal = TUT_STEPS.filter(function(x) { return x.type !== 'modal'; }).length;
+  // Count only steps the user actually sees as cards — exclude modal (welcome/done)
+  // AND interstitial (autoPlay) steps so the displayed numbering is sequential.
+  var contentTotal = TUT_STEPS.filter(function(x) { return x.type !== 'modal' && !x.isInterstitial; }).length;
   var contentIdx = 0;
-  for (var i = 0; i < step; i++) { if (TUT_STEPS[i].type !== 'modal') contentIdx++; }
+  for (var i = 0; i < step; i++) {
+    if (TUT_STEPS[i].type !== 'modal' && !TUT_STEPS[i].isInterstitial) contentIdx++;
+  }
 
   document.getElementById('tutStepBadge').textContent = 'Step ' + (contentIdx + 1) + ' of ' + contentTotal;
   document.getElementById('tutCardTitle').textContent = s.title;
