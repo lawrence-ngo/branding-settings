@@ -899,8 +899,8 @@ code {
           <div class="flow-line"></div>
         </div>
         <div class="flow-content">
-          <div class="flow-title">Operator clicks "Customize for this experience"</div>
-          <div class="flow-desc">The design bar shows this CTA only when a shared profile is active. It's the entry point for per-experience customization.</div>
+          <div class="flow-title">Operator opens the profile switcher and clicks "Customize for this experience"</div>
+          <div class="flow-desc">Clicking the Content Profile pill in the design bar opens the profile switcher. At the bottom of the switcher (only shown when no custom profile exists yet) is a dashed-outline "Customize for this experience" row — this is the entry point for per-experience customization.</div>
         </div>
       </div>
       <div class="flow-step">
@@ -949,7 +949,7 @@ eeProfile.customName = profileName;
         </div>
         <div class="flow-content">
           <div class="flow-title">Operator can switch profiles at any time</div>
-          <div class="flow-desc">The "Switch" button in the design bar opens the profile switcher. The switcher lists shared profiles plus the custom one for this experience. Selecting a different profile replaces the current one (the custom profile remains in the switcher for re-selection).</div>
+          <div class="flow-desc">Clicking the Content Profile pill in the design bar reopens the profile switcher. The switcher lists the "Use default" option, any shared profiles in the account, and the experience's custom profile (if one exists). Selecting a different profile replaces the current one — the custom profile remains in the switcher for re-selection.</div>
         </div>
       </div>
     </div>
@@ -965,8 +965,7 @@ eeProfile.customName = profileName;
           <div class="sm-state-value">customized: false</div>
           <ul class="sm-state-items">
             <li>Canvas in preview mode (locked)</li>
-            <li>"Customize" CTA visible</li>
-            <li>Profile pill has background</li>
+            <li>"Customize" row visible in the profile switcher</li>
             <li>Design bar name = shared profile name</li>
           </ul>
         </div>
@@ -975,9 +974,8 @@ eeProfile.customName = profileName;
           <div class="sm-state-value">customized: true</div>
           <ul class="sm-state-items">
             <li>Canvas editable (preview mode off)</li>
-            <li>"Customize" CTA hidden</li>
-            <li>Profile pill background removed</li>
-            <li>Design bar name = customName</li>
+            <li>"Customize" row hidden in the profile switcher</li>
+            <li>Design bar name = "Custom"</li>
           </ul>
         </div>
       </div>
@@ -993,13 +991,14 @@ eeProfile.customName = profileName;
     </div>
 
     <h3>Profile Switcher</h3>
-    <p>Accessible via the "Switch" button in the design bar. Lists all available profiles for the experience:</p>
+    <p>Opened by clicking the Content Profile pill in the design bar (the whole pill is the click target, signaled by the chevron at the end). Lists all available profiles for the experience:</p>
     <ul style="margin:10px 0 16px 18px;color:var(--sub);line-height:2">
       <li>The "Use default" option (follows account default automatically)</li>
       <li>Any shared profiles in the account (e.g. "Classic," "Premium," "Minimal" if the operator has created profiles by those names)</li>
       <li>The experience's custom profile (if one exists) — always named "Custom", shown with "Custom for this experience" sub-label</li>
     </ul>
-    <p>Shared profiles in the switcher have a hover-revealed pencil icon that navigates to the profile editor for that profile, with a scope warning noting how many experiences will be affected.</p>
+    <p>Below the profile list, a dashed-outline "Customize for this experience" row appears as long as no custom profile exists for this experience. Clicking it opens the confirmation modal that creates a custom profile (see Step 1 of the flow above). Once a custom profile exists, this row hides automatically.</p>
+    <p>To edit a shared profile, the operator navigates to it from Branding Settings → Content Profiles. Edits made there show a scope warning noting how many experiences will be affected.</p>
   </section>
 
   <!-- ⑥ Developer Reference -->
