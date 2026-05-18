@@ -719,6 +719,39 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 .preview-canvas.mobile-mode .bk-hero { height: 200px; }
 .preview-canvas.mobile-mode .bk-widget { position: static; margin-top: 20px; }
 
+/* ─── Mobile-mode adjustments for the checkout page ─── */
+/* DECISION: .checkout-page gets the same phone-frame treatment as .booking-page (390px,
+   rounded corners, dropshadow, black border) so toggling to Checkout in mobile preview
+   stays inside the iPhone frame instead of bleeding to the canvas edges. */
+.preview-canvas.mobile-mode .checkout-page {
+  width: 390px; flex-shrink: 0; flex: 0 0 auto;
+  border-radius: 44px; overflow: hidden;
+  box-shadow: 0 28px 72px rgba(0,0,0,0.38), 0 0 0 1px rgba(0,0,0,0.18);
+  border: 10px solid #1c2030;
+  padding: 24px 18px 32px;
+  min-height: 0;
+}
+.preview-canvas.mobile-mode .checkout-layout {
+  display: flex; flex-direction: column-reverse;
+  grid-template-columns: 1fr; gap: 20px; max-width: 100%;
+}
+/* Summary above form (visually) — column-reverse flips source order so the summary
+   card (which is second in source) appears at the top in mobile, matching AnyRoad's
+   live checkout where the booking details show first on a phone. */
+.preview-canvas.mobile-mode .co-summary-card { position: static; padding: 14px 14px 16px; }
+.preview-canvas.mobile-mode .co-sum-cover {
+  width: calc(100% + 28px); margin: -14px -14px 0; height: 160px;
+}
+.preview-canvas.mobile-mode .co-review-title { font-size: 20px; }
+.preview-canvas.mobile-mode .co-hold-banner { margin-bottom: 22px; }
+.preview-canvas.mobile-mode .co-step { margin-bottom: 26px; }
+.preview-canvas.mobile-mode .co-nps-grid,
+.preview-canvas.mobile-mode .co-nps-meta { max-width: 100%; }
+.preview-canvas.mobile-mode .co-nps-btn { font-size: 12px; height: 28px; }
+.preview-canvas.mobile-mode .co-message-area { max-width: 100%; min-height: 80px; }
+.preview-canvas.mobile-mode .co-submit-btn { min-width: 0; width: 100%; padding: 14px; }
+.preview-canvas.mobile-mode .co-message { margin: 24px 0 20px; }
+
 /* ── Hero ────────────────────────────────────────── */
 .bk-hero {
   height: 300px;
@@ -913,7 +946,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 .ptoggle input:checked + .ptoggle-track::before { transform: translateX(16px); }
 
 /* ── Checkout page ───────────────────────────────── */
-.checkout-page { background: #fff; min-height: 100%; padding: 32px 40px 56px; }
+/* DECISION: flex: 0 0 auto matches .booking-page so the white background fills the full
+   canvas height even when the checkout page is rendered as a direct sibling of .booking-page
+   inside #eeCanvas (rather than nested inside it, as in the account-level preview canvases). */
+.checkout-page { background: #fff; flex: 0 0 auto; min-height: 100%; padding: 32px 40px 56px; }
 .checkout-layout { display: grid; grid-template-columns: 1fr 288px; gap: 48px; max-width: 940px; margin: 0 auto; align-items: start; }
 .co-section { margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid #e3e8ee; }
 .co-section-title { font-size: 15px; font-weight: 700; color: #1a1f36; margin-bottom: 16px; }
@@ -951,6 +987,65 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 .qty-btn { width: 26px; height: 26px; border: 1px solid #d1d5db; border-radius: 50%; background: #fff; cursor: pointer; font-size: 17px; display: flex; align-items: center; justify-content: center; color: #4a5568; line-height: 1; transition: background 0.1s, border-color 0.1s; }
 .qty-btn:hover { background: #eef0fd; border-color: #3D57FF; color: #3D57FF; }
 .qty-num { font-size: 14px; font-weight: 600; min-width: 16px; text-align: center; }
+
+/* ─── Checkout "Review and Book" layout (new design — currently used by eeCheckoutPage only) ─── */
+.co-review-title { font-size: 24px; font-weight: 600; color: #1a1f36; margin: 0 0 10px; line-height: 1.2; }
+.co-hold-banner { background: #e3e8ee; padding: 6px 14px; border-radius: 3px; font-size: 13px; color: #4a5568; margin-bottom: 30px; }
+.co-hold-banner strong { color: #1a1f36; font-weight: 700; }
+
+.co-step { margin-bottom: 32px; }
+.co-step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.co-step-num { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid #1a1f36; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #1a1f36; flex-shrink: 0; }
+.co-step-name { font-size: 13px; font-weight: 700; color: #1a1f36; text-transform: uppercase; letter-spacing: 0.08em; }
+.co-step-lock { color: #3D57FF; flex-shrink: 0; }
+
+.co-sublabel { font-size: 12.5px; color: #9aa5b4; margin-top: -2px; margin-bottom: 8px; line-height: 1.45; }
+.co-payment-note { font-size: 12.5px; color: #697386; line-height: 1.55; margin-bottom: 22px; }
+
+.co-phone-wrap { display: flex; gap: 0; align-items: stretch; }
+.co-phone-pre { display: flex; align-items: center; gap: 4px; padding: 0 10px 0 12px; border: 1px solid #d1d5db; border-right: none; border-radius: 3px 0 0 3px; font-size: 13.5px; color: #1a1f36; background: #fff; flex-shrink: 0; }
+.co-phone-wrap .co-input { border-radius: 0 3px 3px 0; flex: 1; }
+
+.co-nps-meta { display: flex; justify-content: space-between; font-size: 12px; color: #9aa5b4; margin-top: 12px; margin-bottom: 6px; max-width: 380px; }
+.co-nps-grid { display: flex; gap: 4px; max-width: 380px; }
+.co-nps-btn { flex: 1; height: 32px; border: 1px solid #d1d5db; border-radius: 3px; background: #fff; font-size: 13px; color: #1a1f36; cursor: pointer; font-family: inherit; }
+.co-nps-btn:hover { background: #f4f5f7; }
+.co-nps-btn.on { background: #3D57FF; color: #fff; border-color: #3D57FF; }
+
+.co-promo { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; color: #1a1f36; cursor: pointer; margin-top: 8px; text-decoration: none; user-select: none; }
+.co-promo-plus { width: 22px; height: 22px; border-radius: 3px; background: #e3e8ee; display: flex; align-items: center; justify-content: center; color: #697386; font-size: 16px; line-height: 1; }
+
+.co-message { text-align: center; margin: 32px 0 28px; padding-top: 20px; border-top: 1px solid #e3e8ee; }
+.co-message-head { font-size: 12.5px; font-weight: 700; color: #1a1f36; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 16px; }
+.co-message-area { width: 100%; max-width: 480px; min-height: 100px; border: 1px solid #d1d5db; border-radius: 4px; padding: 12px; font-size: 13.5px; font-family: inherit; color: #1a1f36; resize: vertical; box-sizing: border-box; outline: none; }
+.co-message-area:focus { border-color: #3D57FF; }
+
+.co-submit-row { text-align: center; padding-top: 18px; border-top: 1px solid #e3e8ee; }
+.co-submit-btn { background: #3D57FF; color: #fff; border: none; border-radius: 3px; padding: 12px 36px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; min-width: 200px; }
+.co-submit-btn:hover { background: #2d46e0; }
+.co-foot-note { text-align: center; font-size: 12px; color: #9aa5b4; margin-top: 12px; line-height: 1.5; }
+
+.co-ar-foot { text-align: center; margin-top: 32px; }
+.co-ar-mark { display: inline-block; font-size: 14px; font-weight: 600; color: #4a5568; margin-bottom: 8px; }
+.co-ar-link-row { font-size: 12px; color: #9aa5b4; }
+.co-ar-link-row a { color: #9aa5b4; text-decoration: underline; cursor: pointer; }
+.co-ar-link-row a:hover { color: #4a5568; }
+
+/* Redesigned summary card inner content (uses existing .co-summary-card outer wrapper) */
+.co-sum-cover { width: calc(100% + 36px); margin: -18px -18px 0; height: 200px; background: linear-gradient(135deg, #7eb8d4 0%, #5a9cbd 40%, #6aab6e 100%); }
+.co-sum-name { font-size: 15px; font-weight: 700; color: #1a1f36; line-height: 1.3; margin-top: 16px; margin-bottom: 4px; }
+.co-sum-host { font-size: 12.5px; color: #697386; margin-bottom: 4px; }
+.co-sum-hr { border: none; border-top: 1px solid #e3e8ee; margin: 14px 0; }
+.co-sum-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; padding: 4px 0; gap: 12px; }
+.co-sum-row .label { color: #697386; flex-shrink: 0; }
+.co-sum-row .value { color: #1a1f36; font-weight: 600; }
+.co-sum-row .value-blue { color: #3D57FF; font-weight: 600; }
+.co-sum-cancel-block { padding: 4px 0; }
+.co-sum-cancel-block .label { display: block; font-size: 13px; color: #697386; margin-bottom: 2px; }
+.co-sum-cancel-block a { font-size: 12.5px; color: #3D57FF; line-height: 1.4; cursor: pointer; text-decoration: none; }
+.co-sum-cancel-block a:hover { text-decoration: underline; }
+.co-sum-total { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 700; color: #1a1f36; padding: 6px 0 2px; }
+.co-sum-total .chev { color: #9aa5b4; font-size: 10px; margin-left: 4px; }
 </style>
 </head>
 <body>
@@ -1434,19 +1529,190 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
               </div>
 
               <!-- Checkout page (preview only) -->
+              <!-- DECISION: Same numbered "Review and Book" layout as eeCheckoutPage so the
+                   profile editor preview canvas shows what the operator's content profile
+                   produces in the booking flow, identical to how an experience would render
+                   it. JS sets the Confirm button text via #pp-cta-checkout from the profile's
+                   btnLabel setting (Request Booking / Reserve Your Spot / Book Now / etc.). -->
               <div id="pp-page-checkout" style="display:none;">
                 <div class="checkout-page">
                   <div class="checkout-layout">
                     <div>
-                      <div class="co-section"><div class="co-section-title">Guest information</div><div class="co-form-row"><div class="co-input" style="color:#9aa5b4">First name</div><div class="co-input" style="color:#9aa5b4">Last name</div></div><div class="co-input" style="margin-top:12px;color:#9aa5b4">Email address</div></div>
-                      <div class="co-section"><div class="co-section-title">Payment</div><div class="co-card-display"><span>•••• •••• •••• ••••</span></div></div>
-                      <button id="pp-cta-checkout" class="co-confirm-btn">Confirm Purchase</button>
+                      <h1 class="co-review-title">Review and Book</h1>
+                      <div class="co-hold-banner">We are holding your booking for <strong>19:45</strong> minutes.</div>
+
+                      <!-- Step 1 — Your Information -->
+                      <div class="co-step">
+                        <div class="co-step-head">
+                          <div class="co-step-num">1</div>
+                          <div class="co-step-name">YOUR INFORMATION</div>
+                        </div>
+                        <div class="co-field">
+                          <label class="co-label">Name</label>
+                          <div class="co-form-row">
+                            <input class="co-input" type="text" placeholder="First" onclick="event.stopPropagation()">
+                            <input class="co-input" type="text" placeholder="Last" onclick="event.stopPropagation()">
+                          </div>
+                        </div>
+                        <div class="co-field">
+                          <label class="co-label">Email address</label>
+                          <div class="co-sublabel">Receipts and notifications will be sent to this address</div>
+                          <input class="co-input" type="email" placeholder="e.g. email@example.com" onclick="event.stopPropagation()">
+                        </div>
+                        <div class="co-field">
+                          <label class="co-label">Phone <span class="co-optional">(Optional)</span></label>
+                          <div class="co-sublabel">By providing your phone number, you agree to receive SMS messages related to this booking.</div>
+                          <div class="co-phone-wrap">
+                            <div class="co-phone-pre">▾ +1</div>
+                            <input class="co-input" type="tel" placeholder="Phone number" onclick="event.stopPropagation()">
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Step 2 — Payment Information -->
+                      <div class="co-step">
+                        <div class="co-step-head">
+                          <div class="co-step-num">2</div>
+                          <div class="co-step-name">PAYMENT INFORMATION</div>
+                          <svg class="co-step-lock" width="13" height="15" viewBox="0 0 13 15" fill="none"><path d="M3 6V4a3.5 3.5 0 0 1 7 0v2" stroke="currentColor" stroke-width="1.4"/><rect x="1.5" y="6" width="10" height="7.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
+                        </div>
+                        <p class="co-payment-note">We do not store your credit card information. All payments are encrypted and securely processed through our PCI compliant provider.</p>
+                        <div class="co-field">
+                          <label class="co-label">Cardholder's Name</label>
+                          <div class="co-form-row">
+                            <input class="co-input" type="text" placeholder="First" onclick="event.stopPropagation()">
+                            <input class="co-input" type="text" placeholder="Last" onclick="event.stopPropagation()">
+                          </div>
+                        </div>
+                        <div class="co-field">
+                          <label class="co-label">Card Details</label>
+                          <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
+                        </div>
+                        <div class="co-form-row">
+                          <div class="co-field">
+                            <label class="co-label">Expiration</label>
+                            <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
+                          </div>
+                          <div class="co-field">
+                            <label class="co-label">Security Code</label>
+                            <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
+                          </div>
+                        </div>
+                        <div class="co-field">
+                          <label class="co-label">Billing Address</label>
+                          <input class="co-input" type="text" placeholder="Address Line 1" onclick="event.stopPropagation()">
+                          <input class="co-input" type="text" placeholder="Address Line 2" style="margin-top:8px" onclick="event.stopPropagation()">
+                        </div>
+                        <div class="co-form-row">
+                          <div class="co-field">
+                            <label class="co-label">City</label>
+                            <input class="co-input" type="text" placeholder="City" onclick="event.stopPropagation()">
+                          </div>
+                          <div class="co-field">
+                            <label class="co-label">State/Region</label>
+                            <input class="co-input" type="text" placeholder="State" onclick="event.stopPropagation()">
+                          </div>
+                        </div>
+                        <div class="co-form-row">
+                          <div class="co-field">
+                            <label class="co-label">Country</label>
+                            <select class="co-input co-select" onclick="event.stopPropagation()">
+                              <option>United States</option>
+                              <option>Canada</option>
+                              <option>United Kingdom</option>
+                              <option>Australia</option>
+                            </select>
+                          </div>
+                          <div class="co-field">
+                            <label class="co-label">Zip Code</label>
+                            <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
+                          </div>
+                        </div>
+                        <a class="co-promo" onclick="event.stopPropagation()">
+                          <span class="co-promo-plus">+</span>
+                          Redeem Promo Code
+                        </a>
+                      </div>
+
+                      <!-- Step 3 — Additional Information -->
+                      <div class="co-step">
+                        <div class="co-step-head">
+                          <div class="co-step-num">3</div>
+                          <div class="co-step-name">ADDITIONAL INFORMATION</div>
+                        </div>
+                        <div class="co-field">
+                          <label class="co-label">How likely, on a scale of 0 to 10, are you to recommend Acme Corp to a friend?</label>
+                          <div class="co-nps-meta">
+                            <span>Not at all likely</span>
+                            <span>Extremely likely</span>
+                          </div>
+                          <div class="co-nps-grid">
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">0</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">1</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">2</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">3</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">4</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">5</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">6</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">7</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">8</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">9</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">10</button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Message to operator -->
+                      <div class="co-message">
+                        <div class="co-message-head">SEND A MESSAGE TO ACME CORP (OPTIONAL)</div>
+                        <textarea class="co-message-area" placeholder="Have a special request, or just want to say Hi?" onclick="event.stopPropagation()"></textarea>
+                      </div>
+
+                      <!-- Confirm Purchase — id preserved so JS can sync btnLabel from profile config -->
+                      <div class="co-submit-row">
+                        <button id="pp-cta-checkout" class="co-submit-btn" onclick="event.stopPropagation()">Confirm Purchase</button>
+                        <div class="co-foot-note">Tickets are non-transferable &nbsp;|&nbsp; 21+ Age Limit</div>
+                      </div>
+
+                      <!-- AnyRoad footer -->
+                      <div class="co-ar-foot">
+                        <div class="co-ar-mark">AnyRoad</div>
+                        <div class="co-ar-link-row">
+                          <a onclick="event.stopPropagation()">Terms of Service</a> &nbsp;•&nbsp; <a onclick="event.stopPropagation()">Privacy Policy</a>
+                        </div>
+                      </div>
                     </div>
-                    <div class="co-summary-card">
-                      <div class="co-summary-exp"><div class="co-summary-thumb"></div><div><div class="co-summary-name">Painted Ladies Picnic Tour</div><div class="co-summary-meta">Thu, May 22 · 5:00 pm</div></div></div>
-                      <hr style="border:none;border-top:1px solid #e3e8ee;margin:12px 0">
-                      <div class="co-price-row"><span>$45 × 1</span><span>$45.00</span></div>
-                      <div class="co-price-row co-price-total"><span>Total</span><span>$45.00</span></div>
+
+                    <!-- Summary card -->
+                    <div>
+                      <div class="co-summary-card">
+                        <div class="co-sum-cover"></div>
+                        <div class="co-sum-name">The Painted Ladies Picnic &amp; Architecture Tour</div>
+                        <div class="co-sum-host">With Acme Corp</div>
+                        <hr class="co-sum-hr">
+                        <div class="co-sum-row">
+                          <span class="label">Date</span>
+                          <span class="value-blue">May 22, 2026</span>
+                        </div>
+                        <div class="co-sum-row">
+                          <span class="label">Time</span>
+                          <span class="value-blue">6:00 pm</span>
+                        </div>
+                        <div class="co-sum-row">
+                          <span class="label">Number of Guests</span>
+                          <span class="value">1</span>
+                        </div>
+                        <hr class="co-sum-hr">
+                        <div class="co-sum-cancel-block">
+                          <span class="label">Cancellation policy</span>
+                          <a onclick="event.stopPropagation()">5 days before it starts for a 50% refund, with no refunds af...</a>
+                        </div>
+                        <hr class="co-sum-hr">
+                        <div class="co-sum-total">
+                          <span>Total:</span>
+                          <span>$45 <span class="chev">▾</span></span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1856,51 +2122,190 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
                 <div id="bpH2" style="background:#1a1a2e;height:44px;display:flex;align-items:center;justify-content:center;">
                   <span id="bpW2" style="font-weight:800;font-size:12px;letter-spacing:0.06em;color:#fff">ACME CORP</span>
                 </div>
+                <!-- DECISION: Same numbered "Review and Book" layout as eeCheckoutPage so the
+                     brand kit editor preview canvas shows how the operator's brand kit colors
+                     flow through the booking flow's checkout step. The brand header bar (bpH2)
+                     above this remains so the active brand color is demonstrated at the top of
+                     the canvas. JS-referenced IDs preserved: #bpCheckoutGrid (mobile layout),
+                     #bpCta2 (button color sync), #bpCancelLink2 (link color sync). -->
                 <div class="checkout-page">
                   <div class="checkout-layout" id="bpCheckoutGrid">
                     <div>
-                      <div class="co-section">
-                        <div class="co-section-title">Guest information</div>
+                      <h1 class="co-review-title">Review and Book</h1>
+                      <div class="co-hold-banner">We are holding your booking for <strong>19:45</strong> minutes.</div>
+
+                      <!-- Step 1 — Your Information -->
+                      <div class="co-step">
+                        <div class="co-step-head">
+                          <div class="co-step-num">1</div>
+                          <div class="co-step-name">YOUR INFORMATION</div>
+                        </div>
+                        <div class="co-field">
+                          <label class="co-label">Name</label>
+                          <div class="co-form-row">
+                            <input class="co-input" type="text" placeholder="First" onclick="event.stopPropagation()">
+                            <input class="co-input" type="text" placeholder="Last" onclick="event.stopPropagation()">
+                          </div>
+                        </div>
+                        <div class="co-field">
+                          <label class="co-label">Email address</label>
+                          <div class="co-sublabel">Receipts and notifications will be sent to this address</div>
+                          <input class="co-input" type="email" placeholder="e.g. email@example.com" onclick="event.stopPropagation()">
+                        </div>
+                        <div class="co-field">
+                          <label class="co-label">Phone <span class="co-optional">(Optional)</span></label>
+                          <div class="co-sublabel">By providing your phone number, you agree to receive SMS messages related to this booking.</div>
+                          <div class="co-phone-wrap">
+                            <div class="co-phone-pre">▾ +1</div>
+                            <input class="co-input" type="tel" placeholder="Phone number" onclick="event.stopPropagation()">
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Step 2 — Payment Information -->
+                      <div class="co-step">
+                        <div class="co-step-head">
+                          <div class="co-step-num">2</div>
+                          <div class="co-step-name">PAYMENT INFORMATION</div>
+                          <svg class="co-step-lock" width="13" height="15" viewBox="0 0 13 15" fill="none"><path d="M3 6V4a3.5 3.5 0 0 1 7 0v2" stroke="currentColor" stroke-width="1.4"/><rect x="1.5" y="6" width="10" height="7.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
+                        </div>
+                        <p class="co-payment-note">We do not store your credit card information. All payments are encrypted and securely processed through our PCI compliant provider.</p>
+                        <div class="co-field">
+                          <label class="co-label">Cardholder's Name</label>
+                          <div class="co-form-row">
+                            <input class="co-input" type="text" placeholder="First" onclick="event.stopPropagation()">
+                            <input class="co-input" type="text" placeholder="Last" onclick="event.stopPropagation()">
+                          </div>
+                        </div>
+                        <div class="co-field">
+                          <label class="co-label">Card Details</label>
+                          <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
+                        </div>
                         <div class="co-form-row">
-                          <div class="co-input" style="color:#9aa5b4">First name</div>
-                          <div class="co-input" style="color:#9aa5b4">Last name</div>
+                          <div class="co-field">
+                            <label class="co-label">Expiration</label>
+                            <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
+                          </div>
+                          <div class="co-field">
+                            <label class="co-label">Security Code</label>
+                            <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
+                          </div>
                         </div>
-                        <div class="co-input" style="margin-top:12px;color:#9aa5b4">Email address</div>
+                        <div class="co-field">
+                          <label class="co-label">Billing Address</label>
+                          <input class="co-input" type="text" placeholder="Address Line 1" onclick="event.stopPropagation()">
+                          <input class="co-input" type="text" placeholder="Address Line 2" style="margin-top:8px" onclick="event.stopPropagation()">
+                        </div>
+                        <div class="co-form-row">
+                          <div class="co-field">
+                            <label class="co-label">City</label>
+                            <input class="co-input" type="text" placeholder="City" onclick="event.stopPropagation()">
+                          </div>
+                          <div class="co-field">
+                            <label class="co-label">State/Region</label>
+                            <input class="co-input" type="text" placeholder="State" onclick="event.stopPropagation()">
+                          </div>
+                        </div>
+                        <div class="co-form-row">
+                          <div class="co-field">
+                            <label class="co-label">Country</label>
+                            <select class="co-input co-select" onclick="event.stopPropagation()">
+                              <option>United States</option>
+                              <option>Canada</option>
+                              <option>United Kingdom</option>
+                              <option>Australia</option>
+                            </select>
+                          </div>
+                          <div class="co-field">
+                            <label class="co-label">Zip Code</label>
+                            <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
+                          </div>
+                        </div>
+                        <a class="co-promo" onclick="event.stopPropagation()">
+                          <span class="co-promo-plus">+</span>
+                          Redeem Promo Code
+                        </a>
                       </div>
-                      <div class="co-section">
-                        <div class="co-section-title">Additional questions</div>
-                        <div style="background:#f8f9fc;border-radius:6px;padding:10px 12px">
-                          <div style="font-size:13px;color:#697386;margin-bottom:8px">Any dietary restrictions for the picnic?</div>
-                          <div class="co-input" style="color:#9aa5b4">Select an option</div>
+
+                      <!-- Step 3 — Additional Information -->
+                      <div class="co-step">
+                        <div class="co-step-head">
+                          <div class="co-step-num">3</div>
+                          <div class="co-step-name">ADDITIONAL INFORMATION</div>
+                        </div>
+                        <div class="co-field">
+                          <label class="co-label">How likely, on a scale of 0 to 10, are you to recommend Acme Corp to a friend?</label>
+                          <div class="co-nps-meta">
+                            <span>Not at all likely</span>
+                            <span>Extremely likely</span>
+                          </div>
+                          <div class="co-nps-grid">
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">0</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">1</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">2</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">3</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">4</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">5</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">6</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">7</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">8</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">9</button>
+                            <button class="co-nps-btn" onclick="event.stopPropagation()">10</button>
+                          </div>
                         </div>
                       </div>
-                      <div class="co-section">
-                        <div class="co-section-title">Payment</div>
-                        <div class="co-card-display">
-                          <span>•••• •••• •••• ••••</span>
-                          <div style="display:flex;gap:4px"><div style="width:28px;height:18px;background:#1a1f6e;border-radius:3px;opacity:0.55"></div><div style="width:28px;height:18px;background:#e8a020;border-radius:3px;opacity:0.55"></div></div>
-                        </div>
-                        <div class="co-form-row" style="margin-top:10px">
-                          <div class="co-input" style="color:#9aa5b4">MM / YY</div>
-                          <div class="co-input" style="color:#9aa5b4">CVV</div>
+
+                      <!-- Message to operator -->
+                      <div class="co-message">
+                        <div class="co-message-head">SEND A MESSAGE TO ACME CORP (OPTIONAL)</div>
+                        <textarea class="co-message-area" placeholder="Have a special request, or just want to say Hi?" onclick="event.stopPropagation()"></textarea>
+                      </div>
+
+                      <!-- Confirm Purchase — id preserved so JS can sync button color from brand kit -->
+                      <div class="co-submit-row">
+                        <button id="bpCta2" class="co-submit-btn" onclick="event.stopPropagation()">Confirm Purchase</button>
+                        <div class="co-foot-note">Tickets are non-transferable &nbsp;|&nbsp; 21+ Age Limit</div>
+                      </div>
+
+                      <!-- AnyRoad footer -->
+                      <div class="co-ar-foot">
+                        <div class="co-ar-mark">AnyRoad</div>
+                        <div class="co-ar-link-row">
+                          <a onclick="event.stopPropagation()">Terms of Service</a> &nbsp;•&nbsp; <a onclick="event.stopPropagation()">Privacy Policy</a>
                         </div>
                       </div>
-                      <button id="bpCta2" class="co-confirm-btn">Confirm Purchase</button>
-                      <div style="text-align:center;font-size:12px;color:#9aa5b4;margin-top:8px">Secure payment via Stripe</div>
                     </div>
-                    <div class="co-summary-card">
-                      <div class="co-summary-exp">
-                        <div class="co-summary-thumb"></div>
-                        <div>
-                          <div class="co-summary-name">Painted Ladies Picnic Tour</div>
-                          <div class="co-summary-meta">Thu, May 22 · 5:00 pm</div>
-                          <div class="co-summary-meta">1 Attendee</div>
+
+                    <!-- Summary card — cancellation link id preserved for brand-kit link color sync -->
+                    <div>
+                      <div class="co-summary-card">
+                        <div class="co-sum-cover"></div>
+                        <div class="co-sum-name">The Painted Ladies Picnic &amp; Architecture Tour</div>
+                        <div class="co-sum-host">With Acme Corp</div>
+                        <hr class="co-sum-hr">
+                        <div class="co-sum-row">
+                          <span class="label">Date</span>
+                          <span class="value-blue">May 22, 2026</span>
+                        </div>
+                        <div class="co-sum-row">
+                          <span class="label">Time</span>
+                          <span class="value-blue">6:00 pm</span>
+                        </div>
+                        <div class="co-sum-row">
+                          <span class="label">Number of Guests</span>
+                          <span class="value">1</span>
+                        </div>
+                        <hr class="co-sum-hr">
+                        <div class="co-sum-cancel-block">
+                          <span class="label">Cancellation policy</span>
+                          <a id="bpCancelLink2" onclick="event.stopPropagation()">5 days before it starts for a 50% refund, with no refunds af...</a>
+                        </div>
+                        <hr class="co-sum-hr">
+                        <div class="co-sum-total">
+                          <span>Total:</span>
+                          <span>$45 <span class="chev">▾</span></span>
                         </div>
                       </div>
-                      <hr style="border:none;border-top:1px solid #e3e8ee;margin:12px 0">
-                      <div class="co-price-row"><span>$45 × 1</span><span>$45.00</span></div>
-                      <div class="co-price-row co-price-total"><span>Total</span><span>$45.00</span></div>
-                      <div style="margin-top:10px"><a id="bpCancelLink2" class="bk-glance-link" style="font-size:13px">5 days before for 50% refund</a></div>
                     </div>
                   </div>
                 </div>
@@ -2053,12 +2458,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
       Back
     </button>
     <div class="ee-header-title">The Painted Ladies Picnic &amp; Architecture Tour</div>
+    <!-- DECISION: No Save button in the Edit Experience header. Section-level changes
+         in this prototype are not persisted from this top bar — the Preview action is
+         the only header control. The Save button used to live here but was removed for
+         clarity. -->
     <div class="ee-header-actions">
       <button class="ee-btn-outline">
         <svg width="13" height="13" fill="none" viewBox="0 0 13 13"><path d="M7.5 1.5h4v4M11.5 1.5l-5 5M5.5 2.5H2a1 1 0 0 0-1 1V10a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Preview
       </button>
-      <button class="ee-btn-primary">Save</button>
     </div>
   </header>
 
@@ -2399,123 +2807,190 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
           </div>
 
           <!-- Checkout page -->
+          <!-- DECISION: Checkout layout mirrors AnyRoad's live "Review and Book" page —
+               numbered 1/2/3 steps (Your Information, Payment Information, Additional
+               Information), a centered Message section, AnyRoad footer, and a redesigned
+               summary card with cover image + Date/Time/Guests rows + cancellation block +
+               Total. New CSS classes (.co-step, .co-nps-*, .co-sum-*) live alongside the
+               existing co-* classes so the other checkout canvases can continue to use the
+               legacy structure until they're upgraded. -->
           <div class="checkout-page" id="eeCheckoutPage" style="display:none;">
             <div class="checkout-layout">
-              <!-- ── Main form ── -->
+              <!-- ── Left: form ── -->
               <div>
-                <div class="co-section">
-                  <div class="co-section-title">Guest information</div>
+                <h1 class="co-review-title">Review and Book</h1>
+                <div class="co-hold-banner">We are holding your booking for <strong>19:45</strong> minutes.</div>
+
+                <!-- Step 1 — Your Information -->
+                <div class="co-step">
+                  <div class="co-step-head">
+                    <div class="co-step-num">1</div>
+                    <div class="co-step-name">YOUR INFORMATION</div>
+                  </div>
+                  <div class="co-field">
+                    <label class="co-label">Name</label>
+                    <div class="co-form-row">
+                      <input class="co-input" type="text" placeholder="First" onclick="event.stopPropagation()">
+                      <input class="co-input" type="text" placeholder="Last" onclick="event.stopPropagation()">
+                    </div>
+                  </div>
+                  <div class="co-field">
+                    <label class="co-label">Email address</label>
+                    <div class="co-sublabel">Receipts and notifications will be sent to this address</div>
+                    <input class="co-input" type="email" placeholder="e.g. email@example.com" onclick="event.stopPropagation()">
+                  </div>
+                  <div class="co-field">
+                    <label class="co-label">Phone <span class="co-optional">(Optional)</span></label>
+                    <div class="co-sublabel">By providing your phone number, you agree to receive SMS messages related to this booking.</div>
+                    <div class="co-phone-wrap">
+                      <div class="co-phone-pre">▾ +1</div>
+                      <input class="co-input" type="tel" placeholder="Phone number" onclick="event.stopPropagation()">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Step 2 — Payment Information -->
+                <div class="co-step">
+                  <div class="co-step-head">
+                    <div class="co-step-num">2</div>
+                    <div class="co-step-name">PAYMENT INFORMATION</div>
+                    <svg class="co-step-lock" width="13" height="15" viewBox="0 0 13 15" fill="none"><path d="M3 6V4a3.5 3.5 0 0 1 7 0v2" stroke="currentColor" stroke-width="1.4"/><rect x="1.5" y="6" width="10" height="7.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
+                  </div>
+                  <p class="co-payment-note">We do not store your credit card information. All payments are encrypted and securely processed through our PCI compliant provider.</p>
+                  <div class="co-field">
+                    <label class="co-label">Cardholder's Name</label>
+                    <div class="co-form-row">
+                      <input class="co-input" type="text" placeholder="First" onclick="event.stopPropagation()">
+                      <input class="co-input" type="text" placeholder="Last" onclick="event.stopPropagation()">
+                    </div>
+                  </div>
+                  <div class="co-field">
+                    <label class="co-label">Card Details</label>
+                    <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
+                  </div>
                   <div class="co-form-row">
                     <div class="co-field">
-                      <label class="co-label">First name <span class="co-required">*</span></label>
-                      <input class="co-input" type="text" placeholder="Jane" onclick="event.stopPropagation()">
+                      <label class="co-label">Expiration</label>
+                      <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
                     </div>
                     <div class="co-field">
-                      <label class="co-label">Last name <span class="co-required">*</span></label>
-                      <input class="co-input" type="text" placeholder="Smith" onclick="event.stopPropagation()">
+                      <label class="co-label">Security Code</label>
+                      <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
                     </div>
                   </div>
                   <div class="co-field">
-                    <label class="co-label">Email <span class="co-required">*</span></label>
-                    <input class="co-input" type="email" placeholder="jane@example.com" onclick="event.stopPropagation()">
+                    <label class="co-label">Billing Address</label>
+                    <input class="co-input" type="text" placeholder="Address Line 1" onclick="event.stopPropagation()">
+                    <input class="co-input" type="text" placeholder="Address Line 2" style="margin-top:8px" onclick="event.stopPropagation()">
                   </div>
-                  <div class="co-field">
-                    <label class="co-label">Phone <span class="co-optional">(optional)</span></label>
-                    <input class="co-input" type="tel" placeholder="+1 (555) 000-0000" onclick="event.stopPropagation()">
-                  </div>
-                </div>
-                <div class="co-section">
-                  <div class="co-section-title">Additional questions</div>
-                  <div class="co-field" style="margin-bottom:20px">
-                    <label class="co-label">How did you hear about this tour? <span class="co-required">*</span></label>
-                    <div class="co-radio-group">
-                      <label class="co-radio-opt"><input type="radio" name="ee_hear" onclick="event.stopPropagation()"> Social media</label>
-                      <label class="co-radio-opt"><input type="radio" name="ee_hear" onclick="event.stopPropagation()"> Friend or family recommendation</label>
-                      <label class="co-radio-opt"><input type="radio" name="ee_hear" onclick="event.stopPropagation()"> Google search</label>
-                      <label class="co-radio-opt"><input type="radio" name="ee_hear" onclick="event.stopPropagation()"> I've visited before</label>
+                  <div class="co-form-row">
+                    <div class="co-field">
+                      <label class="co-label">City</label>
+                      <input class="co-input" type="text" placeholder="City" onclick="event.stopPropagation()">
                     </div>
-                  </div>
-                  <div class="co-field" style="margin-bottom:20px">
-                    <label class="co-label">Any dietary restrictions for the picnic? <span class="co-required">*</span></label>
-                    <select class="co-input co-select" onclick="event.stopPropagation()">
-                      <option value="">Select an option</option>
-                      <option>None</option>
-                      <option>Vegetarian</option>
-                      <option>Vegan</option>
-                      <option>Gluten-free</option>
-                    </select>
-                  </div>
-                  <div class="co-field">
-                    <div class="co-waiver-box">
-                      <label class="co-waiver-label">
-                        <input type="checkbox" onclick="event.stopPropagation()">
-                        <span>I agree to the <a class="bk-glance-link" onclick="event.stopPropagation()">outdoor activity guidelines</a> and acknowledge this is a walking tour with uneven terrain. <span class="co-required">*</span></span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <div class="co-section">
-                  <div class="co-section-title">Extras</div>
-                  <div class="co-addon-row">
-                    <div style="flex:1">
-                      <div class="co-addon-name">Picnic basket upgrade</div>
-                      <div class="co-addon-desc">Premium hamper with wine, artisan cheese &amp; charcuterie board</div>
-                      <div class="co-addon-price">+$25.00 / person</div>
-                    </div>
-                    <div class="ticket-qty" onclick="event.stopPropagation()">
-                      <button class="qty-btn">−</button>
-                      <span class="qty-num">0</span>
-                      <button class="qty-btn">+</button>
-                    </div>
-                  </div>
-                </div>
-                <div class="co-section" style="border-bottom:none">
-                  <div class="co-section-title">Payment</div>
-                  <div class="co-field">
-                    <label class="co-label">Card number <span class="co-required">*</span></label>
-                    <div class="co-card-display">
-                      <span>•••• •••• •••• ••••</span>
-                      <div style="display:flex;gap:6px">
-                        <div style="width:34px;height:22px;border-radius:4px;background:#1a1f6e;opacity:0.7"></div>
-                        <div style="width:34px;height:22px;border-radius:4px;background:#e8a020;opacity:0.7"></div>
-                      </div>
+                    <div class="co-field">
+                      <label class="co-label">State/Region</label>
+                      <input class="co-input" type="text" placeholder="State" onclick="event.stopPropagation()">
                     </div>
                   </div>
                   <div class="co-form-row">
                     <div class="co-field">
-                      <label class="co-label">Expiry <span class="co-required">*</span></label>
-                      <input class="co-input" type="text" placeholder="MM / YY" onclick="event.stopPropagation()">
+                      <label class="co-label">Country</label>
+                      <select class="co-input co-select" onclick="event.stopPropagation()">
+                        <option>United States</option>
+                        <option>Canada</option>
+                        <option>United Kingdom</option>
+                        <option>Australia</option>
+                      </select>
                     </div>
                     <div class="co-field">
-                      <label class="co-label">CVV <span class="co-required">*</span></label>
-                      <input class="co-input" type="text" placeholder="•••" onclick="event.stopPropagation()">
+                      <label class="co-label">Zip Code</label>
+                      <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
                     </div>
                   </div>
+                  <a class="co-promo" onclick="event.stopPropagation()">
+                    <span class="co-promo-plus">+</span>
+                    Redeem Promo Code
+                  </a>
+                </div>
+
+                <!-- Step 3 — Additional Information -->
+                <div class="co-step">
+                  <div class="co-step-head">
+                    <div class="co-step-num">3</div>
+                    <div class="co-step-name">ADDITIONAL INFORMATION</div>
+                  </div>
                   <div class="co-field">
-                    <label class="co-label">Name on card <span class="co-required">*</span></label>
-                    <input class="co-input" type="text" placeholder="Jane Smith" onclick="event.stopPropagation()">
+                    <label class="co-label">How likely, on a scale of 0 to 10, are you to recommend Acme Corp to a friend?</label>
+                    <div class="co-nps-meta">
+                      <span>Not at all likely</span>
+                      <span>Extremely likely</span>
+                    </div>
+                    <div class="co-nps-grid">
+                      <button class="co-nps-btn" onclick="event.stopPropagation()">0</button>
+                      <button class="co-nps-btn" onclick="event.stopPropagation()">1</button>
+                      <button class="co-nps-btn" onclick="event.stopPropagation()">2</button>
+                      <button class="co-nps-btn" onclick="event.stopPropagation()">3</button>
+                      <button class="co-nps-btn" onclick="event.stopPropagation()">4</button>
+                      <button class="co-nps-btn" onclick="event.stopPropagation()">5</button>
+                      <button class="co-nps-btn" onclick="event.stopPropagation()">6</button>
+                      <button class="co-nps-btn" onclick="event.stopPropagation()">7</button>
+                      <button class="co-nps-btn" onclick="event.stopPropagation()">8</button>
+                      <button class="co-nps-btn" onclick="event.stopPropagation()">9</button>
+                      <button class="co-nps-btn" onclick="event.stopPropagation()">10</button>
+                    </div>
                   </div>
                 </div>
-                <button class="co-confirm-btn" onclick="event.stopPropagation()">Confirm Purchase</button>
-                <div class="co-subtext-note">Tickets are non-transferable &nbsp;·&nbsp; Secure payment via Stripe</div>
+
+                <!-- Message to operator -->
+                <div class="co-message">
+                  <div class="co-message-head">SEND A MESSAGE TO ACME CORP (OPTIONAL)</div>
+                  <textarea class="co-message-area" placeholder="Have a special request, or just want to say Hi?" onclick="event.stopPropagation()"></textarea>
+                </div>
+
+                <!-- Confirm Purchase -->
+                <div class="co-submit-row">
+                  <button class="co-submit-btn" onclick="event.stopPropagation()">Confirm Purchase</button>
+                  <div class="co-foot-note">Tickets are non-transferable &nbsp;|&nbsp; 21+ Age Limit</div>
+                </div>
+
+                <!-- AnyRoad footer -->
+                <div class="co-ar-foot">
+                  <div class="co-ar-mark">AnyRoad</div>
+                  <div class="co-ar-link-row">
+                    <a onclick="event.stopPropagation()">Terms of Service</a> &nbsp;•&nbsp; <a onclick="event.stopPropagation()">Privacy Policy</a>
+                  </div>
+                </div>
               </div>
-              <!-- ── Order summary ── -->
+
+              <!-- ── Right: summary card ── -->
               <div>
                 <div class="co-summary-card">
-                  <div class="co-summary-exp">
-                    <div class="co-summary-thumb"></div>
-                    <div>
-                      <div class="co-summary-name">The Painted Ladies Picnic &amp; Architecture Tour</div>
-                      <div class="co-summary-meta">Thu, May 15, 2026</div>
-                      <div class="co-summary-meta">9:00 AM · 2 Hours</div>
-                      <div class="co-summary-meta">1 Attendee</div>
-                    </div>
+                  <div class="co-sum-cover"></div>
+                  <div class="co-sum-name">The Painted Ladies Picnic &amp; Architecture Tour</div>
+                  <div class="co-sum-host">With Acme Corp</div>
+                  <hr class="co-sum-hr">
+                  <div class="co-sum-row">
+                    <span class="label">Date</span>
+                    <span class="value-blue">May 22, 2026</span>
                   </div>
-                  <hr style="border:none;border-top:1px solid #e3e8ee;margin:12px 0">
-                  <div class="co-price-row"><span>$45.00 × 1 guest</span><span>$45.00</span></div>
-                  <div class="co-price-row co-price-total"><span>Total</span><span>$45.00</span></div>
-                  <div class="co-cancel-note">
-                    <a class="bk-glance-link" style="font-size:11.5px" onclick="event.stopPropagation()">5 days before it starts for a 50% refund</a>
+                  <div class="co-sum-row">
+                    <span class="label">Time</span>
+                    <span class="value-blue">6:00 pm</span>
+                  </div>
+                  <div class="co-sum-row">
+                    <span class="label">Number of Guests</span>
+                    <span class="value">1</span>
+                  </div>
+                  <hr class="co-sum-hr">
+                  <div class="co-sum-cancel-block">
+                    <span class="label">Cancellation policy</span>
+                    <a onclick="event.stopPropagation()">5 days before it starts for a 50% refund, with no refunds af...</a>
+                  </div>
+                  <hr class="co-sum-hr">
+                  <div class="co-sum-total">
+                    <span>Total:</span>
+                    <span>$45 <span class="chev">▾</span></span>
                   </div>
                 </div>
               </div>
