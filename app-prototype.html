@@ -4,9 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AnyRoad — Branding</title>
+<!-- DECISION: Soleil (via Adobe Typekit) is AnyRoad's native app typeface. The booking
+     page / checkout canvases intentionally keep a system / Inter stack so they preview
+     what guests actually see in production (where Soleil isn't loaded). -->
+<link rel="stylesheet" href="https://use.typekit.net/yfq6nad.css">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif; background: #f4f5f7; color: #1a1f36; font-size: 14px; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+body { font-family: "soleil", -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; background: #f4f5f7; color: #1a1f36; font-size: 14px; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+/* DECISION: Form controls in HTML default to the browser's UI font (Arial on most systems)
+   regardless of body font-family. Force them to inherit so Soleil flows through the native
+   app — buttons, tabs, text inputs, selects, textareas. Canvas form controls still inherit
+   from .preview-canvas (Inter) since that override sits closer in the cascade. */
+button, input, select, textarea { font-family: inherit; }
 
 /* ── Admin shell ─────────────────────────── */
 .shell { display: flex; flex: 1; overflow: hidden; }
@@ -18,7 +27,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 }
 .app-header-title { flex: 1; text-align: center; color: #fff; font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
 .user-badge { display: flex; align-items: center; gap: 9px; cursor: pointer; }
-.user-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #a78bfa, #7c3aed); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.user-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #a78bfa, #7c3aed); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #fff; flex-shrink: 0; }
 .user-info { display: flex; flex-direction: column; }
 .user-name { font-size: 12.5px; font-weight: 600; color: #fff; line-height: 1.2; }
 .user-org { font-size: 11px; color: rgba(255,255,255,0.55); }
@@ -40,7 +49,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
   display: flex; flex-direction: column; overflow-y: auto; padding-bottom: 16px;
 }
 .nav-section-label {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
   color: rgba(255,255,255,0.35); padding: 18px 18px 6px;
 }
 .nav-item {
@@ -55,7 +64,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 .nav-icon { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.7; }
 .nav-item.active .nav-icon { opacity: 1; }
 .nav-badge {
-  background: #3D57FF; color: #fff; font-size: 10px; font-weight: 700;
+  background: #3D57FF; color: #fff; font-size: 10px; font-weight: 600;
   padding: 2px 6px; border-radius: 20px; margin-left: auto;
 }
 .nav-badge-new {
@@ -98,7 +107,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 .exp-thumb img { width: 100%; height: 100%; object-fit: cover; }
 .exp-thumb-placeholder { width: 64px; height: 64px; border-radius: 8px; flex-shrink: 0; }
 .exp-info { flex: 1; min-width: 0; }
-.exp-name { font-weight: 700; font-size: 14px; color: #1a1f36; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.exp-name { font-weight: 600; font-size: 14px; color: #1a1f36; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .exp-location { font-size: 12.5px; color: #697386; display: flex; align-items: center; gap: 4px; }
 .exp-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
 .exp-profile-badge {
@@ -120,7 +129,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 /* ── Settings ─────────────────────────────── */
 .settings-layout { display: grid; grid-template-columns: 240px 1fr; flex: 1; }
 .settings-sidebar { background: #fff; border-right: 1px solid #e3e8ee; padding: 24px 0; }
-.settings-sidebar-title { font-size: 18px; font-weight: 700; color: #1a1f36; padding: 0 24px 20px; }
+.settings-sidebar-title { font-size: 18px; font-weight: 600; color: #1a1f36; padding: 0 24px 20px; }
 .settings-nav-item {
   padding: 10px 24px; cursor: pointer; display: flex; flex-direction: column;
   transition: background 0.1s; border-left: 3px solid transparent;
@@ -148,7 +157,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 /* Main settings menu */
 .settings-menu-list { max-width: 620px; }
 .settings-category-label {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.09em;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.09em;
   text-transform: uppercase; color: #9aa5b4; padding: 24px 0 4px;
 }
 .settings-category-label:first-child { padding-top: 0; }
@@ -184,7 +193,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
   display: flex; align-items: flex-start; justify-content: space-between;
   padding: 14px 16px 10px; gap: 12px;
 }
-.profile-card-name { font-size: 14.5px; font-weight: 700; color: #1a1f36; margin-bottom: 3px; }
+.profile-card-name { font-size: 14.5px; font-weight: 600; color: #1a1f36; margin-bottom: 3px; }
 .profile-card-desc { font-size: 12.5px; color: #697386; line-height: 1.45; }
 .profile-card-badges { display: flex; align-items: center; gap: 8px; flex-shrink: 0; padding-top: 1px; }
 .profile-default-badge {
@@ -195,7 +204,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
   padding: 4px 16px 14px; display: flex; justify-content: flex-end;
 }
 .profile-mini-btn {
-  padding: 8px 18px; border: none; font-size: 12.5px; font-weight: 700;
+  padding: 8px 18px; border: none; font-size: 12.5px; font-weight: 600;
   color: #fff; cursor: default; font-family: inherit; white-space: nowrap;
 }
 .profile-card-footer {
@@ -238,7 +247,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 .ke-toggle input:checked + .ke-toggle-track { background: #3D57FF; }
 .ke-toggle input:checked + .ke-toggle-track::before { transform: translateX(15px); }
 .profile-editor-actions { display: flex; gap: 10px; padding-top: 20px; border-top: 1px solid #e3e8ee; margin-top: 8px; }
-.btn-save { flex: 1; background: #3D57FF; color: #fff; border: none; padding: 10px; border-radius: 8px; font-size: 13.5px; font-weight: 700; font-family: inherit; cursor: pointer; }
+.btn-save { flex: 1; background: #3D57FF; color: #fff; border: none; padding: 10px; border-radius: 8px; font-size: 13.5px; font-weight: 600; font-family: inherit; cursor: pointer; }
 .btn-cancel-edit { background: transparent; color: #697386; border: 1px solid #e3e8ee; padding: 10px 18px; border-radius: 8px; font-size: 13.5px; font-family: inherit; cursor: pointer; }
 
 /* Mini booking widget preview */
@@ -277,7 +286,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 /* DECISION: Wordmark text (shown when no logo is uploaded) uses plain font-weight:600 only. No italic, no uppercase, no letter-spacing. Brand kits without logos should not have their name styled as if it were a designed logotype — that styling is reserved for actual logo images. */
 .bk-card-wordmark { font-weight: 600; font-size: 14px; }
 .bk-card-body { padding: 12px 16px 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.bk-card-name { font-size: 14px; font-weight: 700; color: #1a1f36; margin-bottom: 8px; }
+.bk-card-name { font-size: 14px; font-weight: 600; color: #1a1f36; margin-bottom: 8px; }
 .bk-color-swatches { display: flex; gap: 6px; }
 .bk-swatch { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); display: inline-block; flex-shrink: 0; }
 .bk-card-footer {
@@ -338,7 +347,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 .profile-selector-sub { font-size: 11.5px; color: #9aa5b4; margin-top: 1px; }
 .profile-swatch-preview { width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.06); }
 .badge-default {
-  font-size: 10px; font-weight: 700; color: #16a34a; background: #f0fdf4;
+  font-size: 10px; font-weight: 600; color: #16a34a; background: #f0fdf4;
   border: 1px solid #bbf7d0; padding: 1px 7px; border-radius: 20px;
   margin-left: 5px; vertical-align: middle;
 }
@@ -356,7 +365,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
   display: none !important; flex-direction: column !important;
   flex: none !important;
   background: #f4f5f7;
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  font-family: "soleil", -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+}
+
+/* DECISION: Canvases (booking page / checkout previews) keep the system / Inter font
+   stack instead of Soleil — these mock the public-facing guest experience, where the
+   operator's brand kit controls typography rather than the AnyRoad app's typeface. */
+.preview-canvas,
+#bpCanvas {
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
 }
 #page-experience-edit.active, #page-profile-editor.active, #page-brand-editor.active { display: flex !important; }
 
@@ -385,7 +402,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 }
 .ee-btn-primary {
   background: #3D57FF; color: #fff; border: none; padding: 7px 16px;
-  border-radius: 7px; font-size: 12.5px; font-weight: 700; font-family: inherit; cursor: pointer;
+  border-radius: 7px; font-size: 12.5px; font-weight: 600; font-family: inherit; cursor: pointer;
 }
 
 /* EE Body */
@@ -445,7 +462,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 
 /* EE Branding view */
 .ee-branding-view { flex: 1; overflow-y: auto; padding: 32px 40px; background: #fff; }
-.ee-bv-title { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #1a1f36; margin-bottom: 6px; }
+.ee-bv-title { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #1a1f36; margin-bottom: 6px; }
 .ee-bv-sub { font-size: 13px; color: #697386; margin-bottom: 18px; }
 .ee-brand-list { border: 1px solid #d8dde6; border-radius: 8px; overflow: hidden; }
 .ee-brand-card {
@@ -496,18 +513,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
   flex-direction: column; gap: 10px; text-align: center; color: #9aa5b4; padding: 60px 40px;
 }
 .ee-stub-icon { font-size: 38px; }
-.ee-stub-title { font-weight: 700; font-size: 15px; color: #1a1f36; }
+.ee-stub-title { font-weight: 600; font-size: 15px; color: #1a1f36; }
 .ee-stub-sub { font-size: 13px; color: #9aa5b4; max-width: 280px; line-height: 1.5; }
 
 /* ── Profile setting in sidebar ── */
 .ee-profile-setting { padding:10px 14px 12px; background:#f8f9fc; border-bottom:1px solid #edf0f5; }
-.ee-profile-setting-label { font-size:10px; font-weight:700; color:#b0b8c4; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:7px; }
+.ee-profile-setting-label { font-size:10px; font-weight:600; color:#b0b8c4; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:7px; }
 .ee-profile-setting-card { display:flex; align-items:center; gap:10px; background:#fff; border:1.5px solid #e3e8ee; border-radius:8px; padding:9px 10px; cursor:pointer; transition:border-color .15s; }
 .ee-profile-setting-card:hover { border-color:#a5b4fc; }
 .ee-profile-setting-card.custom { border-color:#a5b4fc; background:#f4f5ff; }
 .ee-profile-setting-swatch { width:26px; height:26px; border-radius:6px; background:#3d3d3d; flex-shrink:0; }
 .ee-profile-setting-info { flex:1; min-width:0; }
-.ee-profile-setting-name { font-size:13px; font-weight:700; color:#1a1f36; }
+.ee-profile-setting-name { font-size:13px; font-weight:600; color:#1a1f36; }
 .ee-profile-setting-name.custom { color:#3D57FF; }
 .ee-profile-setting-sub { font-size:11px; color:#9aa5b4; margin-top:1px; }
 .ee-profile-setting-switch { font-size:11.5px; font-weight:600; color:#3D57FF; background:none; border:none; font-family:inherit; cursor:pointer; padding:0; white-space:nowrap; flex-shrink:0; }
@@ -525,12 +542,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 .ee-design-swatch { width:30px; height:30px; border-radius:7px; flex-shrink:0; }
 .ee-design-profile-icon { width:30px; height:30px; border-radius:7px; background:#e3e8ee; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .ee-design-card-info { display:flex; flex-direction:column; }
-.ee-design-card-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#9aa5b4; line-height:1.2; }
+.ee-design-card-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:#9aa5b4; line-height:1.2; }
 .ee-design-card-name { font-size:13px; font-weight:600; color:#1a1f36; line-height:1.3; white-space:nowrap; }
 .ee-design-card-name.custom-name { color:#3D57FF; }
 .ee-design-switch { font-size:12px; font-weight:600; color:#3D57FF; background:none; border:none; font-family:inherit; cursor:pointer; padding:4px 8px; border-radius:5px; white-space:nowrap; transition:background .12s; }
 .ee-design-switch:hover { background:#eef0fd; }
-.ee-design-cta { background:#3D57FF; border:none; border-radius:7px; padding:6px 13px; font-size:12.5px; font-weight:700; font-family:inherit; cursor:pointer; color:#fff; white-space:nowrap; transition:background .15s; }
+.ee-design-cta { background:#3D57FF; border:none; border-radius:7px; padding:6px 13px; font-size:12.5px; font-weight:600; font-family:inherit; cursor:pointer; color:#fff; white-space:nowrap; transition:background .15s; }
 .ee-design-cta:hover { background:#2d46e0; }
 .ee-design-reset { background:none; border:1.5px solid #c7d2fe; border-radius:7px; padding:5px 11px; font-size:12px; font-weight:600; color:#6366f1; font-family:inherit; cursor:pointer; white-space:nowrap; transition:all .15s; }
 .ee-design-reset:hover { background:#eef0fd; }
@@ -545,8 +562,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 .create-profile-backdrop { position:absolute; inset:0; background:rgba(10,15,40,0.5); }
 .create-profile-card { position:relative; background:#fff; border-radius:10px; box-shadow:0 20px 56px rgba(0,0,0,0.22); width:420px; z-index:1; overflow:hidden; }
 .create-profile-body { padding:28px 28px 20px; }
-.create-profile-eyebrow { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#9aa5b4; margin-bottom:6px; }
-.create-profile-title { font-size:17px; font-weight:700; color:#1a1f36; margin-bottom:4px; line-height:1.3; }
+.create-profile-eyebrow { font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:#9aa5b4; margin-bottom:6px; }
+.create-profile-title { font-size:17px; font-weight:600; color:#1a1f36; margin-bottom:4px; line-height:1.3; }
 .create-profile-sub { font-size:13px; color:#697386; line-height:1.55; margin-bottom:20px; }
 .create-profile-label { font-size:12px; font-weight:600; color:#4a5568; margin-bottom:6px; }
 .create-profile-input { width:100%; border:1.5px solid #d1d5db; border-radius:7px; padding:9px 12px; font-size:13.5px; font-family:inherit; color:#1a1f36; outline:none; transition:border-color .15s; }
@@ -563,7 +580,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 .profile-save-modal-backdrop { position:absolute; inset:0; background:rgba(10,15,40,0.65); }
 .profile-save-modal-card { position:relative; background:#fff; border-radius:8px; box-shadow:0 16px 48px rgba(0,0,0,0.28); width:480px; z-index:1; overflow:hidden; }
 .profile-save-modal-top { padding:32px 32px 20px; text-align:center; }
-.profile-save-modal-title { font-size:18px; font-weight:700; color:#1a1f36; margin-bottom:10px; line-height:1.35; }
+.profile-save-modal-title { font-size:18px; font-weight:600; color:#1a1f36; margin-bottom:10px; line-height:1.35; }
 .profile-save-modal-body { font-size:14px; color:#697386; line-height:1.7; }
 .profile-save-modal-body strong { color:#1a1f36; font-weight:600; }
 .profile-save-modal-footer { padding:16px 24px 20px; display:flex; align-items:center; justify-content:flex-end; gap:8px; border-top:1px solid #e3e8ee; background:#fff; }
@@ -593,7 +610,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 .bk-cb-row { display:flex; align-items:center; gap:10px; margin-top:4px; }
 .bk-cb-row input[type=checkbox] { width:17px; height:17px; accent-color:#3D57FF; cursor:pointer; flex-shrink:0; border-radius:4px; }
 .bk-cb-row label { font-size:13.5px; color:#1a1f36; cursor:pointer; }
-.bk-help-icon { width:16px; height:16px; border-radius:50%; border:1.5px solid #c8cfd8; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#9aa5b4; cursor:default; flex-shrink:0; }
+.bk-help-icon { width:16px; height:16px; border-radius:50%; border:1.5px solid #c8cfd8; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:600; color:#9aa5b4; cursor:default; flex-shrink:0; }
 .bk-color-field { display:inline-flex; align-items:center; gap:8px; border:1.5px solid #d1d5db; border-radius:7px; padding:7px 10px; background:#fff; }
 .bk-color-hex { font-size:13px; font-weight:500; color:#1a1f36; font-family:'SFMono-Regular',Consolas,monospace; min-width:58px; }
 .bk-color-swatch-wrap { width:24px; height:24px; border-radius:4px; overflow:hidden; position:relative; flex-shrink:0; border:1px solid rgba(0,0,0,0.1); }
@@ -608,7 +625,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 .bk-header-preview { height:48px; border-radius:6px; display:flex; align-items:center; justify-content:center; background:#1a1a2e; overflow:hidden; }
 .bk-header-preview-text { font-size:11px; font-weight:800; letter-spacing:0.07em; color:#fff; }
 .bk-btn-link-preview { display:flex; align-items:center; gap:16px; }
-.bk-preview-btn { border:none; border-radius:7px; padding:9px 20px; font-size:13.5px; font-weight:700; font-family:inherit; cursor:default; color:#fff; background:#3D57FF; }
+.bk-preview-btn { border:none; border-radius:7px; padding:9px 20px; font-size:13.5px; font-weight:600; font-family:inherit; cursor:default; color:#fff; background:#3D57FF; }
 .bk-preview-link-text { font-size:13.5px; font-weight:500; color:#3D57FF; cursor:default; }
 
 /* DECISION: preview-mode is added to #eeCanvas when a shared profile is active. It hides edit affordances (chips, section tags) and blocks eeOpenPanel() calls. Prevents accidental edits to a profile used by multiple experiences. Removed only when a custom (experience-scoped) profile is active. */
@@ -623,13 +640,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 .ee-modal-backdrop { position:absolute; inset:0; background:rgba(26,31,54,0.4); }
 .ee-profile-picker-card { position:relative; background:#fff; border-radius:14px; box-shadow:0 20px 60px rgba(0,0,0,0.22); width:420px; max-height:82vh; overflow-y:auto; z-index:1; }
 .ee-profile-picker-head { padding:22px 22px 14px; border-bottom:1px solid #e3e8ee; }
-.ee-profile-picker-title { font-size:15px; font-weight:700; color:#1a1f36; margin-bottom:5px; }
+.ee-profile-picker-title { font-size:15px; font-weight:600; color:#1a1f36; margin-bottom:5px; }
 .ee-profile-picker-sub { font-size:13px; color:#697386; line-height:1.5; }
 .ee-profile-picker-list { padding:12px 12px 0; }
 .ee-profile-opt { display:flex; align-items:center; gap:12px; padding:12px; border-radius:8px; cursor:pointer; transition:background .12s; margin-bottom:4px; }
 .ee-profile-opt:hover { background:#f4f5f7; }
 .ee-profile-opt.sel { background:#eef0fd; }
-.ee-profile-opt-swatch { width:38px; height:38px; border-radius:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff; }
+.ee-profile-opt-swatch { width:38px; height:38px; border-radius:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:600; color:#fff; }
 .ee-profile-opt-name { font-size:13.5px; font-weight:600; color:#1a1f36; }
 .ee-profile-opt-desc { font-size:12px; color:#9aa5b4; margin-top:2px; line-height:1.4; }
 .ee-profile-opt-check { margin-left:auto; width:20px; height:20px; border-radius:50%; border:2px solid #d1d5db; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; }
@@ -642,7 +659,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 /* ── Save-as dialog ── */
 .ee-saveas-modal { position:fixed; inset:0; z-index:600; display:flex; align-items:center; justify-content:center; }
 .ee-saveas-card { position:relative; background:#fff; border-radius:16px; box-shadow:0 24px 80px rgba(0,0,0,0.26); width:460px; z-index:1; padding:28px 28px 24px; }
-.ee-saveas-eyebrow { font-size:11px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; color:#9aa5b4; margin-bottom:8px; }
+.ee-saveas-eyebrow { font-size:11px; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:#9aa5b4; margin-bottom:8px; }
 .ee-saveas-title { font-size:17px; font-weight:800; color:#1a1f36; margin-bottom:8px; line-height:1.3; }
 .ee-saveas-body { font-size:13.5px; color:#697386; line-height:1.6; margin-bottom:20px; }
 .ee-saveas-opt { display:flex; align-items:flex-start; gap:12px; border:2px solid #e3e8ee; border-radius:10px; padding:14px 14px 14px 14px; margin-bottom:10px; cursor:pointer; transition:border-color .15s, background .15s; }
@@ -651,12 +668,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 .ee-saveas-radio { width:18px; height:18px; border-radius:50%; border:2px solid #d1d5db; flex-shrink:0; margin-top:3px; display:flex; align-items:center; justify-content:center; transition:all .15s; }
 .ee-saveas-opt.sel .ee-saveas-radio { border-color:#3D57FF; background:#3D57FF; }
 .ee-saveas-opt.sel .ee-saveas-radio::after { content:''; display:block; width:7px; height:7px; border-radius:50%; background:#fff; }
-.ee-saveas-opt-title { font-size:13.5px; font-weight:700; color:#1a1f36; margin-bottom:4px; }
+.ee-saveas-opt-title { font-size:13.5px; font-weight:600; color:#1a1f36; margin-bottom:4px; }
 .ee-saveas-opt-desc { font-size:12.5px; color:#697386; line-height:1.5; }
 .ee-saveas-warn { font-size:11.5px; color:#d97706; font-weight:600; margin-top:6px; display:flex; align-items:center; gap:4px; }
 .ee-saveas-foot { display:flex; justify-content:flex-end; gap:10px; margin-top:22px; padding-top:18px; border-top:1px solid #e3e8ee; }
 .ee-saveas-cancel { background:#fff; border:1px solid #d1d5db; border-radius:8px; padding:9px 18px; font-size:13.5px; font-family:inherit; cursor:pointer; color:#697386; }
-.ee-saveas-confirm { background:#3D57FF; border:none; border-radius:8px; padding:9px 20px; font-size:13.5px; font-weight:700; font-family:inherit; cursor:pointer; color:#fff; transition:background .15s; }
+.ee-saveas-confirm { background:#3D57FF; border:none; border-radius:8px; padding:9px 20px; font-size:13.5px; font-weight:600; font-family:inherit; cursor:pointer; color:#fff; transition:background .15s; }
 .ee-saveas-confirm:hover { background:#2d46e0; }
 
 /* ── Preview topbar & tabs ────────────────────────── */
@@ -875,12 +892,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 }
 .panel-head-left { display: flex; align-items: center; gap: 10px; }
 .panel-icon { width: 30px; height: 30px; border-radius: 8px; background: #eef0fd; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
-.panel-title { font-weight: 700; font-size: 14px; color: #1a1f36; }
+.panel-title { font-weight: 600; font-size: 14px; color: #1a1f36; }
 .panel-close-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: #f0f2f8; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #697386; font-size: 16px; transition: background 0.1s; flex-shrink: 0; }
 .panel-close-btn:hover { background: #e3e8ee; }
 .panel-body { flex: 1; overflow-y: auto; padding: 18px; }
 .panel-foot { padding: 14px 18px; border-top: 1px solid #e3e8ee; display: flex; gap: 8px; flex-shrink: 0; }
-.btn-apply { flex: 1; background: #3D57FF; color: #fff; border: none; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.15s; }
+.btn-apply { flex: 1; background: #3D57FF; color: #fff; border: none; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.15s; }
 .btn-apply:hover { background: #2e47df; }
 .btn-cancel-panel { background: transparent; color: #697386; border: 1px solid #dde2ec; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.15s; }
 .btn-cancel-panel:hover { background: #f8f9fc; }
@@ -896,12 +913,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
 }
 .profile-panel-back-btn:hover { color: #2e47df; }
 .profile-panel-section-title {
-  font-weight: 700; font-size: 14px; color: #1a1f36;
+  font-weight: 600; font-size: 14px; color: #1a1f36;
   padding-left: 12px; border-left: 1px solid #dde2ec; margin-left: 2px;
 }
-.profile-global-title { font-weight: 700; font-size: 14px; color: #1a1f36; }
+.profile-global-title { font-weight: 600; font-size: 14px; color: #1a1f36; }
 .profile-name-input {
-  width: 100%; border: none; outline: none; font-size: 15px; font-weight: 700;
+  width: 100%; border: none; outline: none; font-size: 15px; font-weight: 600;
   color: #1a1f36; font-family: inherit; background: transparent; padding: 0; display: block;
 }
 .profile-desc-input {
@@ -2014,7 +2031,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
                 </button>
               </div>
               <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#9aa5b4">
-                <span style="background:#7c3aed;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:0.04em">BRAND KIT</span>
+                <span style="background:#7c3aed;color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;letter-spacing:0.04em">BRAND KIT</span>
                 Live preview
               </span>
             </div>
@@ -3095,7 +3112,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
             </div>
 
             <div class="ee-brand-card" onclick="eeSelectBrand(this,'events')">
-              <div class="ee-brand-logo" style="background:#dcfce7;color:#15803d;font-size:8px;font-weight:700;letter-spacing:0.02em">Business<br>Name</div>
+              <div class="ee-brand-logo" style="background:#dcfce7;color:#15803d;font-size:8px;font-weight:600;letter-spacing:0.02em">Business<br>Name</div>
               <div class="ee-brand-card-info">
                 <div class="ee-brand-card-name">Acme Events</div>
                 <div class="ee-brand-card-dots">
@@ -3152,7 +3169,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
             </div>
 
             <div class="ee-brand-card" onclick="eeSelectProfile(this,'classic')">
-              <div class="ee-brand-logo" style="background:#3d3d3d;font-size:9px;font-weight:700;letter-spacing:0.02em">CL</div>
+              <div class="ee-brand-logo" style="background:#3d3d3d;font-size:9px;font-weight:600;letter-spacing:0.02em">CL</div>
               <div class="ee-brand-card-info">
                 <div class="ee-brand-card-name">Classic</div>
                 <div class="ee-brand-card-sub">Standard booking flow · 4 experiences</div>
@@ -3161,7 +3178,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
             </div>
 
             <div class="ee-brand-card" onclick="eeSelectProfile(this,'premium')">
-              <div class="ee-brand-logo" style="background:#3D57FF;font-size:9px;font-weight:700">PR</div>
+              <div class="ee-brand-logo" style="background:#3D57FF;font-size:9px;font-weight:600">PR</div>
               <div class="ee-brand-card-info">
                 <div class="ee-brand-card-name">Premium</div>
                 <div class="ee-brand-card-sub">High-touch feel with expanded CTA · 2 experiences</div>
@@ -3170,7 +3187,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
             </div>
 
             <div class="ee-brand-card" onclick="eeSelectProfile(this,'minimal')">
-              <div class="ee-brand-logo" style="background:#1a1f36;font-size:9px;font-weight:700">MN</div>
+              <div class="ee-brand-logo" style="background:#1a1f36;font-size:9px;font-weight:600">MN</div>
               <div class="ee-brand-card-info">
                 <div class="ee-brand-card-name">Minimal</div>
                 <div class="ee-brand-card-sub">Simplified flow with fewer fields · 1 experience</div>
@@ -3230,7 +3247,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
         <div class="ee-profile-opt" id="eeProfileOptDefault" onclick="eePickerSelect('default')">
           <div class="ee-profile-opt-swatch" style="background:#e3e8ee;color:#697386;font-size:14px">★</div>
           <div style="flex:1">
-            <div class="ee-profile-opt-name">Use account default <span style="background:#e3e8ee;color:#697386;font-size:10.5px;padding:1px 7px;border-radius:20px;font-weight:700;margin-left:4px">Classic</span></div>
+            <div class="ee-profile-opt-name">Use account default <span style="background:#e3e8ee;color:#697386;font-size:10.5px;padding:1px 7px;border-radius:20px;font-weight:600;margin-left:4px">Classic</span></div>
             <div class="ee-profile-opt-desc">Automatically updates if the account default changes</div>
           </div>
           <div class="ee-profile-opt-check"></div>
@@ -3242,7 +3259,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans
             <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><rect x="1.5" y="2.5" width="11" height="9" rx="1.5" stroke="#fff" stroke-width="1.2"/><path d="M4 8.5h6M4 6h4" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/></svg>
           </div>
           <div style="flex:1">
-            <div class="ee-profile-opt-name">Classic <span style="background:#d1fae5;color:#065f46;font-size:10.5px;padding:1px 7px;border-radius:20px;font-weight:700;margin-left:4px">Default</span></div>
+            <div class="ee-profile-opt-name">Classic <span style="background:#d1fae5;color:#065f46;font-size:10.5px;padding:1px 7px;border-radius:20px;font-weight:600;margin-left:4px">Default</span></div>
             <div class="ee-profile-opt-desc">Standard booking flow · 4 experiences · Last updated Apr 10</div>
           </div>
           <div class="ee-profile-opt-check">✓</div>
@@ -4483,7 +4500,7 @@ function eeShowProfileSettings() {
       '<div class="pgroup-label">Profile Info</div>' +
       '<div class="pfield">' +
         '<div class="pfield-label">Name</div>' +
-        '<div style="font-size:15px;font-weight:700;color:#1a1f36;padding:8px 11px;background:#f8f9fb;border:1px solid #e3e8ee;border-radius:8px">' + displayName + '</div>' +
+        '<div style="font-size:15px;font-weight:600;color:#1a1f36;padding:8px 11px;background:#f8f9fb;border:1px solid #e3e8ee;border-radius:8px">' + displayName + '</div>' +
         '<div style="font-size:11.5px;color:#9aa5b4;margin-top:5px">Read-only · experience-scoped</div>' +
       '</div>' +
       '<div class="pfield">' +
@@ -4737,7 +4754,7 @@ function createProfileConfirm() {
     newCard.className = 'ee-brand-card sel';
     newCard.setAttribute('onclick', "eeSelectProfile(this,'custom-painted-ladies')");
     newCard.innerHTML =
-      '<div class="ee-brand-logo" style="background:' + (baseCfg.headerColor || '#3d3d3d') + ';font-size:9px;font-weight:700;letter-spacing:0.02em">CP</div>' +
+      '<div class="ee-brand-logo" style="background:' + (baseCfg.headerColor || '#3d3d3d') + ';font-size:9px;font-weight:600;letter-spacing:0.02em">CP</div>' +
       '<div class="ee-brand-card-info">' +
         '<div class="ee-brand-card-name">' + profileName + '</div>' +
         '<div class="ee-brand-card-sub">Custom for this experience</div>' +
