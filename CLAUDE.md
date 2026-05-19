@@ -48,6 +48,53 @@ These layers are completely independent. Changing a Brand Kit does not affect Co
 - Update tutorial step copy if any UI flows, labels, or targets changed
 - If a decision is significant, add it to the Design Decisions chapter in `system-guide.html`
 
+## How to Add a Customizable Block to a Canvas
+
+The content profile editor's canvases use a block-level customization pattern. Each customizable section in a canvas is wrapped in `.cs-section` and shows a hover outline + "Customize" chip; clicking it opens a right-side panel of controls that mutate the canvas live.
+
+### Three steps
+
+**1. Wrap the section in `cs-section`** with a tag and chip:
+
+```html
+<div class="cs-section" id="pp-sec-NAME" onclick="profileOpenPanel('NAME')">
+  <div class="cs-section-tag">Section Display Name</div>
+  <div class="cs-chip"><svg>...</svg> Customize</div>
+  <!-- existing content here, with IDs on anything the panel will mutate -->
+</div>
+```
+
+**2. Add IDs** to the elements the panel will mutate (text nodes whose `textContent` gets rewritten, elements whose visibility toggles, etc.). Convention: `pp-co-*` for checkout-page elements, `pp-*` for details-page elements.
+
+**3. Add a panel config** to `profilePanelConfigs` using the helpers:
+
+```js
+'NAME': {
+  title: 'Section Display Name', icon: '🎯',
+  render: function() { return pGroup('Group label', [
+    pText({ label: 'Field name', target: 'pp-co-element-id', fallback: 'Default value' }),
+    pToggle({ label: 'Show something', target: 'pp-co-other-id' }),
+  ]); }
+}
+```
+
+### Helper reference
+
+- **`pPanel(groups)`** — joins multiple group HTML strings with `<hr class="pdivider">` between them.
+- **`pGroup(label, controls)`** — labeled `.pgroup` wrapper around an array of control HTML strings.
+- **`pText({ label?, target, fallback, sublabel?, transform? })`** — text input that rewrites `target.textContent` live. `transform: 'upper'` applies `.toUpperCase()` (use for uppercase section headers).
+- **`pToggle({ label, target, sublabel?, invert? })`** — checkbox that shows/hides one or more elements via `display:none`. `target` can be a string id or an array. `invert: true` flips the semantics (checked = hidden — use for "Required" or "Disabled" labels).
+- **`pClassToggle({ label, target, className, sublabel?, invert? })`** — checkbox that adds/removes a CSS class on the target.
+
+Render functions can drop to raw template-literal HTML when they need behavior the helpers don't cover. The placeholder "Show price header" toggle in the Booking Widget panel is an example.
+
+### Don't drift
+
+When adding a new panel:
+- Use the helpers if your control fits one of the standard patterns. Don't write a new inline `onchange` string from scratch.
+- If you need a new control type that doesn't fit, add a new `p*` helper rather than inlining JS in one render function. Future blocks will want the same control.
+- The `_setVis`, `_setText`, `_toggleClass` runtime utilities exist so generated `onchange`/`oninput` strings stay narrow. Don't embed long expressions inline.
+
 ## Inline Decision Comments — Required Behavior
 
 Any time a non-obvious design or architecture decision is made, Claude MUST add a `<!-- DECISION: ... -->` comment in HTML/CSS or a `// DECISION: ...` comment in JS, placed immediately before the relevant code. This is not optional. The comment should explain WHY, not just what — future AI and developers need to understand the reasoning, not just the outcome.
