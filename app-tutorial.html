@@ -711,6 +711,7 @@ button, input, select, textarea { font-family: inherit; }
 .ee-canvas-row { flex: 1; display: flex; flex-direction: row; overflow: hidden; }
 .preview-canvas {
   flex: 1; overflow-y: auto; background: #dfe2eb; display: flex; flex-direction: column;
+  position: relative; /* positioning context for the click-to-edit coachmark */
 }
 
 /* DECISION: .persistent keeps the panel always visible at 268px width when a custom profile is active. In this mode, closing a section returns to Profile Settings (not to no-panel). Mirrors the always-open settings panel in the account-level profile editor. */
@@ -879,6 +880,30 @@ button, input, select, textarea { font-family: inherit; }
   pointer-events: none; z-index: 10;
 }
 .cs-section:hover .cs-chip, .cs-section.cs-active .cs-chip { opacity: 1; }
+
+/* DECISION: Click-to-edit discoverability. The hover outline + chip alone is easy to miss
+   on first use, so on entering an editable canvas we (1) briefly "reveal" every section's
+   outline + chip (.cs-reveal, removed after ~1.6s) and (2) show a dismissible coachmark.
+   Both fade away so the canvas still reads as a clean booking-page preview. */
+.cs-reveal .cs-section { outline-color: #3D57FF; }
+.cs-reveal .cs-section-tag, .cs-reveal .cs-chip { opacity: 1; }
+
+.cs-coach {
+  position: absolute; z-index: 60; top: 16px; left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  background: #1a1f36; color: #fff; font-size: 13px; font-weight: 600;
+  padding: 10px 12px 10px 16px; border-radius: 9px; box-shadow: 0 10px 30px rgba(26,31,54,0.28);
+  display: flex; align-items: center; gap: 14px; max-width: 90%;
+  opacity: 0; pointer-events: none; transition: opacity .35s, transform .35s;
+}
+.cs-coach.show { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+.cs-coach strong { font-weight: 700; }
+.cs-coach-x { cursor: pointer; opacity: .6; font-size: 15px; line-height: 1; flex-shrink: 0; }
+.cs-coach-x:hover { opacity: 1; }
+.cs-coach::after {
+  content: ''; position: absolute; bottom: -5px; left: 50%;
+  transform: translateX(-50%) rotate(45deg); width: 11px; height: 11px; background: #1a1f36;
+}
 
 /* ── Customize panel ─────────────────────────────── */
 .customize-panel {
@@ -3906,6 +3931,8 @@ function navigate(page) {
     }
     profileReturnToGlobal();
     document.getElementById('headerActions').innerHTML = '';
+    // Reveal the click-to-edit affordance + coachmark on entering the editor.
+    csRevealAndCoach('ppCanvas2');
 
   } else if (page === 'experience-edit') {
     document.getElementById('page-experience-edit').classList.add('active');
@@ -4270,6 +4297,35 @@ function _setVis(idOrIds, visible) {
 function _setVisClass(cls, visible) {
   document.querySelectorAll('.' + cls).forEach(function(e){ e.style.display = visible ? '' : 'none'; });
 }
+
+// ── Click-to-edit discoverability ───────────────────────────────────────────────
+// csRevealAndCoach — on entering an editable canvas, flash every section's outline + chip
+// (the "reveal") and show a dismissible coachmark. Both fade out so the canvas stays clean.
+function csRevealAndCoach(canvasId) {
+  var canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  canvas.classList.add('cs-reveal');
+  setTimeout(function(){ canvas.classList.remove('cs-reveal'); }, 1600);
+
+  var coach = canvas.querySelector('.cs-coach');
+  if (!coach) {
+    coach = document.createElement('div');
+    coach.className = 'cs-coach';
+    coach.innerHTML = '<span><strong>Tip:</strong> Click any highlighted section to edit its content</span>'
+                    + '<span class="cs-coach-x" title="Dismiss">✕</span>';
+    coach.querySelector('.cs-coach-x').onclick = function(e){ e.stopPropagation(); csHideCoach(canvas); };
+    canvas.appendChild(coach);
+  }
+  requestAnimationFrame(function(){ coach.classList.add('show'); });
+  clearTimeout(canvas._coachTimer);
+  canvas._coachTimer = setTimeout(function(){ csHideCoach(canvas); }, 7000);
+}
+function csHideCoach(canvasOrId) {
+  var canvas = (typeof canvasOrId === 'string') ? document.getElementById(canvasOrId) : canvasOrId;
+  if (!canvas) return;
+  var coach = canvas.querySelector('.cs-coach');
+  if (coach) coach.classList.remove('show');
+}
 // _setOverride — text customizer behavior: an empty field means "use the default"; any
 // typed text overrides it. The default copy and optional upper-case transform are read
 // from the target's data-fb / data-upper (set by pText at render). The raw override is
@@ -4628,6 +4684,7 @@ function profileReturnToGlobal() {
 }
 
 function profileOpenPanel(key) {
+  csHideCoach('ppCanvas2'); // they found it — dismiss the coachmark
   // Deactivate previous section
   if (profileCurrentSection) {
     var old = document.getElementById('pp-sec-' + profileCurrentSection);
@@ -5156,6 +5213,7 @@ function eeShowProfileSettings() {
 function eeOpenPanel(key) {
   var canvas = document.getElementById('eeCanvas');
   if (canvas && canvas.classList.contains('preview-mode')) return;
+  csHideCoach(canvas); // they found it — dismiss the coachmark
 
   // Deselect old section
   if (eeCurrentSection) {
@@ -5280,6 +5338,9 @@ function eeApplyContentProfile(id) {
   });
 }
 
+// Gates the click-to-edit reveal/coachmark so it fires once per entry into the editable
+// (custom-profile) state, not on every eeUpdateProfileUI() re-render.
+var eeCoachShown = false;
 function eeUpdateProfileUI() {
   var card   = document.getElementById('eeProfileSettingCard');
   var name   = document.getElementById('eeProfileSettingName');
@@ -5302,6 +5363,8 @@ function eeUpdateProfileUI() {
     if (profileName) profileName.textContent = displayName;
     if (canvas) canvas.classList.remove('preview-mode');
     if (clickHint) clickHint.style.display = 'flex';
+    // Reveal the click-to-edit affordance + coachmark once per entry into custom mode.
+    if (!eeCoachShown) { eeCoachShown = true; csRevealAndCoach('eeCanvas'); }
 
     // Open the panel in persistent Profile Settings mode
     eeShowProfileSettings();
@@ -5315,6 +5378,8 @@ function eeUpdateProfileUI() {
     if (profileName) profileName.textContent = eeProfile.name;
     if (canvas) canvas.classList.add('preview-mode');
     if (clickHint) clickHint.style.display = 'none';
+    eeCoachShown = false; // re-arm so the reveal plays again next time custom mode is entered
+    csHideCoach('eeCanvas');
 
     // Close panel and remove persistent mode
     var panel = document.getElementById('eeCustomizePanel');
