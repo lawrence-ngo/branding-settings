@@ -82,7 +82,8 @@ The content profile editor's canvases use a block-level customization pattern. E
 
 - **`pPanel(groups)`** — joins multiple group HTML strings with `<hr class="pdivider">` between them.
 - **`pGroup(label, controls)`** — labeled `.pgroup` wrapper around an array of control HTML strings.
-- **`pText({ label?, target, fallback, sublabel?, transform? })`** — text input that rewrites `target.textContent` live. `transform: 'upper'` applies `.toUpperCase()` (use for uppercase section headers).
+- **`pText({ label?, target, fallback, sublabel?, transform? })`** — text input that rewrites `target.textContent` live. The input is **empty by default**: `fallback` is shown as the placeholder and rendered in the preview, and only typed text becomes an override (clearing the field reverts to the default). `transform: 'upper'` applies `.toUpperCase()` (use for uppercase section headers). Override state round-trips via `data-ov` on the target (the default + transform are stashed on `data-fb` / `data-upper`); the generated handler calls `_setOverride`.
+- **`pHeading({ label?, target, fallback, sublabel? })`** — multiline textarea variant of `pText` for a heading block. Same empty-by-default behavior; `fallback` may contain a `{Guest name}` variable (resolved to the sample guest name in the preview). First line renders as a lighter greeting, remaining lines bold. Handler calls `_setHeading`; the default lives on the target's `data-fallback`.
 - **`pToggle({ label, target, sublabel?, invert? })`** — checkbox that shows/hides one or more elements via `display:none`. `target` can be a string id or an array. `invert: true` flips the semantics (checked = hidden — use for "Required" or "Disabled" labels).
 - **`pClassToggle({ label, target, className, sublabel?, invert? })`** — checkbox that adds/removes a CSS class on the target.
 
@@ -93,7 +94,7 @@ Render functions can drop to raw template-literal HTML when they need behavior t
 When adding a new panel:
 - Use the helpers if your control fits one of the standard patterns. Don't write a new inline `onchange` string from scratch.
 - If you need a new control type that doesn't fit, add a new `p*` helper rather than inlining JS in one render function. Future blocks will want the same control.
-- The `_setVis`, `_setText`, `_toggleClass` runtime utilities exist so generated `onchange`/`oninput` strings stay narrow. Don't embed long expressions inline.
+- The `_setVis`, `_setText`, `_setOverride`, `_setHeading`, `_toggleClass` runtime utilities exist so generated `onchange`/`oninput` strings stay narrow. Don't embed long expressions inline.
 
 ## Inline Decision Comments — Required Behavior
 

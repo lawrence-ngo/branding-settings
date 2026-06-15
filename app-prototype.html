@@ -4267,6 +4267,20 @@ function _setText(id, value, fallback) {
   var e = document.getElementById(id);
   if (e) e.textContent = (value && value.length) ? value : (fallback || '');
 }
+// _setOverride — text customizer behavior: an empty field means "use the default"; any
+// typed text overrides it. The default copy and optional upper-case transform are read
+// from the target's data-fb / data-upper (set by pText at render). The raw override is
+// stored on data-ov so the field can be re-populated when the panel reopens.
+// DECISION: defaults are NOT pre-filled into inputs — empty = default, typed = override.
+function _setOverride(id, value) {
+  var e = document.getElementById(id);
+  if (!e) return;
+  var fb = e.dataset.fb || '';
+  var hasVal = value && value.length;
+  if (hasVal) e.dataset.ov = value; else delete e.dataset.ov;
+  var text = hasVal ? value : fb;
+  e.textContent = (e.dataset.upper === '1') ? text.toUpperCase() : text;
+}
 function _toggleClass(id, cls, on) {
   var e = document.getElementById(id);
   if (e) e.classList.toggle(cls, on);
@@ -4326,30 +4340,41 @@ function pPanel(groups) {
 //     sublabel  — optional psublabel rendered below the input
 //     transform — 'upper' to apply .toUpperCase() before setting textContent
 function pText(opts) {
-  var current = ((document.getElementById(opts.target) || {}).textContent || opts.fallback || '').trim();
-  var fb = (opts.fallback || '').replace(/'/g, "\'");
-  var oninput = opts.transform === 'upper'
-    ? "_setText('" + opts.target + "', (this.value||'" + fb + "').toUpperCase())"
-    : "_setText('" + opts.target + "', this.value, '" + fb + "')";
+  // DECISION: the field is left EMPTY by default — the default copy shows as the
+  // placeholder, and only typed text becomes an override. The default and transform are
+  // stashed on the target (data-fb / data-upper) so the inline handler stays narrow and
+  // _setOverride can restore the default when the field is cleared. data-ov holds the
+  // current override so reopening the panel repopulates it.
+  var el = document.getElementById(opts.target);
+  var fb = opts.fallback || '';
+  if (el) {
+    el.dataset.fb = fb;
+    if (opts.transform === 'upper') el.dataset.upper = '1';
+  }
+  var ov = (el && el.dataset && el.dataset.ov) ? el.dataset.ov : '';
+  var placeholder = opts.transform === 'upper' ? fb.toUpperCase() : fb;
   var fieldLabel = opts.label ? '<div class="pfield-label">' + opts.label + '</div>' : '';
   var sub = opts.sublabel ? '<div class="psublabel" style="margin-top:6px">' + opts.sublabel + '</div>' : '';
   return '<div class="pfield">' + fieldLabel
-       + '<input class="pinput" value="' + _esc(current) + '" placeholder="' + _esc(opts.fallback || '') + '"'
-       + ' oninput="' + oninput + '">' + sub + '</div>';
+       + '<input class="pinput" value="' + _esc(ov) + '" placeholder="' + _esc(placeholder) + '"'
+       + ' oninput="_setOverride(\'' + opts.target + '\', this.value)">' + sub + '</div>';
 }
 
-// pHeading — multiline textarea for the merged confirmation heading. Default copy can
-// carry a {Guest name} variable; static text overrides it. Round-trips via the target
-// element's data-raw (set by _setHeading); falls back to opts.fallback on first render.
+// pHeading — multiline textarea for the merged confirmation heading. Like pText, the
+// field is EMPTY by default and the default copy (which can carry a {Guest name}
+// variable) shows as the placeholder; typed text overrides it. data-raw (set by
+// _setHeading) holds the current override so reopening the panel repopulates it; the
+// default itself lives on the target's data-fallback for _setHeading to restore.
 //   opts: { label?, target, fallback, sublabel? }
 function pHeading(opts) {
   var e = document.getElementById(opts.target);
-  var current = (e && e.dataset && e.dataset.raw) ? e.dataset.raw : (opts.fallback || '');
+  var ov = (e && e.dataset && e.dataset.raw) ? e.dataset.raw : '';
   var fieldLabel = opts.label ? '<div class="pfield-label">' + opts.label + '</div>' : '';
   var sub = opts.sublabel ? '<div class="psublabel" style="margin-top:6px">' + opts.sublabel + '</div>' : '';
   return '<div class="pfield">' + fieldLabel
        + '<textarea class="pinput" rows="3" style="resize:vertical;font-family:inherit;line-height:1.5"'
-       + ' oninput="_setHeading(\'' + opts.target + '\', this.value)">' + _esc(current) + '</textarea>'
+       + ' placeholder="' + _esc(opts.fallback || '') + '"'
+       + ' oninput="_setHeading(\'' + opts.target + '\', this.value)">' + _esc(ov) + '</textarea>'
        + sub + '</div>';
 }
 
