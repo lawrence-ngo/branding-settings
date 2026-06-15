@@ -711,6 +711,7 @@ button, input, select, textarea { font-family: inherit; }
 .ee-canvas-row { flex: 1; display: flex; flex-direction: row; overflow: hidden; }
 .preview-canvas {
   flex: 1; overflow-y: auto; background: #dfe2eb; display: flex; flex-direction: column;
+  position: relative; /* positioning context for the click-to-edit coachmark */
 }
 
 /* DECISION: .persistent keeps the panel always visible at 268px width when a custom profile is active. In this mode, closing a section returns to Profile Settings (not to no-panel). Mirrors the always-open settings panel in the account-level profile editor. */
@@ -880,6 +881,30 @@ button, input, select, textarea { font-family: inherit; }
 }
 .cs-section:hover .cs-chip, .cs-section.cs-active .cs-chip { opacity: 1; }
 
+/* DECISION: Click-to-edit discoverability. The hover outline + chip alone is easy to miss
+   on first use, so on entering an editable canvas we (1) briefly "reveal" every section's
+   outline + chip (.cs-reveal, removed after ~1.6s) and (2) show a dismissible coachmark.
+   Both fade away so the canvas still reads as a clean booking-page preview. */
+.cs-reveal .cs-section { outline-color: #3D57FF; }
+.cs-reveal .cs-section-tag, .cs-reveal .cs-chip { opacity: 1; }
+
+.cs-coach {
+  position: absolute; z-index: 60; top: 16px; left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  background: #1a1f36; color: #fff; font-size: 13px; font-weight: 600;
+  padding: 10px 12px 10px 16px; border-radius: 9px; box-shadow: 0 10px 30px rgba(26,31,54,0.28);
+  display: flex; align-items: center; gap: 14px; max-width: 90%;
+  opacity: 0; pointer-events: none; transition: opacity .35s, transform .35s;
+}
+.cs-coach.show { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+.cs-coach strong { font-weight: 700; }
+.cs-coach-x { cursor: pointer; opacity: .6; font-size: 15px; line-height: 1; flex-shrink: 0; }
+.cs-coach-x:hover { opacity: 1; }
+.cs-coach::after {
+  content: ''; position: absolute; bottom: -5px; left: 50%;
+  transform: translateX(-50%) rotate(45deg); width: 11px; height: 11px; background: #1a1f36;
+}
+
 /* ── Customize panel ─────────────────────────────── */
 .customize-panel {
   width: 0; overflow: hidden; transition: width 0.24s; background: #fff;
@@ -1031,6 +1056,33 @@ button, input, select, textarea { font-family: inherit; }
 
 .co-promo { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; color: #1a1f36; cursor: pointer; margin-top: 8px; text-decoration: none; user-select: none; }
 .co-promo-plus { width: 22px; height: 22px; border-radius: 3px; background: #e3e8ee; display: flex; align-items: center; justify-content: center; color: #697386; font-size: 16px; line-height: 1; }
+
+/* ─── Stripe Payment Element (wallets + unified card row) — replaces the legacy
+   cardholder-name / billing-address form on the Payment tab. ─── */
+.co-pay-wallets { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+.co-pay-wallet { height: 44px; border: none; border-radius: 5px; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; font-family: inherit; font-size: 16px; font-weight: 600; }
+.co-pay-wallet svg { display: block; }
+.co-pay-or { text-align: center; font-size: 12.5px; color: #697386; margin-bottom: 16px; }
+.co-card-field { position: relative; }
+.co-card-field .co-input { padding-right: 124px; }
+.co-card-brands { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); display: flex; gap: 4px; align-items: center; pointer-events: none; }
+.co-card-brand { width: 26px; height: 17px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 6.5px; font-weight: 800; color: #fff; letter-spacing: 0.02em; }
+
+/* ─── Promo code block — its own inline block, separate from the Stripe payment
+   fields. Collapsed shows the "+ Redeem Promo Code" toggle; .expanded reveals the
+   input + Apply and flips the plus to a minus (set in coPromoToggle). ─── */
+.co-promo-block { border-top: 1px solid #e3e8ee; border-bottom: 1px solid #e3e8ee; padding: 18px 0; margin: 0 0 22px; }
+.co-promo-block .co-promo { margin-top: 0; }
+.co-promo-expand { display: none; gap: 12px; margin-top: 16px; }
+.co-promo-block.expanded .co-promo-expand { display: flex; }
+.co-promo-input { flex: 1; }
+.co-promo-apply { padding: 0 30px; height: 42px; border: 1px solid #d1d5db; border-radius: 4px; background: #fff; font-family: inherit; font-size: 14px; color: #1a1f36; cursor: pointer; flex-shrink: 0; }
+.co-promo-apply:hover { background: #f4f5f7; }
+
+/* ─── Confirmation heading — one block (greeting + headline merged). First line is
+   the lighter greeting, remaining lines render bold. Default copy carries a
+   {Guest name} variable; static text typed in the panel overrides it entirely. ─── */
+.co-conf-heading { font-size: 24px; color: #1a1f36; line-height: 1.3; margin-bottom: 22px; }
 
 .co-message { text-align: center; margin: 32px 0 28px; padding-top: 20px; border-top: 1px solid #e3e8ee; }
 .co-message-head { font-size: 12.5px; font-weight: 700; color: #1a1f36; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 16px; }
@@ -1427,6 +1479,8 @@ button, input, select, textarea { font-family: inherit; }
               <span class="page-tab-sep">›</span>
               <button class="page-tab" id="pp-tab-checkout" onclick="profileSwitchPage('checkout')">Checkout</button>
               <span class="page-tab-sep">›</span>
+              <button class="page-tab" id="pp-tab-payment" onclick="profileSwitchPage('payment')">Payment</button>
+              <span class="page-tab-sep">›</span>
               <button class="page-tab" id="pp-tab-confirm" onclick="profileSwitchPage('confirm')">Confirmation</button>
             </div>
             <div class="preview-topbar-right">
@@ -1494,7 +1548,7 @@ button, input, select, textarea { font-family: inherit; }
                       </div>
 
                       <!-- At a Glance section -->
-                      <div class="cs-section" id="pp-sec-glance" onclick="profileOpenPanel('glance')" style="padding:3px;margin:-3px;margin-top:0">
+                      <div class="cs-section" id="pp-sec-glance" onclick="profileOpenPanel('glance')">
                         <div class="cs-section-tag">At a Glance</div>
                         <div class="cs-chip">
                           <svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1554,7 +1608,11 @@ button, input, select, textarea { font-family: inherit; }
               <div id="pp-page-checkout" style="display:none;">
                 <div class="checkout-page">
                   <div class="checkout-layout">
+                    <!-- DECISION: Checkout split into Checkout + Payment tabs sharing one summary
+                         card — see eeCheckoutPage for the rationale. Stacks toggled by
+                         profileSwitchPage('checkout'|'payment'). -->
                     <div>
+                      <div id="pp-co-stack-checkout">
                       <!-- cs-section: Review and Book — customizes the title text -->
                       <div class="cs-section" id="pp-sec-co-review" onclick="profileOpenPanel('co-review')">
                         <div class="cs-section-tag">Review and Book</div>
@@ -1595,82 +1653,14 @@ button, input, select, textarea { font-family: inherit; }
                         </div>
                       </div>
 
-                      <!-- Step 2 — Payment Information (cs-section block) -->
-                      <div class="cs-section" id="pp-sec-co-step2" onclick="profileOpenPanel('co-step2')">
-                        <div class="cs-section-tag">Payment Information</div>
-                        <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
-                        <div class="co-step">
-                          <div class="co-step-head">
-                            <div class="co-step-num">2</div>
-                            <div class="co-step-name" id="pp-co-step2-name">PAYMENT INFORMATION</div>
-                          <svg class="co-step-lock" width="13" height="15" viewBox="0 0 13 15" fill="none"><path d="M3 6V4a3.5 3.5 0 0 1 7 0v2" stroke="currentColor" stroke-width="1.4"/><rect x="1.5" y="6" width="10" height="7.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
-                        </div>
-                        <p class="co-payment-note">We do not store your credit card information. All payments are encrypted and securely processed through our PCI compliant provider.</p>
-                        <div class="co-field">
-                          <label class="co-label">Cardholder's Name</label>
-                          <div class="co-form-row">
-                            <input class="co-input" type="text" placeholder="First" onclick="event.stopPropagation()">
-                            <input class="co-input" type="text" placeholder="Last" onclick="event.stopPropagation()">
-                          </div>
-                        </div>
-                        <div class="co-field">
-                          <label class="co-label">Card Details</label>
-                          <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
-                        </div>
-                        <div class="co-form-row">
-                          <div class="co-field">
-                            <label class="co-label">Expiration</label>
-                            <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
-                          </div>
-                          <div class="co-field">
-                            <label class="co-label">Security Code</label>
-                            <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
-                          </div>
-                        </div>
-                        <div class="co-field">
-                          <label class="co-label">Billing Address</label>
-                          <input class="co-input" type="text" placeholder="Address Line 1" onclick="event.stopPropagation()">
-                          <input class="co-input" type="text" placeholder="Address Line 2" style="margin-top:8px" onclick="event.stopPropagation()">
-                        </div>
-                        <div class="co-form-row">
-                          <div class="co-field">
-                            <label class="co-label">City</label>
-                            <input class="co-input" type="text" placeholder="City" onclick="event.stopPropagation()">
-                          </div>
-                          <div class="co-field">
-                            <label class="co-label">State/Region</label>
-                            <input class="co-input" type="text" placeholder="State" onclick="event.stopPropagation()">
-                          </div>
-                        </div>
-                        <div class="co-form-row">
-                          <div class="co-field">
-                            <label class="co-label">Country</label>
-                            <select class="co-input co-select" onclick="event.stopPropagation()">
-                              <option>United States</option>
-                              <option>Canada</option>
-                              <option>United Kingdom</option>
-                              <option>Australia</option>
-                            </select>
-                          </div>
-                          <div class="co-field">
-                            <label class="co-label">Zip Code</label>
-                            <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
-                          </div>
-                        </div>
-                        <a class="co-promo" onclick="event.stopPropagation()">
-                          <span class="co-promo-plus">+</span>
-                          <span id="pp-co-promo-text">Redeem Promo Code</span>
-                        </a>
-                        </div>
-                      </div>
-
-                      <!-- Step 3 — Additional Information (cs-section block) -->
+                      <!-- Step 2 — Additional Information (cs-section block) — lives on the Checkout
+                           page (custom questions collected before payment), not the Payment page. -->
                       <div class="cs-section" id="pp-sec-co-step3" onclick="profileOpenPanel('co-step3')">
                         <div class="cs-section-tag">Additional Information</div>
                         <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
                         <div class="co-step">
                           <div class="co-step-head">
-                            <div class="co-step-num">3</div>
+                            <div class="co-step-num">2</div>
                             <div class="co-step-name" id="pp-co-step3-name">ADDITIONAL INFORMATION</div>
                         </div>
                         <div class="co-field">
@@ -1696,6 +1686,91 @@ button, input, select, textarea { font-family: inherit; }
                         </div>
                       </div>
 
+                      <!-- Proceed to payment — static; mirrors the real flow's advance to the Payment tab -->
+                      <div class="co-submit-row">
+                        <button class="co-submit-btn" onclick="event.stopPropagation()">Proceed to payment</button>
+                      </div>
+                      </div><!-- end pp-co-stack-checkout -->
+
+                      <div id="pp-co-stack-payment" style="display:none;">
+                      <div class="co-hold-banner">We are holding your booking for <strong>19:45</strong> minutes.</div>
+
+                      <!-- Step 2 — Payment Information (cs-section block) -->
+                      <div class="cs-section" id="pp-sec-co-step2" onclick="profileOpenPanel('co-step2')">
+                        <div class="cs-section-tag">Payment Information</div>
+                        <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
+                        <div class="co-step">
+                          <div class="co-step-head">
+                            <div class="co-step-name" id="pp-co-step2-name">PAYMENT INFORMATION</div>
+                          <svg class="co-step-lock" width="13" height="15" viewBox="0 0 13 15" fill="none"><path d="M3 6V4a3.5 3.5 0 0 1 7 0v2" stroke="currentColor" stroke-width="1.4"/><rect x="1.5" y="6" width="10" height="7.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
+                        </div>
+                        <p class="co-payment-note">We do not store your credit card information. All payments are encrypted and securely processed through our PCI compliant provider.</p>
+                        </div>
+                      </div>
+
+                      <!-- DECISION: Promo Code is its own inline block (cs-section), separate
+                           from the Stripe Payment Element — see eeCheckoutPage. -->
+                      <div class="cs-section" id="pp-sec-co-promo" onclick="profileOpenPanel('co-promo')">
+                        <div class="cs-section-tag">Promo Code</div>
+                        <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
+                        <div class="co-promo-block">
+                          <a class="co-promo" onclick="event.stopPropagation();coPromoToggle(this)">
+                            <span class="co-promo-plus">+</span>
+                            <span id="pp-co-promo-text">Redeem Promo Code</span>
+                          </a>
+                          <div class="co-promo-expand">
+                            <input class="co-input co-promo-input" type="text" placeholder="Enter Promo Code" onclick="event.stopPropagation()">
+                            <button class="co-promo-apply" onclick="event.stopPropagation()">Apply</button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Stripe Payment Element (express-checkout wallets + unified card row) -->
+                      <div class="co-pay-fields">
+                        <div class="co-pay-wallets">
+                          <button class="co-pay-wallet" onclick="event.stopPropagation()" aria-label="Apple Pay"><svg width="14" height="17" viewBox="0 0 14 17" fill="currentColor"><path d="M11.2 9c0-1.7 1.4-2.5 1.4-2.6-.8-1.1-2-1.3-2.4-1.3-1-.1-2 .6-2.5.6s-1.3-.6-2.1-.6c-1.1 0-2.1.6-2.7 1.6-1.1 2-.3 4.9.8 6.5.5.8 1.2 1.7 2 1.6.8 0 1.1-.5 2.1-.5s1.2.5 2.1.5 1.4-.8 1.9-1.5c.6-.9.8-1.7.9-1.8-.1 0-1.7-.6-1.7-2.5zM9.6 4c.4-.5.7-1.3.6-2-.6 0-1.4.4-1.9 1-.4.5-.8 1.3-.7 2 .7 0 1.5-.4 2-.9z"/></svg>Pay</button>
+                          <button class="co-pay-wallet" onclick="event.stopPropagation()" aria-label="Google Pay"><svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.6 9.2c0-.6 0-1.1-.1-1.6H9v3.3h4.8c-.2 1.1-.8 2-1.8 2.6v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3C2.4 15.9 5.5 18 9 18z"/><path fill="#FBBC05" d="M3.9 10.7c-.2-.5-.3-1.1-.3-1.7s.1-1.2.3-1.7V5H.9C.3 6.2 0 7.6 0 9s.3 2.8.9 4l3-2.3z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.4 1.3l2.6-2.6C13.5.9 11.4 0 9 0 5.5 0 2.4 2.1.9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/></svg>Pay</button>
+                        </div>
+                        <div class="co-pay-or">Or pay with card</div>
+                        <div class="co-field">
+                          <label class="co-label">Card number</label>
+                          <div class="co-card-field">
+                            <input class="co-input" type="text" placeholder="1234 1234 1234 1234" onclick="event.stopPropagation()">
+                            <div class="co-card-brands">
+                              <span class="co-card-brand" style="background:#1a1f71">VISA</span>
+                              <span class="co-card-brand" style="background:#eb001b">MC</span>
+                              <span class="co-card-brand" style="background:#2e77bc">AMEX</span>
+                              <span class="co-card-brand" style="background:#f47216">DISC</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="co-form-row">
+                          <div class="co-field">
+                            <label class="co-label">Expiration date</label>
+                            <input class="co-input" type="text" placeholder="MM / YY" onclick="event.stopPropagation()">
+                          </div>
+                          <div class="co-field">
+                            <label class="co-label">Security code</label>
+                            <input class="co-input" type="text" placeholder="CVC" onclick="event.stopPropagation()">
+                          </div>
+                        </div>
+                        <div class="co-form-row">
+                          <div class="co-field">
+                            <label class="co-label">Country</label>
+                            <select class="co-input co-select" onclick="event.stopPropagation()">
+                              <option>United States</option>
+                              <option>Canada</option>
+                              <option>United Kingdom</option>
+                              <option>Australia</option>
+                            </select>
+                          </div>
+                          <div class="co-field">
+                            <label class="co-label">ZIP code</label>
+                            <input class="co-input" type="text" placeholder="12345" onclick="event.stopPropagation()">
+                          </div>
+                        </div>
+                      </div><!-- end co-pay-fields -->
+
                       <!-- Confirmation Area (cs-section block) — message + submit + subtext -->
                       <div class="cs-section" id="pp-sec-co-confirm-area" onclick="profileOpenPanel('co-confirm-area')">
                         <div class="cs-section-tag">Confirmation Area</div>
@@ -1712,8 +1787,9 @@ button, input, select, textarea { font-family: inherit; }
                           <div class="co-foot-note" id="pp-co-foot-note">Tickets are non-transferable &nbsp;|&nbsp; 21+ Age Limit</div>
                         </div>
                       </div>
+                      </div><!-- end pp-co-stack-payment -->
 
-                      <!-- AnyRoad footer -->
+                      <!-- AnyRoad footer (shared across both tabs) -->
                       <div class="co-ar-foot">
                         <div class="co-ar-mark">AnyRoad</div>
                         <div class="co-ar-link-row">
@@ -1725,22 +1801,22 @@ button, input, select, textarea { font-family: inherit; }
                     <!-- Summary card (cs-section block) -->
                     <div>
                       <div class="cs-section" id="pp-sec-co-summary" onclick="profileOpenPanel('co-summary')">
-                        <div class="cs-section-tag">Checkout Summary</div>
+                        <div class="cs-section-tag">Booking Summary</div>
                         <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
                         <div class="co-summary-card">
-                          <div class="co-sum-cover" id="pp-co-cover"></div>
+                          <div class="co-sum-cover sumImg" id="pp-co-cover"></div>
                           <div class="co-sum-name">The Painted Ladies Picnic &amp; Architecture Tour</div>
-                          <div class="co-sum-host" id="pp-co-host">With Acme Corp</div>
+                          <div class="co-sum-host sumHost" id="pp-co-host">With Acme Corp</div>
                         <hr class="co-sum-hr">
-                        <div class="co-sum-row">
+                        <div class="co-sum-row sumDate">
                           <span class="label">Date</span>
                           <span class="value-blue">May 22, 2026</span>
                         </div>
-                        <div class="co-sum-row">
+                        <div class="co-sum-row sumTime">
                           <span class="label">Time</span>
                           <span class="value-blue">6:00 pm</span>
                         </div>
-                        <div class="co-sum-row">
+                        <div class="co-sum-row sumGuests">
                           <span class="label">Number of Guests</span>
                           <span class="value">1</span>
                         </div>
@@ -1765,38 +1841,43 @@ button, input, select, textarea { font-family: inherit; }
               <div id="pp-page-confirm" style="display:none;width:100%;">
                 <div id="ppConfirmInner" style="background:#fff;min-height:100%;">
                   <div style="max-width:860px;margin:0 auto;padding:52px 40px 60px;display:flex;gap:52px;align-items:flex-start;">
-                    <!-- Left: confirmation message -->
-                    <div style="flex:1;min-width:0;">
-                      <div style="font-size:24px;font-weight:400;color:#1a1f36;margin-bottom:4px;">Thank you, Lawrence.</div>
-                      <div style="font-size:24px;font-weight:700;color:#1a1f36;margin-bottom:22px;">Your booking is confirmed.</div>
-                      <div style="font-size:14px;color:#697386;line-height:1.7;margin-bottom:20px;">We just sent an email to you with all your details. No reservation codes. No tickets to print.</div>
+                    <!-- Left: confirmation message (cs-section block) -->
+                    <div class="cs-section" id="pp-sec-co-confirm-msg" onclick="profileOpenPanel('co-confirm-msg')" style="flex:1;min-width:0;">
+                      <div class="cs-section-tag">Confirmation Message</div>
+                      <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
+                      <div id="pp-conf-heading" class="co-conf-heading" data-fallback="Thank you, {Guest name}.&#10;Your booking is confirmed."><span style="font-weight:400">Thank you, Lawrence.</span><br><span style="font-weight:700">Your booking is confirmed.</span></div>
+                      <div id="pp-conf-email" style="font-size:14px;color:#697386;line-height:1.7;margin-bottom:20px;">We just sent an email to you with all your details. No reservation codes. No tickets to print.</div>
                       <div style="font-size:11.5px;color:#9aa5b4;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">Sent to</div>
                       <div style="font-size:14px;font-weight:600;color:#1a1f36;margin-bottom:5px;">lawrence@anyroad.com</div>
-                      <a id="ppConfLink1" style="font-size:14px;color:#3b5bff;cursor:pointer;font-weight:500;">Edit</a>
-                      <div style="font-size:14px;color:#697386;margin-top:18px;margin-bottom:26px;line-height:1.65;">We look forward to seeing you on <strong style="color:#1a1f36;">Thu, May 22, 2026 at 6:00 PM</strong></div>
+                      <a id="ppConfLink1" style="font-size:14px;color:#3b5bff;cursor:pointer;font-weight:500;" onclick="event.stopPropagation()">Edit</a>
+                      <div id="pp-conf-forward" style="font-size:14px;color:#697386;margin-top:18px;margin-bottom:26px;line-height:1.65;">We look forward to seeing you on <strong style="color:#1a1f36;">Thu, May 22, 2026 at 6:00 PM</strong></div>
                       <hr style="border:none;border-top:1px solid #e3e8ee;margin-bottom:22px;">
                       <div style="margin-bottom:14px;">
-                        <a id="ppConfBtn1" style="font-size:15px;color:#3b5bff;font-weight:500;cursor:pointer;">Reschedule booking →</a>
+                        <a id="ppConfBtn1" style="font-size:15px;color:#3b5bff;font-weight:500;cursor:pointer;" onclick="event.stopPropagation()">Reschedule booking →</a>
                       </div>
-                      <div style="font-size:14px;color:#697386;margin-bottom:5px;">Have questions for us?</div>
-                      <a id="ppConfLink2" style="font-size:14px;color:#3b5bff;font-weight:500;cursor:pointer;">Send a message</a>
+                      <div id="pp-conf-questions">
+                        <div style="font-size:14px;color:#697386;margin-bottom:5px;">Have questions for us?</div>
+                        <a id="ppConfLink2" style="font-size:14px;color:#3b5bff;font-weight:500;cursor:pointer;" onclick="event.stopPropagation()">Send a message</a>
+                      </div>
                     </div>
-                    <!-- Right: booking summary card -->
-                    <div style="width:268px;flex-shrink:0;">
+                    <!-- Right: booking summary card (cs-section block) -->
+                    <div class="cs-section" id="pp-sec-co-confirm-summary" onclick="profileOpenPanel('co-confirm-summary')" style="width:268px;flex-shrink:0;">
+                      <div class="cs-section-tag">Booking Summary</div>
+                      <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
                       <div style="border-radius:8px;overflow:hidden;border:1px solid #e3e8ee;">
-                        <div style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
+                        <div class="sumImg" style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
                         <div style="background:#f7f8fa;padding:18px 16px;">
                           <div style="font-size:14px;font-weight:700;color:#1a1f36;margin-bottom:3px;line-height:1.4;">The Painted Ladies Picnic &amp; Architecture Tour</div>
-                          <div style="font-size:13px;color:#697386;margin-bottom:14px;">With Painted Ladies Tours</div>
+                          <div class="sumHost" style="font-size:13px;color:#697386;margin-bottom:14px;">With Painted Ladies Tours</div>
                           <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                            <tr><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
-                            <tr><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
-                            <tr><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
+                            <tr id="pp-conf-row-date" class="sumDate"><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
+                            <tr id="pp-conf-row-time" class="sumTime"><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
+                            <tr id="pp-conf-row-guests" class="sumGuests"><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
                           </table>
                           <hr style="border:none;border-top:1px solid #e3e8ee;margin:12px 0;">
                           <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
                             <span style="font-size:13px;color:#697386;white-space:nowrap;flex-shrink:0;">Cancellation policy</span>
-                            <a id="ppCancelLink3" style="font-size:13px;color:#3b5bff;cursor:pointer;text-align:right;line-height:1.4;">5 days before for a 50% refund, with no refunds af...</a>
+                            <a id="ppCancelLink3" style="font-size:13px;color:#3b5bff;cursor:pointer;text-align:right;line-height:1.4;" onclick="event.stopPropagation()">5 days before for a 50% refund, with no refunds af...</a>
                           </div>
                         </div>
                       </div>
@@ -2045,6 +2126,8 @@ button, input, select, textarea { font-family: inherit; }
               <span class="page-tab-sep">›</span>
               <button class="page-tab" id="bp-tab-checkout" onclick="bpSwitchTab('checkout')">Checkout</button>
               <span class="page-tab-sep">›</span>
+              <button class="page-tab" id="bp-tab-payment" onclick="bpSwitchTab('payment')">Payment</button>
+              <span class="page-tab-sep">›</span>
               <button class="page-tab" id="bp-tab-confirm" onclick="bpSwitchTab('confirm')">Confirmation</button>
             </div>
             <div class="preview-topbar-right">
@@ -2172,8 +2255,12 @@ button, input, select, textarea { font-family: inherit; }
                      the canvas. JS-referenced IDs preserved: #bpCheckoutGrid (mobile layout),
                      #bpCta2 (button color sync), #bpCancelLink2 (link color sync). -->
                 <div class="checkout-page">
+                  <!-- DECISION: Checkout split into Checkout + Payment tabs sharing one summary
+                       card — see eeCheckoutPage. Stacks toggled by bpSwitchTab('checkout'|'payment').
+                       #bpProceedCta is added to the brand-color sync alongside #bpCta2. -->
                   <div class="checkout-layout" id="bpCheckoutGrid">
                     <div>
+                      <div id="bp-co-stack-checkout">
                       <h1 class="co-review-title">Review and Book</h1>
                       <div class="co-hold-banner">We are holding your booking for <strong>19:45</strong> minutes.</div>
 
@@ -2205,75 +2292,10 @@ button, input, select, textarea { font-family: inherit; }
                         </div>
                       </div>
 
-                      <!-- Step 2 — Payment Information -->
+                      <!-- Step 2 — Additional Information — on the Checkout page (collected before payment) -->
                       <div class="co-step">
                         <div class="co-step-head">
                           <div class="co-step-num">2</div>
-                          <div class="co-step-name">PAYMENT INFORMATION</div>
-                          <svg class="co-step-lock" width="13" height="15" viewBox="0 0 13 15" fill="none"><path d="M3 6V4a3.5 3.5 0 0 1 7 0v2" stroke="currentColor" stroke-width="1.4"/><rect x="1.5" y="6" width="10" height="7.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
-                        </div>
-                        <p class="co-payment-note">We do not store your credit card information. All payments are encrypted and securely processed through our PCI compliant provider.</p>
-                        <div class="co-field">
-                          <label class="co-label">Cardholder's Name</label>
-                          <div class="co-form-row">
-                            <input class="co-input" type="text" placeholder="First" onclick="event.stopPropagation()">
-                            <input class="co-input" type="text" placeholder="Last" onclick="event.stopPropagation()">
-                          </div>
-                        </div>
-                        <div class="co-field">
-                          <label class="co-label">Card Details</label>
-                          <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
-                        </div>
-                        <div class="co-form-row">
-                          <div class="co-field">
-                            <label class="co-label">Expiration</label>
-                            <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
-                          </div>
-                          <div class="co-field">
-                            <label class="co-label">Security Code</label>
-                            <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
-                          </div>
-                        </div>
-                        <div class="co-field">
-                          <label class="co-label">Billing Address</label>
-                          <input class="co-input" type="text" placeholder="Address Line 1" onclick="event.stopPropagation()">
-                          <input class="co-input" type="text" placeholder="Address Line 2" style="margin-top:8px" onclick="event.stopPropagation()">
-                        </div>
-                        <div class="co-form-row">
-                          <div class="co-field">
-                            <label class="co-label">City</label>
-                            <input class="co-input" type="text" placeholder="City" onclick="event.stopPropagation()">
-                          </div>
-                          <div class="co-field">
-                            <label class="co-label">State/Region</label>
-                            <input class="co-input" type="text" placeholder="State" onclick="event.stopPropagation()">
-                          </div>
-                        </div>
-                        <div class="co-form-row">
-                          <div class="co-field">
-                            <label class="co-label">Country</label>
-                            <select class="co-input co-select" onclick="event.stopPropagation()">
-                              <option>United States</option>
-                              <option>Canada</option>
-                              <option>United Kingdom</option>
-                              <option>Australia</option>
-                            </select>
-                          </div>
-                          <div class="co-field">
-                            <label class="co-label">Zip Code</label>
-                            <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
-                          </div>
-                        </div>
-                        <a class="co-promo" onclick="event.stopPropagation()">
-                          <span class="co-promo-plus">+</span>
-                          Redeem Promo Code
-                        </a>
-                      </div>
-
-                      <!-- Step 3 — Additional Information -->
-                      <div class="co-step">
-                        <div class="co-step-head">
-                          <div class="co-step-num">3</div>
                           <div class="co-step-name">ADDITIONAL INFORMATION</div>
                         </div>
                         <div class="co-field">
@@ -2298,6 +2320,78 @@ button, input, select, textarea { font-family: inherit; }
                         </div>
                       </div>
 
+                      <!-- Proceed to payment — static; mirrors the real flow's advance to the Payment tab -->
+                      <div class="co-submit-row">
+                        <button id="bpProceedCta" class="co-submit-btn" onclick="event.stopPropagation()">Proceed to payment</button>
+                      </div>
+                      </div><!-- end bp-co-stack-checkout -->
+
+                      <div id="bp-co-stack-payment" style="display:none;">
+                      <div class="co-hold-banner">We are holding your booking for <strong>19:45</strong> minutes.</div>
+
+                      <!-- Step 2 — Payment Information -->
+                      <div class="co-step">
+                        <div class="co-step-head">
+                          <div class="co-step-name">PAYMENT INFORMATION</div>
+                          <svg class="co-step-lock" width="13" height="15" viewBox="0 0 13 15" fill="none"><path d="M3 6V4a3.5 3.5 0 0 1 7 0v2" stroke="currentColor" stroke-width="1.4"/><rect x="1.5" y="6" width="10" height="7.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
+                        </div>
+                        <p class="co-payment-note">We do not store your credit card information. All payments are encrypted and securely processed through our PCI compliant provider.</p>
+                        <!-- DECISION: Expandable promo block (collapsed toggle → input + Apply),
+                             rendered as its own block separate from the Stripe payment fields — see eeCheckoutPage. -->
+                        <div class="co-promo-block">
+                          <a class="co-promo" onclick="event.stopPropagation();coPromoToggle(this)">
+                            <span class="co-promo-plus">+</span>
+                            Redeem Promo Code
+                          </a>
+                          <div class="co-promo-expand">
+                            <input class="co-input co-promo-input" type="text" placeholder="Enter Promo Code" onclick="event.stopPropagation()">
+                            <button class="co-promo-apply" onclick="event.stopPropagation()">Apply</button>
+                          </div>
+                        </div>
+                        <div class="co-pay-wallets">
+                          <button class="co-pay-wallet" onclick="event.stopPropagation()" aria-label="Apple Pay"><svg width="14" height="17" viewBox="0 0 14 17" fill="currentColor"><path d="M11.2 9c0-1.7 1.4-2.5 1.4-2.6-.8-1.1-2-1.3-2.4-1.3-1-.1-2 .6-2.5.6s-1.3-.6-2.1-.6c-1.1 0-2.1.6-2.7 1.6-1.1 2-.3 4.9.8 6.5.5.8 1.2 1.7 2 1.6.8 0 1.1-.5 2.1-.5s1.2.5 2.1.5 1.4-.8 1.9-1.5c.6-.9.8-1.7.9-1.8-.1 0-1.7-.6-1.7-2.5zM9.6 4c.4-.5.7-1.3.6-2-.6 0-1.4.4-1.9 1-.4.5-.8 1.3-.7 2 .7 0 1.5-.4 2-.9z"/></svg>Pay</button>
+                          <button class="co-pay-wallet" onclick="event.stopPropagation()" aria-label="Google Pay"><svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.6 9.2c0-.6 0-1.1-.1-1.6H9v3.3h4.8c-.2 1.1-.8 2-1.8 2.6v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3C2.4 15.9 5.5 18 9 18z"/><path fill="#FBBC05" d="M3.9 10.7c-.2-.5-.3-1.1-.3-1.7s.1-1.2.3-1.7V5H.9C.3 6.2 0 7.6 0 9s.3 2.8.9 4l3-2.3z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.4 1.3l2.6-2.6C13.5.9 11.4 0 9 0 5.5 0 2.4 2.1.9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/></svg>Pay</button>
+                        </div>
+                        <div class="co-pay-or">Or pay with card</div>
+                        <div class="co-field">
+                          <label class="co-label">Card number</label>
+                          <div class="co-card-field">
+                            <input class="co-input" type="text" placeholder="1234 1234 1234 1234" onclick="event.stopPropagation()">
+                            <div class="co-card-brands">
+                              <span class="co-card-brand" style="background:#1a1f71">VISA</span>
+                              <span class="co-card-brand" style="background:#eb001b">MC</span>
+                              <span class="co-card-brand" style="background:#2e77bc">AMEX</span>
+                              <span class="co-card-brand" style="background:#f47216">DISC</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="co-form-row">
+                          <div class="co-field">
+                            <label class="co-label">Expiration date</label>
+                            <input class="co-input" type="text" placeholder="MM / YY" onclick="event.stopPropagation()">
+                          </div>
+                          <div class="co-field">
+                            <label class="co-label">Security code</label>
+                            <input class="co-input" type="text" placeholder="CVC" onclick="event.stopPropagation()">
+                          </div>
+                        </div>
+                        <div class="co-form-row">
+                          <div class="co-field">
+                            <label class="co-label">Country</label>
+                            <select class="co-input co-select" onclick="event.stopPropagation()">
+                              <option>United States</option>
+                              <option>Canada</option>
+                              <option>United Kingdom</option>
+                              <option>Australia</option>
+                            </select>
+                          </div>
+                          <div class="co-field">
+                            <label class="co-label">ZIP code</label>
+                            <input class="co-input" type="text" placeholder="12345" onclick="event.stopPropagation()">
+                          </div>
+                        </div>
+                      </div>
+
                       <!-- Message to operator -->
                       <div class="co-message">
                         <div class="co-message-head">SEND A MESSAGE TO ACME CORP (OPTIONAL)</div>
@@ -2309,8 +2403,9 @@ button, input, select, textarea { font-family: inherit; }
                         <button id="bpCta2" class="co-submit-btn" onclick="event.stopPropagation()">Confirm Purchase</button>
                         <div class="co-foot-note">Tickets are non-transferable &nbsp;|&nbsp; 21+ Age Limit</div>
                       </div>
+                      </div><!-- end bp-co-stack-payment -->
 
-                      <!-- AnyRoad footer -->
+                      <!-- AnyRoad footer (shared across both tabs) -->
                       <div class="co-ar-foot">
                         <div class="co-ar-mark">AnyRoad</div>
                         <div class="co-ar-link-row">
@@ -2322,19 +2417,19 @@ button, input, select, textarea { font-family: inherit; }
                     <!-- Summary card — cancellation link id preserved for brand-kit link color sync -->
                     <div>
                       <div class="co-summary-card">
-                        <div class="co-sum-cover"></div>
+                        <div class="co-sum-cover sumImg"></div>
                         <div class="co-sum-name">The Painted Ladies Picnic &amp; Architecture Tour</div>
-                        <div class="co-sum-host">With Acme Corp</div>
+                        <div class="co-sum-host sumHost">With Acme Corp</div>
                         <hr class="co-sum-hr">
-                        <div class="co-sum-row">
+                        <div class="co-sum-row sumDate">
                           <span class="label">Date</span>
                           <span class="value-blue">May 22, 2026</span>
                         </div>
-                        <div class="co-sum-row">
+                        <div class="co-sum-row sumTime">
                           <span class="label">Time</span>
                           <span class="value-blue">6:00 pm</span>
                         </div>
-                        <div class="co-sum-row">
+                        <div class="co-sum-row sumGuests">
                           <span class="label">Number of Guests</span>
                           <span class="value">1</span>
                         </div>
@@ -2362,33 +2457,35 @@ button, input, select, textarea { font-family: inherit; }
                   <span id="bpW3" style="font-weight:800;font-size:12px;letter-spacing:0.06em;color:#fff">ACME CORP</span>
                 </div>
                 <div style="max-width:860px;margin:0 auto;padding:52px 40px 60px;display:flex;gap:52px;align-items:flex-start;">
-                  <!-- Left: confirmation message -->
+                  <!-- Left: confirmation message — bp-conf-* ids let the Content Profile / Experience
+                       Editor confirmation toggles reflect here (see eePanels co-confirm-*). -->
                   <div style="flex:1;min-width:0;">
-                    <div style="font-size:24px;font-weight:400;color:#1a1f36;margin-bottom:4px;">Thank you, Lawrence.</div>
-                    <div style="font-size:24px;font-weight:700;color:#1a1f36;margin-bottom:22px;">Your booking is confirmed.</div>
+                    <div class="co-conf-heading"><span style="font-weight:400">Thank you, Lawrence.</span><br><span style="font-weight:700">Your booking is confirmed.</span></div>
                     <div style="font-size:14px;color:#697386;line-height:1.7;margin-bottom:20px;">We just sent an email to you with all your details. No reservation codes. No tickets to print.</div>
                     <div style="font-size:11.5px;color:#9aa5b4;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">Sent to</div>
                     <div style="font-size:14px;font-weight:600;color:#1a1f36;margin-bottom:5px;">lawrence@anyroad.com</div>
                     <a id="bpConfLink1" style="font-size:14px;color:#3b5bff;cursor:pointer;font-weight:500;">Edit</a>
-                    <div style="font-size:14px;color:#697386;margin-top:18px;margin-bottom:26px;line-height:1.65;">We look forward to seeing you on <strong style="color:#1a1f36;">Thu, May 22, 2026 at 6:00 PM</strong></div>
+                    <div id="bp-conf-forward" style="font-size:14px;color:#697386;margin-top:18px;margin-bottom:26px;line-height:1.65;">We look forward to seeing you on <strong style="color:#1a1f36;">Thu, May 22, 2026 at 6:00 PM</strong></div>
                     <hr style="border:none;border-top:1px solid #e3e8ee;margin-bottom:22px;">
                     <div style="margin-bottom:14px;">
                       <a id="bpConfBtn1" style="font-size:15px;color:#3b5bff;font-weight:500;cursor:pointer;">Reschedule booking →</a>
                     </div>
-                    <div style="font-size:14px;color:#697386;margin-bottom:5px;">Have questions for us?</div>
-                    <a id="bpConfLink2" style="font-size:14px;color:#3b5bff;font-weight:500;cursor:pointer;">Send a message</a>
+                    <div id="bp-conf-questions">
+                      <div style="font-size:14px;color:#697386;margin-bottom:5px;">Have questions for us?</div>
+                      <a id="bpConfLink2" style="font-size:14px;color:#3b5bff;font-weight:500;cursor:pointer;">Send a message</a>
+                    </div>
                   </div>
                   <!-- Right: booking summary card -->
                   <div style="width:268px;flex-shrink:0;">
                     <div style="border-radius:8px;overflow:hidden;border:1px solid #e3e8ee;">
-                      <div style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
+                      <div class="sumImg" style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
                       <div style="background:#f7f8fa;padding:18px 16px;">
                         <div style="font-size:14px;font-weight:700;color:#1a1f36;margin-bottom:3px;line-height:1.4;">The Painted Ladies Picnic &amp; Architecture Tour</div>
-                        <div style="font-size:13px;color:#697386;margin-bottom:14px;">With Acme Corp</div>
+                        <div class="sumHost" style="font-size:13px;color:#697386;margin-bottom:14px;">With Acme Corp</div>
                         <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                          <tr><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
-                          <tr><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
-                          <tr><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
+                          <tr id="bp-conf-row-date" class="sumDate"><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
+                          <tr id="bp-conf-row-time" class="sumTime"><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
+                          <tr id="bp-conf-row-guests" class="sumGuests"><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
                         </table>
                         <hr style="border:none;border-top:1px solid #e3e8ee;margin:12px 0;">
                         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
@@ -2614,6 +2711,8 @@ button, input, select, textarea { font-family: inherit; }
             <span class="page-tab-sep">›</span>
             <button class="page-tab" id="ee-pagetab-checkout" onclick="eeSetPage('checkout')">Checkout</button>
             <span class="page-tab-sep">›</span>
+            <button class="page-tab" id="ee-pagetab-payment" onclick="eeSetPage('payment')">Payment</button>
+            <span class="page-tab-sep">›</span>
             <button class="page-tab" id="ee-pagetab-confirm" onclick="eeSetPage('confirm')">Confirmation</button>
           </div>
           <!-- DECISION: Viewport toggle is on the LEFT of the topbar, hint text on the RIGHT. No "Open full preview" link. This matches the account-level profile editor layout exactly for consistency. -->
@@ -2661,7 +2760,7 @@ button, input, select, textarea { font-family: inherit; }
               <div>
 
                 <!-- SECTION: Experience Info -->
-                <div class="cs-section" id="sec-info" onclick="eeOpenPanel('info')" style="padding:3px;margin:-3px;">
+                <div class="cs-section" id="sec-info" onclick="eeOpenPanel('info')">
                   <div class="cs-section-tag">Experience Info</div>
                   <div class="cs-chip">
                     <svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -2695,7 +2794,7 @@ button, input, select, textarea { font-family: inherit; }
                 </div>
 
                 <!-- SECTION: At a Glance -->
-                <div class="cs-section" id="sec-glance" onclick="eeOpenPanel('glance')" style="padding:3px;margin:-3px;margin-top:0">
+                <div class="cs-section" id="sec-glance" onclick="eeOpenPanel('glance')">
                   <div class="cs-section-tag">At a Glance</div>
                   <div class="cs-chip">
                     <svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -2860,7 +2959,16 @@ button, input, select, textarea { font-family: inherit; }
           <div class="checkout-page" id="eeCheckoutPage" style="display:none;">
             <div class="checkout-layout">
               <!-- ── Left: form ── -->
+              <!-- DECISION: The checkout flow is split into two page tabs — "Checkout" (Your
+                   Information + Additional Information + Proceed to payment) and "Payment"
+                   (Payment Information + Confirm Purchase). Additional Information (custom
+                   questions) is collected before payment, so it lives on the Checkout page.
+                   Both tabs share the SINGLE summary card on the right, so the left column holds
+                   two stacks toggled by eeSetPage('checkout'|'payment') instead of two separate
+                   page containers. This keeps one set of summary IDs (ee-co-cover, ee-co-host)
+                   and avoids duplicate-ID breakage of the Booking Summary customize panel. -->
               <div>
+                <div id="ee-co-stack-checkout">
                 <!-- cs-section: Review and Book — customizes the page title -->
                 <div class="cs-section" id="sec-co-review" onclick="eeOpenPanel('co-review')">
                   <div class="cs-section-tag">Review and Book</div>
@@ -2901,82 +3009,14 @@ button, input, select, textarea { font-family: inherit; }
                   </div>
                 </div>
 
-                <!-- Step 2 — Payment Information (cs-section block) -->
-                <div class="cs-section" id="sec-co-step2" onclick="eeOpenPanel('co-step2')">
-                  <div class="cs-section-tag">Payment Information</div>
-                  <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
-                  <div class="co-step">
-                    <div class="co-step-head">
-                      <div class="co-step-num">2</div>
-                      <div class="co-step-name" id="ee-co-step2-name">PAYMENT INFORMATION</div>
-                    <svg class="co-step-lock" width="13" height="15" viewBox="0 0 13 15" fill="none"><path d="M3 6V4a3.5 3.5 0 0 1 7 0v2" stroke="currentColor" stroke-width="1.4"/><rect x="1.5" y="6" width="10" height="7.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
-                  </div>
-                  <p class="co-payment-note">We do not store your credit card information. All payments are encrypted and securely processed through our PCI compliant provider.</p>
-                  <div class="co-field">
-                    <label class="co-label">Cardholder's Name</label>
-                    <div class="co-form-row">
-                      <input class="co-input" type="text" placeholder="First" onclick="event.stopPropagation()">
-                      <input class="co-input" type="text" placeholder="Last" onclick="event.stopPropagation()">
-                    </div>
-                  </div>
-                  <div class="co-field">
-                    <label class="co-label">Card Details</label>
-                    <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
-                  </div>
-                  <div class="co-form-row">
-                    <div class="co-field">
-                      <label class="co-label">Expiration</label>
-                      <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
-                    </div>
-                    <div class="co-field">
-                      <label class="co-label">Security Code</label>
-                      <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
-                    </div>
-                  </div>
-                  <div class="co-field">
-                    <label class="co-label">Billing Address</label>
-                    <input class="co-input" type="text" placeholder="Address Line 1" onclick="event.stopPropagation()">
-                    <input class="co-input" type="text" placeholder="Address Line 2" style="margin-top:8px" onclick="event.stopPropagation()">
-                  </div>
-                  <div class="co-form-row">
-                    <div class="co-field">
-                      <label class="co-label">City</label>
-                      <input class="co-input" type="text" placeholder="City" onclick="event.stopPropagation()">
-                    </div>
-                    <div class="co-field">
-                      <label class="co-label">State/Region</label>
-                      <input class="co-input" type="text" placeholder="State" onclick="event.stopPropagation()">
-                    </div>
-                  </div>
-                  <div class="co-form-row">
-                    <div class="co-field">
-                      <label class="co-label">Country</label>
-                      <select class="co-input co-select" onclick="event.stopPropagation()">
-                        <option>United States</option>
-                        <option>Canada</option>
-                        <option>United Kingdom</option>
-                        <option>Australia</option>
-                      </select>
-                    </div>
-                    <div class="co-field">
-                      <label class="co-label">Zip Code</label>
-                      <input class="co-input" type="text" placeholder="" onclick="event.stopPropagation()">
-                    </div>
-                  </div>
-                    <a class="co-promo" onclick="event.stopPropagation()">
-                      <span class="co-promo-plus">+</span>
-                      <span id="ee-co-promo-text">Redeem Promo Code</span>
-                    </a>
-                  </div>
-                </div>
-
-                <!-- Step 3 — Additional Information (cs-section block) -->
+                <!-- Step 2 — Additional Information (cs-section block) — lives on the Checkout
+                     page (custom questions collected before payment), not the Payment page. -->
                 <div class="cs-section" id="sec-co-step3" onclick="eeOpenPanel('co-step3')">
                   <div class="cs-section-tag">Additional Information</div>
                   <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
                   <div class="co-step">
                     <div class="co-step-head">
-                      <div class="co-step-num">3</div>
+                      <div class="co-step-num">2</div>
                       <div class="co-step-name" id="ee-co-step3-name">ADDITIONAL INFORMATION</div>
                   </div>
                   <div class="co-field">
@@ -3002,6 +3042,98 @@ button, input, select, textarea { font-family: inherit; }
                   </div>
                 </div>
 
+                  <!-- Proceed to payment — static; mirrors the real flow's advance to the Payment tab -->
+                  <div class="co-submit-row">
+                    <button class="co-submit-btn" onclick="event.stopPropagation()">Proceed to payment</button>
+                  </div>
+                </div><!-- end ee-co-stack-checkout -->
+
+                <div id="ee-co-stack-payment" style="display:none;">
+                  <!-- DECISION: Payment tab repeats the booking-hold banner (the live flow shows it
+                       on every checkout step) and drops the numbered step circles — the screenshots
+                       show Payment Information leading the page without a step number. -->
+                  <div class="co-hold-banner">We are holding your booking for <strong>19:45</strong> minutes.</div>
+
+                <!-- Step 2 — Payment Information (cs-section block) -->
+                <div class="cs-section" id="sec-co-step2" onclick="eeOpenPanel('co-step2')">
+                  <div class="cs-section-tag">Payment Information</div>
+                  <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
+                  <div class="co-step">
+                    <div class="co-step-head">
+                      <div class="co-step-name" id="ee-co-step2-name">PAYMENT INFORMATION</div>
+                    <svg class="co-step-lock" width="13" height="15" viewBox="0 0 13 15" fill="none"><path d="M3 6V4a3.5 3.5 0 0 1 7 0v2" stroke="currentColor" stroke-width="1.4"/><rect x="1.5" y="6" width="10" height="7.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
+                  </div>
+                  <p class="co-payment-note">We do not store your credit card information. All payments are encrypted and securely processed through our PCI compliant provider.</p>
+                  </div>
+                </div>
+
+                <!-- DECISION: Promo Code is its own inline block (cs-section), customized
+                     independently of the Stripe Payment Element. It sits between the Payment
+                     Information intro and the payment fields, and its hover outline no longer
+                     wraps the card form. Collapsed shows the toggle; coPromoToggle() expands it
+                     to an input + Apply. #ee-co-promo-text stays so the promo-label input works. -->
+                <div class="cs-section" id="sec-co-promo" onclick="eeOpenPanel('co-promo')">
+                  <div class="cs-section-tag">Promo Code</div>
+                  <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
+                  <div class="co-promo-block">
+                    <a class="co-promo" onclick="event.stopPropagation();coPromoToggle(this)">
+                      <span class="co-promo-plus">+</span>
+                      <span id="ee-co-promo-text">Redeem Promo Code</span>
+                    </a>
+                    <div class="co-promo-expand">
+                      <input class="co-input co-promo-input" type="text" placeholder="Enter Promo Code" onclick="event.stopPropagation()">
+                      <button class="co-promo-apply" onclick="event.stopPropagation()">Apply</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stripe Payment Element (express-checkout wallets + unified card row +
+                     Country/ZIP). Own region, not part of the Promo Code block. -->
+                <div class="co-pay-fields">
+                  <div class="co-pay-wallets">
+                    <button class="co-pay-wallet" onclick="event.stopPropagation()" aria-label="Apple Pay"><svg width="14" height="17" viewBox="0 0 14 17" fill="currentColor"><path d="M11.2 9c0-1.7 1.4-2.5 1.4-2.6-.8-1.1-2-1.3-2.4-1.3-1-.1-2 .6-2.5.6s-1.3-.6-2.1-.6c-1.1 0-2.1.6-2.7 1.6-1.1 2-.3 4.9.8 6.5.5.8 1.2 1.7 2 1.6.8 0 1.1-.5 2.1-.5s1.2.5 2.1.5 1.4-.8 1.9-1.5c.6-.9.8-1.7.9-1.8-.1 0-1.7-.6-1.7-2.5zM9.6 4c.4-.5.7-1.3.6-2-.6 0-1.4.4-1.9 1-.4.5-.8 1.3-.7 2 .7 0 1.5-.4 2-.9z"/></svg>Pay</button>
+                    <button class="co-pay-wallet" onclick="event.stopPropagation()" aria-label="Google Pay"><svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.6 9.2c0-.6 0-1.1-.1-1.6H9v3.3h4.8c-.2 1.1-.8 2-1.8 2.6v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3C2.4 15.9 5.5 18 9 18z"/><path fill="#FBBC05" d="M3.9 10.7c-.2-.5-.3-1.1-.3-1.7s.1-1.2.3-1.7V5H.9C.3 6.2 0 7.6 0 9s.3 2.8.9 4l3-2.3z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.4 1.3l2.6-2.6C13.5.9 11.4 0 9 0 5.5 0 2.4 2.1.9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/></svg>Pay</button>
+                  </div>
+                  <div class="co-pay-or">Or pay with card</div>
+                  <div class="co-field">
+                    <label class="co-label">Card number</label>
+                    <div class="co-card-field">
+                      <input class="co-input" type="text" placeholder="1234 1234 1234 1234" onclick="event.stopPropagation()">
+                      <div class="co-card-brands">
+                        <span class="co-card-brand" style="background:#1a1f71">VISA</span>
+                        <span class="co-card-brand" style="background:#eb001b">MC</span>
+                        <span class="co-card-brand" style="background:#2e77bc">AMEX</span>
+                        <span class="co-card-brand" style="background:#f47216">DISC</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="co-form-row">
+                    <div class="co-field">
+                      <label class="co-label">Expiration date</label>
+                      <input class="co-input" type="text" placeholder="MM / YY" onclick="event.stopPropagation()">
+                    </div>
+                    <div class="co-field">
+                      <label class="co-label">Security code</label>
+                      <input class="co-input" type="text" placeholder="CVC" onclick="event.stopPropagation()">
+                    </div>
+                  </div>
+                  <div class="co-form-row">
+                    <div class="co-field">
+                      <label class="co-label">Country</label>
+                      <select class="co-input co-select" onclick="event.stopPropagation()">
+                        <option>United States</option>
+                        <option>Canada</option>
+                        <option>United Kingdom</option>
+                        <option>Australia</option>
+                      </select>
+                    </div>
+                    <div class="co-field">
+                      <label class="co-label">ZIP code</label>
+                      <input class="co-input" type="text" placeholder="12345" onclick="event.stopPropagation()">
+                    </div>
+                  </div>
+                </div><!-- end co-pay-fields -->
+
                 <!-- Confirmation Area (cs-section block) — message + submit + subtext -->
                 <div class="cs-section" id="sec-co-confirm-area" onclick="eeOpenPanel('co-confirm-area')">
                   <div class="cs-section-tag">Confirmation Area</div>
@@ -3018,8 +3150,9 @@ button, input, select, textarea { font-family: inherit; }
                     <div class="co-foot-note" id="ee-co-foot-note">Tickets are non-transferable &nbsp;|&nbsp; 21+ Age Limit</div>
                   </div>
                 </div>
+                </div><!-- end ee-co-stack-payment -->
 
-                <!-- AnyRoad footer -->
+                <!-- AnyRoad footer (shared across both tabs) -->
                 <div class="co-ar-foot">
                   <div class="co-ar-mark">AnyRoad</div>
                   <div class="co-ar-link-row">
@@ -3031,22 +3164,22 @@ button, input, select, textarea { font-family: inherit; }
               <!-- ── Right: summary card (cs-section block) ── -->
               <div>
                 <div class="cs-section" id="sec-co-summary" onclick="eeOpenPanel('co-summary')">
-                  <div class="cs-section-tag">Checkout Summary</div>
+                  <div class="cs-section-tag">Booking Summary</div>
                   <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
                   <div class="co-summary-card">
-                    <div class="co-sum-cover" id="ee-co-cover"></div>
+                    <div class="co-sum-cover sumImg" id="ee-co-cover"></div>
                     <div class="co-sum-name">The Painted Ladies Picnic &amp; Architecture Tour</div>
-                    <div class="co-sum-host" id="ee-co-host">With Acme Corp</div>
+                    <div class="co-sum-host sumHost" id="ee-co-host">With Acme Corp</div>
                   <hr class="co-sum-hr">
-                  <div class="co-sum-row">
+                  <div class="co-sum-row sumDate">
                     <span class="label">Date</span>
                     <span class="value-blue">May 22, 2026</span>
                   </div>
-                  <div class="co-sum-row">
+                  <div class="co-sum-row sumTime">
                     <span class="label">Time</span>
                     <span class="value-blue">6:00 pm</span>
                   </div>
-                  <div class="co-sum-row">
+                  <div class="co-sum-row sumGuests">
                     <span class="label">Number of Guests</span>
                     <span class="value">1</span>
                   </div>
@@ -3070,38 +3203,43 @@ button, input, select, textarea { font-family: inherit; }
           <div id="eeConfirmPage" style="display:none;width:100%;">
             <div style="background:#fff;min-height:100%;">
               <div style="max-width:860px;margin:0 auto;padding:52px 40px 60px;display:flex;gap:52px;align-items:flex-start;">
-                <!-- Left: confirmation message -->
-                <div style="flex:1;min-width:0;">
-                  <div style="font-size:24px;font-weight:400;color:#1a1f36;margin-bottom:4px;">Thank you, Lawrence.</div>
-                  <div style="font-size:24px;font-weight:700;color:#1a1f36;margin-bottom:22px;">Your booking is confirmed.</div>
-                  <div style="font-size:14px;color:#697386;line-height:1.7;margin-bottom:20px;">We just sent an email to you with all your details. No reservation codes. No tickets to print.</div>
+                <!-- Left: confirmation message (cs-section block) -->
+                <div class="cs-section" id="sec-co-confirm-msg" onclick="eeOpenPanel('co-confirm-msg')" style="flex:1;min-width:0;">
+                  <div class="cs-section-tag">Confirmation Message</div>
+                  <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
+                  <div id="ee-conf-heading" class="co-conf-heading" data-fallback="Thank you, {Guest name}.&#10;Your booking is confirmed."><span style="font-weight:400">Thank you, Lawrence.</span><br><span style="font-weight:700">Your booking is confirmed.</span></div>
+                  <div id="ee-conf-email" style="font-size:14px;color:#697386;line-height:1.7;margin-bottom:20px;">We just sent an email to you with all your details. No reservation codes. No tickets to print.</div>
                   <div style="font-size:11.5px;color:#9aa5b4;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">Sent to</div>
                   <div style="font-size:14px;font-weight:600;color:#1a1f36;margin-bottom:5px;">lawrence@anyroad.com</div>
-                  <a style="font-size:14px;color:#3b5bff;cursor:pointer;font-weight:500;">Edit</a>
-                  <div style="font-size:14px;color:#697386;margin-top:18px;margin-bottom:26px;line-height:1.65;">We look forward to seeing you on <strong style="color:#1a1f36;">Thu, May 22, 2026 at 6:00 PM</strong></div>
+                  <a style="font-size:14px;color:#3b5bff;cursor:pointer;font-weight:500;" onclick="event.stopPropagation()">Edit</a>
+                  <div id="ee-conf-forward" style="font-size:14px;color:#697386;margin-top:18px;margin-bottom:26px;line-height:1.65;">We look forward to seeing you on <strong style="color:#1a1f36;">Thu, May 22, 2026 at 6:00 PM</strong></div>
                   <hr style="border:none;border-top:1px solid #e3e8ee;margin-bottom:22px;">
                   <div style="margin-bottom:14px;">
-                    <a style="font-size:15px;color:#3b5bff;font-weight:500;cursor:pointer;">Reschedule booking →</a>
+                    <a style="font-size:15px;color:#3b5bff;font-weight:500;cursor:pointer;" onclick="event.stopPropagation()">Reschedule booking →</a>
                   </div>
-                  <div style="font-size:14px;color:#697386;margin-bottom:5px;">Have questions for us?</div>
-                  <a style="font-size:14px;color:#3b5bff;font-weight:500;cursor:pointer;">Send a message</a>
+                  <div id="ee-conf-questions">
+                    <div style="font-size:14px;color:#697386;margin-bottom:5px;">Have questions for us?</div>
+                    <a style="font-size:14px;color:#3b5bff;font-weight:500;cursor:pointer;" onclick="event.stopPropagation()">Send a message</a>
+                  </div>
                 </div>
-                <!-- Right: booking summary card -->
-                <div style="width:268px;flex-shrink:0;">
+                <!-- Right: booking summary card (cs-section block) -->
+                <div class="cs-section" id="sec-co-confirm-summary" onclick="eeOpenPanel('co-confirm-summary')" style="width:268px;flex-shrink:0;">
+                  <div class="cs-section-tag">Booking Summary</div>
+                  <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
                   <div style="border-radius:8px;overflow:hidden;border:1px solid #e3e8ee;">
-                    <div style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
+                    <div class="sumImg" style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
                     <div style="background:#f7f8fa;padding:18px 16px;">
                       <div style="font-size:14px;font-weight:700;color:#1a1f36;margin-bottom:3px;line-height:1.4;">The Painted Ladies Picnic &amp; Architecture Tour</div>
-                      <div style="font-size:13px;color:#697386;margin-bottom:14px;">With Acme Corp</div>
+                      <div class="sumHost" style="font-size:13px;color:#697386;margin-bottom:14px;">With Acme Corp</div>
                       <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                        <tr><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
-                        <tr><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
-                        <tr><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
+                        <tr id="ee-conf-row-date" class="sumDate"><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
+                        <tr id="ee-conf-row-time" class="sumTime"><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
+                        <tr id="ee-conf-row-guests" class="sumGuests"><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
                       </table>
                       <hr style="border:none;border-top:1px solid #e3e8ee;margin:12px 0;">
                       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
                         <span style="font-size:13px;color:#697386;white-space:nowrap;flex-shrink:0;">Cancellation policy</span>
-                        <a style="font-size:13px;color:#3b5bff;cursor:pointer;text-align:right;line-height:1.4;">5 days before for a 50% refund, with no refunds af...</a>
+                        <a style="font-size:13px;color:#3b5bff;cursor:pointer;text-align:right;line-height:1.4;" onclick="event.stopPropagation()">5 days before for a 50% refund, with no refunds af...</a>
                       </div>
                     </div>
                   </div>
@@ -3498,6 +3636,7 @@ button, input, select, textarea { font-family: inherit; }
           <div class="bp-tabs">
             <button class="bp-tab active" onclick="epTab('details',this)">Experience Details</button>
             <button class="bp-tab" onclick="epTab('checkout',this)">Checkout</button>
+            <button class="bp-tab" onclick="epTab('payment',this)">Payment</button>
             <button class="bp-tab" onclick="epTab('confirm',this)">Confirmation</button>
             <div class="bp-vp-toggle">
               <button class="bp-vp-btn active" id="epVpDesktop" onclick="epSetVp('desktop')" title="Desktop">
@@ -3563,12 +3702,19 @@ button, input, select, textarea { font-family: inherit; }
                 <div style="padding:22px 26px 28px;">
                   <div id="epCheckoutGrid" style="display:grid;grid-template-columns:1fr 210px;gap:22px;align-items:start;">
                     <div>
+                      <!-- DECISION: Checkout split into Checkout + Payment tabs sharing one summary
+                           card — see eeCheckoutPage. Stacks toggled by epTab('checkout'|'payment');
+                           #epProceedCta added to the brand-color sync alongside #epCta2. -->
+                      <div id="ep-co-stack-checkout">
                       <div style="font-size:13.5px;font-weight:700;color:#1a1f36;margin-bottom:10px">Guest information</div>
                       <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px">
                         <div style="border:1px solid #d1d5db;border-radius:5px;padding:7px 10px;font-size:11px;color:#9aa5b4">First name</div>
                         <div style="border:1px solid #d1d5db;border-radius:5px;padding:7px 10px;font-size:11px;color:#9aa5b4">Last name</div>
                       </div>
                       <div style="border:1px solid #d1d5db;border-radius:5px;padding:7px 10px;font-size:11px;color:#9aa5b4;margin-bottom:14px">Email address</div>
+                      <button id="epProceedCta" style="width:100%;padding:11px;background:#3b5bff;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:12.5px;font-family:inherit;cursor:default">Proceed to payment</button>
+                      </div><!-- end ep-co-stack-checkout -->
+                      <div id="ep-co-stack-payment" style="display:none;">
                       <div style="font-size:13.5px;font-weight:700;color:#1a1f36;margin-bottom:9px">Payment</div>
                       <div style="border:1px solid #d1d5db;border-radius:5px;padding:8px 11px;font-size:12px;color:#9aa5b4;background:#fafafa;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center">
                         <span>•••• •••• •••• ••••</span>
@@ -3580,6 +3726,7 @@ button, input, select, textarea { font-family: inherit; }
                       </div>
                       <button id="epCta2" style="width:100%;padding:11px;background:#3b5bff;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:12.5px;font-family:inherit;cursor:default">Confirm Purchase</button>
                       <div style="text-align:center;font-size:10.5px;color:#9aa5b4;margin-top:7px">Secure payment via Stripe</div>
+                      </div><!-- end ep-co-stack-payment -->
                     </div>
                     <div style="border:1px solid #e3e8ee;border-radius:8px;overflow:hidden;">
                       <div style="background:#f8f9fc;border-bottom:1px solid #e3e8ee;padding:11px 13px;">
@@ -3608,31 +3755,32 @@ button, input, select, textarea { font-family: inherit; }
                 <div style="max-width:860px;margin:0 auto;padding:52px 40px 60px;display:flex;gap:52px;align-items:flex-start;">
                   <!-- Left: confirmation message -->
                   <div style="flex:1;min-width:0;">
-                    <div style="font-size:24px;font-weight:400;color:#1a1f36;margin-bottom:4px;">Thank you, Lawrence.</div>
-                    <div style="font-size:24px;font-weight:700;color:#1a1f36;margin-bottom:22px;">Your booking is confirmed.</div>
+                    <div class="co-conf-heading"><span style="font-weight:400">Thank you, Lawrence.</span><br><span style="font-weight:700">Your booking is confirmed.</span></div>
                     <div style="font-size:14px;color:#697386;line-height:1.7;margin-bottom:20px;">We just sent an email to you with all your details. No reservation codes. No tickets to print.</div>
                     <div style="font-size:11.5px;color:#9aa5b4;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">Sent to</div>
                     <div style="font-size:14px;font-weight:600;color:#1a1f36;margin-bottom:5px;">lawrence@anyroad.com</div>
                     <a id="epConfLink1" style="font-size:14px;color:#3b5bff;cursor:pointer;font-weight:500;">Edit</a>
-                    <div style="font-size:14px;color:#697386;margin-top:18px;margin-bottom:26px;line-height:1.65;">We look forward to seeing you on <strong style="color:#1a1f36;">Thu, May 22, 2026 at 6:00 PM</strong></div>
+                    <div id="ep-conf-forward" style="font-size:14px;color:#697386;margin-top:18px;margin-bottom:26px;line-height:1.65;">We look forward to seeing you on <strong style="color:#1a1f36;">Thu, May 22, 2026 at 6:00 PM</strong></div>
                     <hr style="border:none;border-top:1px solid #e3e8ee;margin-bottom:22px;">
                     <div style="margin-bottom:14px;">
                       <a id="epConfBtn1" style="font-size:15px;color:#3b5bff;font-weight:500;cursor:pointer;">Reschedule booking →</a>
                     </div>
-                    <div style="font-size:14px;color:#697386;margin-bottom:5px;">Have questions for us?</div>
-                    <a id="epConfLink2" style="font-size:14px;color:#3b5bff;font-weight:500;cursor:pointer;">Send a message</a>
+                    <div id="ep-conf-questions">
+                      <div style="font-size:14px;color:#697386;margin-bottom:5px;">Have questions for us?</div>
+                      <a id="epConfLink2" style="font-size:14px;color:#3b5bff;font-weight:500;cursor:pointer;">Send a message</a>
+                    </div>
                   </div>
                   <!-- Right: booking summary card -->
                   <div style="width:268px;flex-shrink:0;">
                     <div style="border-radius:8px;overflow:hidden;border:1px solid #e3e8ee;">
-                      <div style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
+                      <div class="sumImg" style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
                       <div style="background:#f7f8fa;padding:18px 16px;">
                         <div style="font-size:14px;font-weight:700;color:#1a1f36;margin-bottom:3px;line-height:1.4;">The Painted Ladies Picnic &amp; Architecture Tour</div>
-                        <div style="font-size:13px;color:#697386;margin-bottom:14px;">With Acme Corp</div>
+                        <div class="sumHost" style="font-size:13px;color:#697386;margin-bottom:14px;">With Acme Corp</div>
                         <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                          <tr><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
-                          <tr><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
-                          <tr><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
+                          <tr id="ep-conf-row-date" class="sumDate"><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
+                          <tr id="ep-conf-row-time" class="sumTime"><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
+                          <tr id="ep-conf-row-guests" class="sumGuests"><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
                         </table>
                         <hr style="border:none;border-top:1px solid #e3e8ee;margin:12px 0;">
                         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
@@ -3783,6 +3931,8 @@ function navigate(page) {
     }
     profileReturnToGlobal();
     document.getElementById('headerActions').innerHTML = '';
+    // Reveal the click-to-edit affordance + coachmark on entering the editor.
+    csRevealAndCoach('ppCanvas2');
 
   } else if (page === 'experience-edit') {
     document.getElementById('page-experience-edit').classList.add('active');
@@ -3830,6 +3980,7 @@ function updateBrandPreview() {
   var cb = document.getElementById('bpContactBtn1');
   if(cb) { cb.style.color=link; cb.style.borderColor=link; }
   _s('bpCta2','background',primary);   _s('bpCta2','borderRadius',radius+'px');
+  _s('bpProceedCta','background',primary); _s('bpProceedCta','borderRadius',radius+'px');
   _sc('bpCancelLink2',link);
   _s('bpCheckIcon','background',primary);
   _s('bpConfBtn1','background',primary); _s('bpConfBtn1','borderRadius',radius+'px');
@@ -4064,6 +4215,7 @@ function updateExpPreview() {
   _s('epWH1','background',bk.headerBg);
   _s('epCta1','background',bk.primary); _s('epCta1','borderRadius',radius+'px');
   _s('epCta2','background',bk.primary); _s('epCta2','borderRadius',radius+'px');
+  _s('epProceedCta','background',bk.primary); _s('epProceedCta','borderRadius',radius+'px');
   _s('epCheckIcon','background',bk.primary);
   _s('epConfBtn1','background',bk.primary); _s('epConfBtn1','borderRadius',radius+'px');
   _s('epConfBtn2','color',bk.primary); _s('epConfBtn2','borderColor',bk.primary); _s('epConfBtn2','borderRadius',radius+'px');
@@ -4085,8 +4237,12 @@ function updateExpPreview() {
 function epTab(tab, btn) {
   document.querySelectorAll('#epCanvas .bpp').forEach(function(p) { p.style.display = 'none'; });
   document.querySelectorAll('#page-experience-edit .bp-tab').forEach(function(b) { b.classList.remove('active'); });
-  var pg = document.getElementById('epp-' + tab);
+  // DECISION: Payment reuses the epp-checkout container — only the visible left-column stack changes.
+  var pageKey = (tab === 'payment') ? 'checkout' : tab;
+  var pg = document.getElementById('epp-' + pageKey);
   if(pg) pg.style.display = 'block';
+  _setVis('ep-co-stack-checkout', tab !== 'payment');
+  _setVis('ep-co-stack-payment', tab === 'payment');
   btn.classList.add('active');
 }
 
@@ -4134,13 +4290,87 @@ function _setVis(idOrIds, visible) {
     if (e) e.style.display = visible ? '' : 'none';
   });
 }
-function _setText(id, value, fallback) {
+// _setVisClass — show/hide EVERY element carrying a marker class. Used by the unified
+// summary visibility toggles so one control drives the summary card on all three pages
+// (Checkout, Payment, Confirmation) and every preview surface at once — keeping them
+// consistent. display:'' restores each element's stylesheet default (block / flex / table-row).
+function _setVisClass(cls, visible) {
+  document.querySelectorAll('.' + cls).forEach(function(e){ e.style.display = visible ? '' : 'none'; });
+}
+
+// ── Click-to-edit discoverability ───────────────────────────────────────────────
+// csRevealAndCoach — on entering an editable canvas, flash every section's outline + chip
+// (the "reveal") and show a dismissible coachmark. Both fade out so the canvas stays clean.
+function csRevealAndCoach(canvasId) {
+  var canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  canvas.classList.add('cs-reveal');
+  setTimeout(function(){ canvas.classList.remove('cs-reveal'); }, 1600);
+
+  var coach = canvas.querySelector('.cs-coach');
+  if (!coach) {
+    coach = document.createElement('div');
+    coach.className = 'cs-coach';
+    coach.innerHTML = '<span><strong>Tip:</strong> Click any highlighted section to edit its content</span>'
+                    + '<span class="cs-coach-x" title="Dismiss">✕</span>';
+    coach.querySelector('.cs-coach-x').onclick = function(e){ e.stopPropagation(); csHideCoach(canvas); };
+    canvas.appendChild(coach);
+  }
+  requestAnimationFrame(function(){ coach.classList.add('show'); });
+  clearTimeout(canvas._coachTimer);
+  canvas._coachTimer = setTimeout(function(){ csHideCoach(canvas); }, 7000);
+}
+function csHideCoach(canvasOrId) {
+  var canvas = (typeof canvasOrId === 'string') ? document.getElementById(canvasOrId) : canvasOrId;
+  if (!canvas) return;
+  var coach = canvas.querySelector('.cs-coach');
+  if (coach) coach.classList.remove('show');
+}
+// _setOverride — text customizer behavior: an empty field means "use the default"; any
+// typed text overrides it. The default copy and optional upper-case transform are read
+// from the target's data-fb / data-upper (set by pText at render). The raw override is
+// stored on data-ov so the field can be re-populated when the panel reopens.
+// DECISION: defaults are NOT pre-filled into inputs — empty = default, typed = override.
+function _setOverride(id, value) {
   var e = document.getElementById(id);
-  if (e) e.textContent = (value && value.length) ? value : (fallback || '');
+  if (!e) return;
+  var fb = e.dataset.fb || '';
+  var hasVal = value && value.length;
+  if (hasVal) e.dataset.ov = value; else delete e.dataset.ov;
+  var text = hasVal ? value : fb;
+  e.textContent = (e.dataset.upper === '1') ? text.toUpperCase() : text;
 }
 function _toggleClass(id, cls, on) {
   var e = document.getElementById(id);
   if (e) e.classList.toggle(cls, on);
+}
+// coPromoToggle — expand/collapse the promo block from its "Redeem Promo Code" toggle.
+// Operates relative to the clicked link so it works for every checkout surface's copy.
+// DECISION: the toggle calls event.stopPropagation() at the call site so clicking it on the
+// editor canvas expands the preview instead of opening the cs-section's customize panel.
+function coPromoToggle(el) {
+  var block = el.closest('.co-promo-block');
+  if (!block) return;
+  var expanded = block.classList.toggle('expanded');
+  var plus = block.querySelector('.co-promo-plus');
+  if (plus) plus.textContent = expanded ? '−' : '+';
+}
+// _setHeading — render the merged confirmation heading from the panel textarea.
+// The default copy carries a {Guest name} variable (resolved to the sample guest name
+// in the preview); typing static text overrides it. First line is the lighter greeting,
+// remaining lines render bold. Empty input falls back to the element's data-fallback.
+function _setHeading(id, value) {
+  var e = document.getElementById(id);
+  if (!e) return;
+  e.dataset.raw = (value == null) ? '' : value;
+  var raw = (value != null && value.length) ? value : (e.dataset.fallback || '');
+  var resolved = raw.replace(/\{Guest name\}/gi, 'Lawrence');
+  var lines = resolved.split('\n');
+  var first = _esc(lines.shift() || '');
+  var rest = _esc(lines.join('\n')).replace(/\n/g, '<br>');
+  var html = '<span style="font-weight:400">' + first + '</span>';
+  if (rest.length) html += '<br><span style="font-weight:700">' + rest + '</span>';
+  e.innerHTML = html;
 }
 function _esc(s) {
   return String(s == null ? '' : s)
@@ -4169,16 +4399,42 @@ function pPanel(groups) {
 //     sublabel  — optional psublabel rendered below the input
 //     transform — 'upper' to apply .toUpperCase() before setting textContent
 function pText(opts) {
-  var current = ((document.getElementById(opts.target) || {}).textContent || opts.fallback || '').trim();
-  var fb = (opts.fallback || '').replace(/'/g, "\'");
-  var oninput = opts.transform === 'upper'
-    ? "_setText('" + opts.target + "', (this.value||'" + fb + "').toUpperCase())"
-    : "_setText('" + opts.target + "', this.value, '" + fb + "')";
+  // DECISION: the field is left EMPTY by default — the default copy shows as the
+  // placeholder, and only typed text becomes an override. The default and transform are
+  // stashed on the target (data-fb / data-upper) so the inline handler stays narrow and
+  // _setOverride can restore the default when the field is cleared. data-ov holds the
+  // current override so reopening the panel repopulates it.
+  var el = document.getElementById(opts.target);
+  var fb = opts.fallback || '';
+  if (el) {
+    el.dataset.fb = fb;
+    if (opts.transform === 'upper') el.dataset.upper = '1';
+  }
+  var ov = (el && el.dataset && el.dataset.ov) ? el.dataset.ov : '';
+  var placeholder = opts.transform === 'upper' ? fb.toUpperCase() : fb;
   var fieldLabel = opts.label ? '<div class="pfield-label">' + opts.label + '</div>' : '';
   var sub = opts.sublabel ? '<div class="psublabel" style="margin-top:6px">' + opts.sublabel + '</div>' : '';
   return '<div class="pfield">' + fieldLabel
-       + '<input class="pinput" value="' + _esc(current) + '" placeholder="' + _esc(opts.fallback || '') + '"'
-       + ' oninput="' + oninput + '">' + sub + '</div>';
+       + '<input class="pinput" value="' + _esc(ov) + '" placeholder="' + _esc(placeholder) + '"'
+       + ' oninput="_setOverride(\'' + opts.target + '\', this.value)">' + sub + '</div>';
+}
+
+// pHeading — multiline textarea for the merged confirmation heading. Like pText, the
+// field is EMPTY by default and the default copy (which can carry a {Guest name}
+// variable) shows as the placeholder; typed text overrides it. data-raw (set by
+// _setHeading) holds the current override so reopening the panel repopulates it; the
+// default itself lives on the target's data-fallback for _setHeading to restore.
+//   opts: { label?, target, fallback, sublabel? }
+function pHeading(opts) {
+  var e = document.getElementById(opts.target);
+  var ov = (e && e.dataset && e.dataset.raw) ? e.dataset.raw : '';
+  var fieldLabel = opts.label ? '<div class="pfield-label">' + opts.label + '</div>' : '';
+  var sub = opts.sublabel ? '<div class="psublabel" style="margin-top:6px">' + opts.sublabel + '</div>' : '';
+  return '<div class="pfield">' + fieldLabel
+       + '<textarea class="pinput" rows="3" style="resize:vertical;font-family:inherit;line-height:1.5"'
+       + ' placeholder="' + _esc(opts.fallback || '') + '"'
+       + ' oninput="_setHeading(\'' + opts.target + '\', this.value)">' + _esc(ov) + '</textarea>'
+       + sub + '</div>';
 }
 
 // pToggle — checkbox that shows/hides one or more elements via display:none.
@@ -4199,6 +4455,38 @@ function pToggle(opts) {
        + '<label class="ptoggle"><input type="checkbox"' + (checked ? ' checked' : '')
        + ' onchange="_setVis(' + targetExpr + ', ' + visExpr + ')">'
        + '<span class="ptoggle-track"></span></label></div>';
+}
+
+// pToggleAll — checkbox that shows/hides EVERY element carrying a marker class (via
+// _setVisClass). Use for settings that must stay consistent across multiple instances —
+// e.g. the summary card that appears on Checkout, Payment, and Confirmation. Initial
+// state is read from the first element in the group.
+//   opts: { label, group, sublabel? }   group = the marker class (no leading dot)
+function pToggleAll(opts) {
+  var first = document.querySelector('.' + opts.group);
+  var visible = !first || first.style.display !== 'none';
+  var labelBlock = opts.sublabel
+    ? '<div><div class="plabel">' + opts.label + '</div><div class="psublabel">' + opts.sublabel + '</div></div>'
+    : '<div class="plabel">' + opts.label + '</div>';
+  return '<div class="prow">' + labelBlock
+       + '<label class="ptoggle"><input type="checkbox"' + (visible ? ' checked' : '')
+       + ' onchange="_setVisClass(\'' + opts.group + '\', this.checked)">'
+       + '<span class="ptoggle-track"></span></label></div>';
+}
+
+// summaryVisGroup — the ONE shared control set for the booking summary card. The same
+// group renders for every summary panel (Checkout/Payment via co-summary, Confirmation
+// via co-confirm-summary, on both editor surfaces), and each toggle drives every matching
+// element across all pages + previews by marker class. DECISION: one shared, linked set so
+// the summary stays consistent everywhere it appears.
+function summaryVisGroup() {
+  return pGroup('Summary', [
+    pToggleAll({ label: 'Experience Image',  group: 'sumImg'    }),
+    pToggleAll({ label: 'Brand Subtext',      group: 'sumHost'   }),
+    pToggleAll({ label: 'Date',               group: 'sumDate'   }),
+    pToggleAll({ label: 'Time',               group: 'sumTime'   }),
+    pToggleAll({ label: 'Number of Guests',   group: 'sumGuests' }),
+  ]);
 }
 
 // pClassToggle — checkbox that adds/removes a CSS class on the target element.
@@ -4289,18 +4577,22 @@ var profilePanelConfigs = {
 
   'co-step2': {
     title: 'Payment Information', icon: '💳',
-    render: function() { return pPanel([
-      pGroup('Section', [
-        pText({ label: 'Section title', target: 'pp-co-step2-name', fallback: 'PAYMENT INFORMATION', transform: 'upper' }),
-      ]),
-      pGroup('Promo code', [
-        pText({
-          label: 'Link label',
-          target: 'pp-co-promo-text',
-          fallback: 'Redeem Promo Code',
-          sublabel: 'Common alternatives: Discount Code, Special Code, Voucher'
-        }),
-      ]),
+    render: function() { return pGroup('Section', [
+      pText({ label: 'Section title', target: 'pp-co-step2-name', fallback: 'PAYMENT INFORMATION', transform: 'upper' }),
+    ]); }
+  },
+
+  // DECISION: Promo Code is its own panel now that it is its own block, separate from the
+  // Payment Information / Stripe section.
+  'co-promo': {
+    title: 'Promo Code', icon: '🏷️',
+    render: function() { return pGroup('Promo code', [
+      pText({
+        label: 'Link label',
+        target: 'pp-co-promo-text',
+        fallback: 'Redeem Promo Code',
+        sublabel: 'Common alternatives: Discount Code, Special Code, Voucher'
+      }),
     ]); }
   },
 
@@ -4327,11 +4619,32 @@ var profilePanelConfigs = {
   },
 
   'co-summary': {
-    title: 'Checkout Summary', icon: '📋',
-    render: function() { return pGroup('Visibility', [
-      pToggle({ label: 'Experience Image', target: 'pp-co-cover' }),
-      pToggle({ label: 'Brand Subtext',    target: 'pp-co-host'  }),
+    title: 'Booking Summary', icon: '📋',
+    render: function() { return summaryVisGroup(); }
+  },
+
+  // DECISION: Confirmation page customization for Content Profiles. The headline + body copy
+  // are editable text; the supporting lines and summary rows are show/hide toggles. Split into
+  // two blocks (left message, right summary card) to mirror the Checkout page's section model.
+  'co-confirm-msg': {
+    title: 'Confirmation Message', icon: '✓',
+    render: function() { return pPanel([
+      pGroup('Heading', [
+        pHeading({ label: 'Heading', target: 'pp-conf-heading', fallback: 'Thank you, {Guest name}.\nYour booking is confirmed.', sublabel: 'Use {Guest name} to insert the guest name, or replace it with your own static text to override.' }),
+      ]),
+      pGroup('Body', [
+        pText({ label: 'Email confirmation text', target: 'pp-conf-email', fallback: 'We just sent an email to you with all your details. No reservation codes. No tickets to print.' }),
+      ]),
+      pGroup('Sections', [
+        pToggle({ label: 'Show event date reminder', target: ['pp-conf-forward', 'bp-conf-forward', 'ep-conf-forward'] }),
+        pToggle({ label: 'Enable Send a message', target: ['pp-conf-questions', 'bp-conf-questions', 'ep-conf-questions'] }),
+      ]),
     ]); }
+  },
+
+  'co-confirm-summary': {
+    title: 'Booking Summary', icon: '🧾',
+    render: function() { return summaryVisGroup(); }
   }
 
 };
@@ -4371,6 +4684,7 @@ function profileReturnToGlobal() {
 }
 
 function profileOpenPanel(key) {
+  csHideCoach('ppCanvas2'); // they found it — dismiss the coachmark
   // Deactivate previous section
   if (profileCurrentSection) {
     var old = document.getElementById('pp-sec-' + profileCurrentSection);
@@ -4394,14 +4708,18 @@ function profileOpenPanel(key) {
 }
 
 function profileSwitchPage(page) {
-  document.querySelectorAll('#pp-tab-date, #pp-tab-checkout, #pp-tab-confirm').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('#pp-tab-date, #pp-tab-checkout, #pp-tab-payment, #pp-tab-confirm').forEach(function(t) { t.classList.remove('active'); });
   document.getElementById('pp-tab-' + page).classList.add('active');
   var d    = document.getElementById('pp-page-details');
   var c    = document.getElementById('pp-page-checkout');
   var conf = document.getElementById('pp-page-confirm');
+  // DECISION: Checkout and Payment share pp-page-checkout — the tab swaps the visible
+  // left-column stack while the summary card stays put.
   if (d)    d.style.display    = page === 'date'     ? '' : 'none';
-  if (c)    c.style.display    = page === 'checkout' ? '' : 'none';
+  if (c)    c.style.display    = (page === 'checkout' || page === 'payment') ? '' : 'none';
   if (conf) conf.style.display = page === 'confirm'  ? '' : 'none';
+  _setVis('pp-co-stack-checkout', page !== 'payment');
+  _setVis('pp-co-stack-payment', page === 'payment');
   if (page === 'date') profileReturnToGlobal();
 }
 
@@ -4505,8 +4823,13 @@ function bpSwitchTab(tab) {
   var activeTab = document.getElementById('bp-tab-' + tab);
   if (activeTab) activeTab.classList.add('active');
   document.querySelectorAll('#bpCanvas .bpp').forEach(function(p) { p.style.display = 'none'; });
-  var pg = document.getElementById('bpp-' + tab);
+  // DECISION: Payment reuses the bpp-checkout container — only the visible left-column
+  // stack changes; the summary card stays put.
+  var pageKey = (tab === 'payment') ? 'checkout' : tab;
+  var pg = document.getElementById('bpp-' + pageKey);
   if (pg) pg.style.display = 'block';
+  _setVis('bp-co-stack-checkout', tab !== 'payment');
+  _setVis('bp-co-stack-payment', tab === 'payment');
   bkReturnToGlobal();
 }
 
@@ -4651,18 +4974,22 @@ var eePanels = {
 
   'co-step2': {
     title: 'Payment Information', icon: '💳',
-    render: function() { return pPanel([
-      pGroup('Section', [
-        pText({ label: 'Section title', target: 'ee-co-step2-name', fallback: 'PAYMENT INFORMATION', transform: 'upper' }),
-      ]),
-      pGroup('Promo code', [
-        pText({
-          label: 'Link label',
-          target: 'ee-co-promo-text',
-          fallback: 'Redeem Promo Code',
-          sublabel: 'Common alternatives: Discount Code, Special Code, Voucher'
-        }),
-      ]),
+    render: function() { return pGroup('Section', [
+      pText({ label: 'Section title', target: 'ee-co-step2-name', fallback: 'PAYMENT INFORMATION', transform: 'upper' }),
+    ]); }
+  },
+
+  // DECISION: Promo Code is its own panel now that it is its own block, separate from the
+  // Payment Information / Stripe section.
+  'co-promo': {
+    title: 'Promo Code', icon: '🏷️',
+    render: function() { return pGroup('Promo code', [
+      pText({
+        label: 'Link label',
+        target: 'ee-co-promo-text',
+        fallback: 'Redeem Promo Code',
+        sublabel: 'Common alternatives: Discount Code, Special Code, Voucher'
+      }),
     ]); }
   },
 
@@ -4689,11 +5016,33 @@ var eePanels = {
   },
 
   'co-summary': {
-    title: 'Checkout Summary', icon: '📋',
-    render: function() { return pGroup('Visibility', [
-      pToggle({ label: 'Experience Image', target: 'ee-co-cover' }),
-      pToggle({ label: 'Brand Subtext',    target: 'ee-co-host'  }),
+    title: 'Booking Summary', icon: '📋',
+    render: function() { return summaryVisGroup(); }
+  },
+
+  // DECISION: Confirmation page customization, mirrored from the Content Profile editor.
+  // The show/hide toggles target arrays — the editor's own canvas (ee-conf-*) plus the
+  // Brand Kit preview (bp-conf-*) and Experience preview (ep-conf-*) — so a confirmation
+  // toggle reflects across all booking-flow preview surfaces, not just this canvas.
+  'co-confirm-msg': {
+    title: 'Confirmation Message', icon: '✓',
+    render: function() { return pPanel([
+      pGroup('Heading', [
+        pHeading({ label: 'Heading', target: 'ee-conf-heading', fallback: 'Thank you, {Guest name}.\nYour booking is confirmed.', sublabel: 'Use {Guest name} to insert the guest name, or replace it with your own static text to override.' }),
+      ]),
+      pGroup('Body', [
+        pText({ label: 'Email confirmation text', target: 'ee-conf-email', fallback: 'We just sent an email to you with all your details. No reservation codes. No tickets to print.' }),
+      ]),
+      pGroup('Sections', [
+        pToggle({ label: 'Show event date reminder', target: ['ee-conf-forward', 'bp-conf-forward', 'ep-conf-forward'] }),
+        pToggle({ label: 'Enable Send a message', target: ['ee-conf-questions', 'bp-conf-questions', 'ep-conf-questions'] }),
+      ]),
     ]); }
+  },
+
+  'co-confirm-summary': {
+    title: 'Booking Summary', icon: '🧾',
+    render: function() { return summaryVisGroup(); }
   }
 
 };
@@ -4751,10 +5100,14 @@ function eeSetPage(page) {
   var cp = document.getElementById('eeCheckoutPage');
   var cf = document.getElementById('eeConfirmPage');
   var pp = document.getElementById('eePagePlaceholder');
+  // DECISION: Checkout and Payment share the one eeCheckoutPage container — the tab only
+  // swaps which left-column stack is visible, so the summary card stays put (one set of IDs).
   if (bp) bp.style.display = page === 'date'     ? '' : 'none';
-  if (cp) cp.style.display = page === 'checkout' ? '' : 'none';
+  if (cp) cp.style.display = (page === 'checkout' || page === 'payment') ? '' : 'none';
   if (cf) cf.style.display = page === 'confirm'  ? '' : 'none';
   if (pp) pp.style.display = 'none';
+  _setVis('ee-co-stack-checkout', page !== 'payment');
+  _setVis('ee-co-stack-payment', page === 'payment');
   eeClosePanel();
 }
 
@@ -4860,6 +5213,7 @@ function eeShowProfileSettings() {
 function eeOpenPanel(key) {
   var canvas = document.getElementById('eeCanvas');
   if (canvas && canvas.classList.contains('preview-mode')) return;
+  csHideCoach(canvas); // they found it — dismiss the coachmark
 
   // Deselect old section
   if (eeCurrentSection) {
@@ -4984,6 +5338,9 @@ function eeApplyContentProfile(id) {
   });
 }
 
+// Gates the click-to-edit reveal/coachmark so it fires once per entry into the editable
+// (custom-profile) state, not on every eeUpdateProfileUI() re-render.
+var eeCoachShown = false;
 function eeUpdateProfileUI() {
   var card   = document.getElementById('eeProfileSettingCard');
   var name   = document.getElementById('eeProfileSettingName');
@@ -5006,6 +5363,8 @@ function eeUpdateProfileUI() {
     if (profileName) profileName.textContent = displayName;
     if (canvas) canvas.classList.remove('preview-mode');
     if (clickHint) clickHint.style.display = 'flex';
+    // Reveal the click-to-edit affordance + coachmark once per entry into custom mode.
+    if (!eeCoachShown) { eeCoachShown = true; csRevealAndCoach('eeCanvas'); }
 
     // Open the panel in persistent Profile Settings mode
     eeShowProfileSettings();
@@ -5019,6 +5378,8 @@ function eeUpdateProfileUI() {
     if (profileName) profileName.textContent = eeProfile.name;
     if (canvas) canvas.classList.add('preview-mode');
     if (clickHint) clickHint.style.display = 'none';
+    eeCoachShown = false; // re-arm so the reveal plays again next time custom mode is entered
+    csHideCoach('eeCanvas');
 
     // Close panel and remove persistent mode
     var panel = document.getElementById('eeCustomizePanel');
