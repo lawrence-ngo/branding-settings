@@ -1776,22 +1776,22 @@ button, input, select, textarea { font-family: inherit; }
                     <!-- Summary card (cs-section block) -->
                     <div>
                       <div class="cs-section" id="pp-sec-co-summary" onclick="profileOpenPanel('co-summary')">
-                        <div class="cs-section-tag">Checkout Summary</div>
+                        <div class="cs-section-tag">Booking Summary</div>
                         <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
                         <div class="co-summary-card">
-                          <div class="co-sum-cover" id="pp-co-cover"></div>
+                          <div class="co-sum-cover sumImg" id="pp-co-cover"></div>
                           <div class="co-sum-name">The Painted Ladies Picnic &amp; Architecture Tour</div>
-                          <div class="co-sum-host" id="pp-co-host">With Acme Corp</div>
+                          <div class="co-sum-host sumHost" id="pp-co-host">With Acme Corp</div>
                         <hr class="co-sum-hr">
-                        <div class="co-sum-row">
+                        <div class="co-sum-row sumDate">
                           <span class="label">Date</span>
                           <span class="value-blue">May 22, 2026</span>
                         </div>
-                        <div class="co-sum-row">
+                        <div class="co-sum-row sumTime">
                           <span class="label">Time</span>
                           <span class="value-blue">6:00 pm</span>
                         </div>
-                        <div class="co-sum-row">
+                        <div class="co-sum-row sumGuests">
                           <span class="label">Number of Guests</span>
                           <span class="value">1</span>
                         </div>
@@ -1840,14 +1840,14 @@ button, input, select, textarea { font-family: inherit; }
                       <div class="cs-section-tag">Booking Summary</div>
                       <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
                       <div style="border-radius:8px;overflow:hidden;border:1px solid #e3e8ee;">
-                        <div style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
+                        <div class="sumImg" style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
                         <div style="background:#f7f8fa;padding:18px 16px;">
                           <div style="font-size:14px;font-weight:700;color:#1a1f36;margin-bottom:3px;line-height:1.4;">The Painted Ladies Picnic &amp; Architecture Tour</div>
-                          <div style="font-size:13px;color:#697386;margin-bottom:14px;">With Painted Ladies Tours</div>
+                          <div class="sumHost" style="font-size:13px;color:#697386;margin-bottom:14px;">With Painted Ladies Tours</div>
                           <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                            <tr id="pp-conf-row-date"><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
-                            <tr id="pp-conf-row-time"><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
-                            <tr id="pp-conf-row-guests"><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
+                            <tr id="pp-conf-row-date" class="sumDate"><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
+                            <tr id="pp-conf-row-time" class="sumTime"><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
+                            <tr id="pp-conf-row-guests" class="sumGuests"><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
                           </table>
                           <hr style="border:none;border-top:1px solid #e3e8ee;margin:12px 0;">
                           <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
@@ -2392,19 +2392,19 @@ button, input, select, textarea { font-family: inherit; }
                     <!-- Summary card — cancellation link id preserved for brand-kit link color sync -->
                     <div>
                       <div class="co-summary-card">
-                        <div class="co-sum-cover"></div>
+                        <div class="co-sum-cover sumImg"></div>
                         <div class="co-sum-name">The Painted Ladies Picnic &amp; Architecture Tour</div>
-                        <div class="co-sum-host">With Acme Corp</div>
+                        <div class="co-sum-host sumHost">With Acme Corp</div>
                         <hr class="co-sum-hr">
-                        <div class="co-sum-row">
+                        <div class="co-sum-row sumDate">
                           <span class="label">Date</span>
                           <span class="value-blue">May 22, 2026</span>
                         </div>
-                        <div class="co-sum-row">
+                        <div class="co-sum-row sumTime">
                           <span class="label">Time</span>
                           <span class="value-blue">6:00 pm</span>
                         </div>
-                        <div class="co-sum-row">
+                        <div class="co-sum-row sumGuests">
                           <span class="label">Number of Guests</span>
                           <span class="value">1</span>
                         </div>
@@ -2453,14 +2453,14 @@ button, input, select, textarea { font-family: inherit; }
                   <!-- Right: booking summary card -->
                   <div style="width:268px;flex-shrink:0;">
                     <div style="border-radius:8px;overflow:hidden;border:1px solid #e3e8ee;">
-                      <div style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
+                      <div class="sumImg" style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
                       <div style="background:#f7f8fa;padding:18px 16px;">
                         <div style="font-size:14px;font-weight:700;color:#1a1f36;margin-bottom:3px;line-height:1.4;">The Painted Ladies Picnic &amp; Architecture Tour</div>
-                        <div style="font-size:13px;color:#697386;margin-bottom:14px;">With Acme Corp</div>
+                        <div class="sumHost" style="font-size:13px;color:#697386;margin-bottom:14px;">With Acme Corp</div>
                         <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                          <tr id="bp-conf-row-date"><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
-                          <tr id="bp-conf-row-time"><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
-                          <tr id="bp-conf-row-guests"><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
+                          <tr id="bp-conf-row-date" class="sumDate"><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
+                          <tr id="bp-conf-row-time" class="sumTime"><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
+                          <tr id="bp-conf-row-guests" class="sumGuests"><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
                         </table>
                         <hr style="border:none;border-top:1px solid #e3e8ee;margin:12px 0;">
                         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
@@ -2941,7 +2941,7 @@ button, input, select, textarea { font-family: inherit; }
                    Both tabs share the SINGLE summary card on the right, so the left column holds
                    two stacks toggled by eeSetPage('checkout'|'payment') instead of two separate
                    page containers. This keeps one set of summary IDs (ee-co-cover, ee-co-host)
-                   and avoids duplicate-ID breakage of the Checkout Summary customize panel. -->
+                   and avoids duplicate-ID breakage of the Booking Summary customize panel. -->
               <div>
                 <div id="ee-co-stack-checkout">
                 <!-- cs-section: Review and Book — customizes the page title -->
@@ -3139,22 +3139,22 @@ button, input, select, textarea { font-family: inherit; }
               <!-- ── Right: summary card (cs-section block) ── -->
               <div>
                 <div class="cs-section" id="sec-co-summary" onclick="eeOpenPanel('co-summary')">
-                  <div class="cs-section-tag">Checkout Summary</div>
+                  <div class="cs-section-tag">Booking Summary</div>
                   <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
                   <div class="co-summary-card">
-                    <div class="co-sum-cover" id="ee-co-cover"></div>
+                    <div class="co-sum-cover sumImg" id="ee-co-cover"></div>
                     <div class="co-sum-name">The Painted Ladies Picnic &amp; Architecture Tour</div>
-                    <div class="co-sum-host" id="ee-co-host">With Acme Corp</div>
+                    <div class="co-sum-host sumHost" id="ee-co-host">With Acme Corp</div>
                   <hr class="co-sum-hr">
-                  <div class="co-sum-row">
+                  <div class="co-sum-row sumDate">
                     <span class="label">Date</span>
                     <span class="value-blue">May 22, 2026</span>
                   </div>
-                  <div class="co-sum-row">
+                  <div class="co-sum-row sumTime">
                     <span class="label">Time</span>
                     <span class="value-blue">6:00 pm</span>
                   </div>
-                  <div class="co-sum-row">
+                  <div class="co-sum-row sumGuests">
                     <span class="label">Number of Guests</span>
                     <span class="value">1</span>
                   </div>
@@ -3202,14 +3202,14 @@ button, input, select, textarea { font-family: inherit; }
                   <div class="cs-section-tag">Booking Summary</div>
                   <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
                   <div style="border-radius:8px;overflow:hidden;border:1px solid #e3e8ee;">
-                    <div style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
+                    <div class="sumImg" style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
                     <div style="background:#f7f8fa;padding:18px 16px;">
                       <div style="font-size:14px;font-weight:700;color:#1a1f36;margin-bottom:3px;line-height:1.4;">The Painted Ladies Picnic &amp; Architecture Tour</div>
-                      <div style="font-size:13px;color:#697386;margin-bottom:14px;">With Acme Corp</div>
+                      <div class="sumHost" style="font-size:13px;color:#697386;margin-bottom:14px;">With Acme Corp</div>
                       <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                        <tr id="ee-conf-row-date"><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
-                        <tr id="ee-conf-row-time"><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
-                        <tr id="ee-conf-row-guests"><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
+                        <tr id="ee-conf-row-date" class="sumDate"><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
+                        <tr id="ee-conf-row-time" class="sumTime"><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
+                        <tr id="ee-conf-row-guests" class="sumGuests"><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
                       </table>
                       <hr style="border:none;border-top:1px solid #e3e8ee;margin:12px 0;">
                       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
@@ -3748,14 +3748,14 @@ button, input, select, textarea { font-family: inherit; }
                   <!-- Right: booking summary card -->
                   <div style="width:268px;flex-shrink:0;">
                     <div style="border-radius:8px;overflow:hidden;border:1px solid #e3e8ee;">
-                      <div style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
+                      <div class="sumImg" style="height:160px;background:linear-gradient(135deg,#7eb8d4 0%,#5a9cbd 40%,#6aab6e 100%);"></div>
                       <div style="background:#f7f8fa;padding:18px 16px;">
                         <div style="font-size:14px;font-weight:700;color:#1a1f36;margin-bottom:3px;line-height:1.4;">The Painted Ladies Picnic &amp; Architecture Tour</div>
-                        <div style="font-size:13px;color:#697386;margin-bottom:14px;">With Acme Corp</div>
+                        <div class="sumHost" style="font-size:13px;color:#697386;margin-bottom:14px;">With Acme Corp</div>
                         <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                          <tr id="ep-conf-row-date"><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
-                          <tr id="ep-conf-row-time"><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
-                          <tr id="ep-conf-row-guests"><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
+                          <tr id="ep-conf-row-date" class="sumDate"><td style="color:#697386;padding:5px 0;vertical-align:top;">Date</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">May 22, 2026</td></tr>
+                          <tr id="ep-conf-row-time" class="sumTime"><td style="color:#697386;padding:5px 0;">Time</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">6:00 pm</td></tr>
+                          <tr id="ep-conf-row-guests" class="sumGuests"><td style="color:#697386;padding:5px 0;">Number of Guests</td><td style="color:#1a1f36;font-weight:600;padding:5px 0;text-align:right;">1</td></tr>
                         </table>
                         <hr style="border:none;border-top:1px solid #e3e8ee;margin:12px 0;">
                         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
@@ -4263,6 +4263,13 @@ function _setVis(idOrIds, visible) {
     if (e) e.style.display = visible ? '' : 'none';
   });
 }
+// _setVisClass — show/hide EVERY element carrying a marker class. Used by the unified
+// summary visibility toggles so one control drives the summary card on all three pages
+// (Checkout, Payment, Confirmation) and every preview surface at once — keeping them
+// consistent. display:'' restores each element's stylesheet default (block / flex / table-row).
+function _setVisClass(cls, visible) {
+  document.querySelectorAll('.' + cls).forEach(function(e){ e.style.display = visible ? '' : 'none'; });
+}
 // _setOverride — text customizer behavior: an empty field means "use the default"; any
 // typed text overrides it. The default copy and optional upper-case transform are read
 // from the target's data-fb / data-upper (set by pText at render). The raw override is
@@ -4392,6 +4399,38 @@ function pToggle(opts) {
        + '<label class="ptoggle"><input type="checkbox"' + (checked ? ' checked' : '')
        + ' onchange="_setVis(' + targetExpr + ', ' + visExpr + ')">'
        + '<span class="ptoggle-track"></span></label></div>';
+}
+
+// pToggleAll — checkbox that shows/hides EVERY element carrying a marker class (via
+// _setVisClass). Use for settings that must stay consistent across multiple instances —
+// e.g. the summary card that appears on Checkout, Payment, and Confirmation. Initial
+// state is read from the first element in the group.
+//   opts: { label, group, sublabel? }   group = the marker class (no leading dot)
+function pToggleAll(opts) {
+  var first = document.querySelector('.' + opts.group);
+  var visible = !first || first.style.display !== 'none';
+  var labelBlock = opts.sublabel
+    ? '<div><div class="plabel">' + opts.label + '</div><div class="psublabel">' + opts.sublabel + '</div></div>'
+    : '<div class="plabel">' + opts.label + '</div>';
+  return '<div class="prow">' + labelBlock
+       + '<label class="ptoggle"><input type="checkbox"' + (visible ? ' checked' : '')
+       + ' onchange="_setVisClass(\'' + opts.group + '\', this.checked)">'
+       + '<span class="ptoggle-track"></span></label></div>';
+}
+
+// summaryVisGroup — the ONE shared control set for the booking summary card. The same
+// group renders for every summary panel (Checkout/Payment via co-summary, Confirmation
+// via co-confirm-summary, on both editor surfaces), and each toggle drives every matching
+// element across all pages + previews by marker class. DECISION: one shared, linked set so
+// the summary stays consistent everywhere it appears.
+function summaryVisGroup() {
+  return pGroup('Summary', [
+    pToggleAll({ label: 'Experience Image',  group: 'sumImg'    }),
+    pToggleAll({ label: 'Brand Subtext',      group: 'sumHost'   }),
+    pToggleAll({ label: 'Date',               group: 'sumDate'   }),
+    pToggleAll({ label: 'Time',               group: 'sumTime'   }),
+    pToggleAll({ label: 'Number of Guests',   group: 'sumGuests' }),
+  ]);
 }
 
 // pClassToggle — checkbox that adds/removes a CSS class on the target element.
@@ -4524,11 +4563,8 @@ var profilePanelConfigs = {
   },
 
   'co-summary': {
-    title: 'Checkout Summary', icon: '📋',
-    render: function() { return pGroup('Visibility', [
-      pToggle({ label: 'Experience Image', target: 'pp-co-cover' }),
-      pToggle({ label: 'Brand Subtext',    target: 'pp-co-host'  }),
-    ]); }
+    title: 'Booking Summary', icon: '📋',
+    render: function() { return summaryVisGroup(); }
   },
 
   // DECISION: Confirmation page customization for Content Profiles. The headline + body copy
@@ -4552,11 +4588,7 @@ var profilePanelConfigs = {
 
   'co-confirm-summary': {
     title: 'Booking Summary', icon: '🧾',
-    render: function() { return pGroup('Details', [
-      pToggle({ label: 'Show Date', target: ['pp-conf-row-date', 'bp-conf-row-date', 'ep-conf-row-date'] }),
-      pToggle({ label: 'Show Time', target: ['pp-conf-row-time', 'bp-conf-row-time', 'ep-conf-row-time'] }),
-      pToggle({ label: 'Show Number of Guests', target: ['pp-conf-row-guests', 'bp-conf-row-guests', 'ep-conf-row-guests'] }),
-    ]); }
+    render: function() { return summaryVisGroup(); }
   }
 
 };
@@ -4927,11 +4959,8 @@ var eePanels = {
   },
 
   'co-summary': {
-    title: 'Checkout Summary', icon: '📋',
-    render: function() { return pGroup('Visibility', [
-      pToggle({ label: 'Experience Image', target: 'ee-co-cover' }),
-      pToggle({ label: 'Brand Subtext',    target: 'ee-co-host'  }),
-    ]); }
+    title: 'Booking Summary', icon: '📋',
+    render: function() { return summaryVisGroup(); }
   },
 
   // DECISION: Confirmation page customization, mirrored from the Content Profile editor.
@@ -4956,11 +4985,7 @@ var eePanels = {
 
   'co-confirm-summary': {
     title: 'Booking Summary', icon: '🧾',
-    render: function() { return pGroup('Details', [
-      pToggle({ label: 'Show Date', target: ['ee-conf-row-date', 'bp-conf-row-date', 'ep-conf-row-date'] }),
-      pToggle({ label: 'Show Time', target: ['ee-conf-row-time', 'bp-conf-row-time', 'ep-conf-row-time'] }),
-      pToggle({ label: 'Show Number of Guests', target: ['ee-conf-row-guests', 'bp-conf-row-guests', 'ep-conf-row-guests'] }),
-    ]); }
+    render: function() { return summaryVisGroup(); }
   }
 
 };

@@ -85,6 +85,7 @@ The content profile editor's canvases use a block-level customization pattern. E
 - **`pText({ label?, target, fallback, sublabel?, transform? })`** — text input that rewrites `target.textContent` live. The input is **empty by default**: `fallback` is shown as the placeholder and rendered in the preview, and only typed text becomes an override (clearing the field reverts to the default). `transform: 'upper'` applies `.toUpperCase()` (use for uppercase section headers). Override state round-trips via `data-ov` on the target (the default + transform are stashed on `data-fb` / `data-upper`); the generated handler calls `_setOverride`.
 - **`pHeading({ label?, target, fallback, sublabel? })`** — multiline textarea variant of `pText` for a heading block. Same empty-by-default behavior; `fallback` may contain a `{Guest name}` variable (resolved to the sample guest name in the preview). First line renders as a lighter greeting, remaining lines bold. Handler calls `_setHeading`; the default lives on the target's `data-fallback`.
 - **`pToggle({ label, target, sublabel?, invert? })`** — checkbox that shows/hides one or more elements via `display:none`. `target` can be a string id or an array. `invert: true` flips the semantics (checked = hidden — use for "Required" or "Disabled" labels).
+- **`pToggleAll({ label, group, sublabel? })`** — checkbox that shows/hides **every** element carrying a marker class (`group`, no leading dot) via `_setVisClass`. Use when one setting must control many instances at once — e.g. the booking summary card that repeats on Checkout, Payment, Confirmation, and the previews. Tag each instance's element with the shared class (`sumImg`, `sumHost`, `sumDate`, `sumTime`, `sumGuests` for the summary). `summaryVisGroup()` is the shared control set both summary panels render so they stay identical.
 - **`pClassToggle({ label, target, className, sublabel?, invert? })`** — checkbox that adds/removes a CSS class on the target.
 
 Render functions can drop to raw template-literal HTML when they need behavior the helpers don't cover. The placeholder "Show price header" toggle in the Booking Widget panel is an example.
@@ -94,7 +95,7 @@ Render functions can drop to raw template-literal HTML when they need behavior t
 When adding a new panel:
 - Use the helpers if your control fits one of the standard patterns. Don't write a new inline `onchange` string from scratch.
 - If you need a new control type that doesn't fit, add a new `p*` helper rather than inlining JS in one render function. Future blocks will want the same control.
-- The `_setVis`, `_setOverride`, `_setHeading`, `_toggleClass` runtime utilities exist so generated `onchange`/`oninput` strings stay narrow. Don't embed long expressions inline.
+- The `_setVis`, `_setVisClass`, `_setOverride`, `_setHeading`, `_toggleClass` runtime utilities exist so generated `onchange`/`oninput` strings stay narrow. Don't embed long expressions inline.
 
 ## Inline Decision Comments — Required Behavior
 
