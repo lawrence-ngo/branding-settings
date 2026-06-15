@@ -4263,10 +4263,6 @@ function _setVis(idOrIds, visible) {
     if (e) e.style.display = visible ? '' : 'none';
   });
 }
-function _setText(id, value, fallback) {
-  var e = document.getElementById(id);
-  if (e) e.textContent = (value && value.length) ? value : (fallback || '');
-}
 // _setOverride — text customizer behavior: an empty field means "use the default"; any
 // typed text overrides it. The default copy and optional upper-case transform are read
 // from the target's data-fb / data-upper (set by pText at render). The raw override is

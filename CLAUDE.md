@@ -94,7 +94,7 @@ Render functions can drop to raw template-literal HTML when they need behavior t
 When adding a new panel:
 - Use the helpers if your control fits one of the standard patterns. Don't write a new inline `onchange` string from scratch.
 - If you need a new control type that doesn't fit, add a new `p*` helper rather than inlining JS in one render function. Future blocks will want the same control.
-- The `_setVis`, `_setText`, `_setOverride`, `_setHeading`, `_toggleClass` runtime utilities exist so generated `onchange`/`oninput` strings stay narrow. Don't embed long expressions inline.
+- The `_setVis`, `_setOverride`, `_setHeading`, `_toggleClass` runtime utilities exist so generated `onchange`/`oninput` strings stay narrow. Don't embed long expressions inline.
 
 ## Inline Decision Comments — Required Behavior
 
