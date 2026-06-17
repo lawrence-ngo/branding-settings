@@ -4640,8 +4640,16 @@ var profilePanelConfigs = {
       pGroup('Visibility', [
         pToggle({ label: 'Send a Message', target: 'pp-co-message' }),
       ]),
-      pGroup('CTA Button', [
-        pText({ label: 'Label', target: 'pp-cta-checkout', fallback: 'Confirm Purchase' }),
+      pGroup('Final CTA', [
+        // DECISION: one Final CTA label, rendered on whichever button is last before the
+        // confirmation page (see profileApplyFinalCta). Custom control: the placeholder is the
+        // active fixture's per-type default and the value is the single profile-level override.
+        (function(){
+          var fx = previewFixtures[profilePvCurrent] || previewFixtures.paid;
+          return '<div class="pfield"><div class="pfield-label">Button label</div>'
+            + '<input class="pinput" value="' + _esc(profileFinalCta) + '" placeholder="' + _esc(fx.finalDefault) + '" oninput="profileSetFinalCta(this.value)">'
+            + '<div class="psublabel" style="margin-top:6px">The last button before the confirmation page — on Payment for paid experiences, or on Checkout for free / RSVP.</div></div>';
+        })(),
       ]),
       pGroup('Confirmation Button Subtext', [
         pText({ target: 'pp-co-foot-note', fallback: 'Tickets are non-transferable | 21+ Age Limit' }),
@@ -4743,12 +4751,16 @@ function profileOpenPanel(key) {
 // experience types render different sections + CTAs. The picker previews against built-in
 // type samples (which also cover the brand-new-account empty state) or one of the operator's
 // real experiences. It is PREVIEW-ONLY — it never changes what the profile applies to.
+// finalDefault = the default label for the LAST CTA before confirmation (Confirm Purchase
+// on Payment for paid; the Checkout button for free/RSVP, which have no payment step).
 var previewFixtures = {
-  paid: { label:'Paid ticketed tour',  type:'Ticketed · Paid',  name:'The Painted Ladies Picnic & Architecture Tour', sub:'Victorian Architecture Walk', host:'With Painted Ladies Tours', price:'$45', paid:true,  checkoutCta:'Proceed to payment' },
-  free: { label:'Free ticketed event', type:'Ticketed · Free',  name:'Community Yoga in the Park', sub:'Saturday Morning Flow', host:'With Bright Body Studio', price:'Free', paid:false, checkoutCta:'Reserve Your Spot' },
-  rsvp: { label:'RSVP / onsite event', type:'RSVP · Onsite',    name:'Summer Rooftop Mixer',      sub:'Evening Networking Event', host:'With Skyline Social',  price:'Free', paid:false, checkoutCta:'RSVP' }
+  paid: { label:'Paid Ticketed Experience', type:'Ticketed · Paid', name:'The Painted Ladies Picnic & Architecture Tour', sub:'Victorian Architecture Walk', host:'With Painted Ladies Tours', price:'$45', paid:true,  finalDefault:'Confirm Purchase' },
+  free: { label:'Free Ticketed Experience', type:'Ticketed · Free', name:'Community Yoga in the Park', sub:'Saturday Morning Flow', host:'With Bright Body Studio', price:'Free', paid:false, finalDefault:'Reserve Your Spot' },
+  rsvp: { label:'RSVP/On-Site Event',       type:'RSVP · On-site',  name:'Summer Rooftop Mixer',      sub:'Evening Networking Event', host:'With Skyline Social',  price:'Free', paid:false, finalDefault:'RSVP' }
 };
 var profilePvCurrent = 'paid';
+// Single profile-level override for the final CTA label (empty = use the type's default).
+var profileFinalCta = '';
 
 // Prototype: map a few known experiences to free/RSVP; everything else is ticketed-paid.
 // In production the experience would carry its own type.
@@ -4759,9 +4771,9 @@ function profileMakeRealFixture(name) {
   var paid = !isRsvp && !isFree;
   return {
     label: name, name: name, sub: '', host: 'With Acme Corp',
-    type: isRsvp ? 'RSVP · Onsite' : (paid ? 'Ticketed · Paid' : 'Ticketed · Free'),
+    type: isRsvp ? 'RSVP · On-site' : (paid ? 'Ticketed · Paid' : 'Ticketed · Free'),
     price: paid ? '$45' : 'Free', paid: paid,
-    checkoutCta: isRsvp ? 'RSVP' : (paid ? 'Proceed to payment' : 'Reserve Your Spot')
+    finalDefault: isRsvp ? 'RSVP' : (paid ? 'Confirm Purchase' : 'Reserve Your Spot')
   };
 }
 
@@ -4774,16 +4786,46 @@ function profileApplyFixture(key) {
   var sub = document.getElementById('pp-fx-sub'); if (sub) sub.textContent = fx.sub || '';
   var price = document.getElementById('pp-fx-price'); if (price) price.textContent = fx.price;
   var from = document.getElementById('pp-fx-from'); if (from) from.style.display = fx.paid ? '' : 'none';
-  var proceed = document.getElementById('pp-proceed-cta'); if (proceed) proceed.textContent = fx.checkoutCta;
   // DECISION: the Payment step exists only for paid experiences — free ticketed and RSVP
-  // skip it, so the tab (and its separator) hide and the Checkout button becomes the final CTA.
+  // skip it, so the tab (and its separator) hide.
   _setVis('pp-tab-payment', fx.paid);
   _setVis('pp-sep-payment', fx.paid);
   var payTab = document.getElementById('pp-tab-payment');
   if (!fx.paid && payTab && payTab.classList.contains('active')) profileSwitchPage('checkout');
+  // DECISION: the Confirmation Area (message + final CTA) is the last step before
+  // confirmation, so it lives on the Payment page for paid experiences and moves to the end
+  // of the Checkout page for free/RSVP (no payment step). The single "Final CTA" label
+  // customization therefore always lands on the correct, last-before-confirmation button.
+  var confArea  = document.getElementById('pp-sec-co-confirm-area');
+  var proceedEl = document.getElementById('pp-proceed-cta');
+  var proceedRow = proceedEl ? proceedEl.closest('.co-submit-row') : null;
+  if (fx.paid) {
+    if (confArea) document.getElementById('pp-co-stack-payment').appendChild(confArea);
+    if (proceedRow) proceedRow.style.display = '';
+  } else {
+    if (confArea) document.getElementById('pp-co-stack-checkout').appendChild(confArea);
+    if (proceedRow) proceedRow.style.display = 'none';
+  }
+  profileApplyFinalCta();
   var lbl = document.getElementById('pp-pv-name'); if (lbl) lbl.textContent = fx.label;
   profileBuildPvMenu();
 }
+
+// profileApplyFinalCta — put the single Final CTA label on whichever button is last before
+// confirmation: the Payment "Confirm Purchase" button for paid, the Checkout button for
+// free/RSVP. Empty override falls back to the active fixture's per-type default.
+function profileApplyFinalCta() {
+  var fx = previewFixtures[profilePvCurrent] || previewFixtures.paid;
+  var label = profileFinalCta || fx.finalDefault;
+  // The final button (pp-cta-checkout) lives inside the Confirmation Area, which moves to
+  // whichever page is last — so it always gets the Final CTA label. The Checkout "Proceed to
+  // payment" button is only the intermediate step for paid (hidden for free/RSVP).
+  var finalBtn = document.getElementById('pp-cta-checkout');
+  if (finalBtn) finalBtn.textContent = label;
+  var proceedBtn = document.getElementById('pp-proceed-cta');
+  if (proceedBtn) proceedBtn.textContent = 'Proceed to payment';
+}
+function profileSetFinalCta(v) { profileFinalCta = v || ''; profileApplyFinalCta(); }
 
 function profileBuildPvMenu() {
   var menu = document.getElementById('pp-pv-menu'); if (!menu) return;
