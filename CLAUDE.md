@@ -19,6 +19,8 @@ Every booking page is shaped by two independent layers:
 
 These layers are completely independent. Changing a Brand Kit does not affect Content Profiles and vice versa.
 
+Both editors expose their layer **block by block**: clicking a section of the canvas opens a panel of settings for that block. The two block sets differ by layer, and neither editor shows the other's blocks. The Content Profile editor's blocks edit copy and field visibility; the Brand Kit editor's blocks edit visual treatment, and add Header and Cover, which are not profile settings at all.
+
 ## Key Terminology
 
 - **Brand Kit** — not "brand theme", not "kit" alone in UI copy
@@ -27,6 +29,7 @@ These layers are completely independent. Changing a Brand Kit does not affect Co
 - **Shared profile** — a Content Profile that can be assigned to multiple experiences. Account-level. A new account starts with one blank default profile; the operator can create additional shared profiles as needed. Prototype examples like "Classic," "Premium," and "Minimal" are illustrative, not shipped defaults.
 - **Branding Settings** — the account-level settings page. Contains Brand Kits tab and Content Profiles tab
 - **Design Bar** — the control bar at the top of the Experience Editor Design tab
+- **Block** — one customizable section of a canvas, wrapped in `.cs-section`. Say "block" for the canvas region and "block panel" for the controls it opens. In the Brand Kit editor the panel's other state is the **home state** (the account-level Brand Kit settings)
 - No em-dashes in any UI copy or tutorial text
 
 ## Architecture Rules — Do Not Break These
@@ -39,7 +42,10 @@ These layers are completely independent. Changing a Brand Kit does not affect Co
 6. **"Customize for this experience" lives in the profile switcher** — in `#eeSwitcherCustomizeRow`, not in the design bar.
 7. **Custom profile naming** — always `'Custom'`, never derived from the experience name.
 8. **Topbar layout** — viewport toggle left, hint text right, no "Open full preview" link. Matches account-level profile editor exactly.
-9. **Brand kit wordmark** — plain `font-weight: 600` only when no logo. No italic, uppercase, letter-spacing, or decorative fonts.
+9. **Brand kit wordmark** — plain `font-weight: 600` only when no logo. No italic, uppercase, letter-spacing, or decorative fonts. Size is adjustable from the Header block; family, weight, and case are not, which is why the Header panel has a size picker and no font picker.
+10. **One panel element, in the brand kit editor too** — `#bkPanel` serves both the home state (`#bkPanelHome`, the static account-level settings) and block editing (`#bkPanelBody`). Never add a second panel. `#bkPanelHead` is hidden in the home state and only appears in block state, where the back link is the way out.
+11. **Block panels never repeat account-level settings** — a Brand Kit block panel holds only settings that have no account-level equivalent. Colors, logo, brand name, and kit name stay in the home state. If a new setting would apply across blocks, it belongs in the home state, not in a block.
+12. **Brand kit block settings are kit-wide** — a block control targets every instance of that block across the canvas pages (all three header bars, every booking button), not just the Experience Details one that was clicked. The block is where you find the setting, not the scope of it. Declare the extra targets in `bkBlockControls`.
 
 ## Making Changes
 
@@ -48,9 +54,11 @@ These layers are completely independent. Changing a Brand Kit does not affect Co
 - Update tutorial step copy if any UI flows, labels, or targets changed
 - If a decision is significant, add it to the Design Decisions chapter in `system-guide.html`
 
-## How to Add a Customizable Block to a Canvas
+## How to Add a Block to a Content Profile Canvas
 
 The content profile editor's canvases use a block-level customization pattern. Each customizable section in a canvas is wrapped in `.cs-section` and shows a hover outline + "Customize" chip; clicking it opens a right-side panel of controls that mutate the canvas live.
+
+The Brand Kit editor uses the same `.cs-section` shell but a different control mechanism — see **How to Add a Block to the Brand Kit Canvas** below. Do not mix the two: `p*` helpers do not work in a brand kit panel, and `bk*` helpers do not work in a profile panel.
 
 ### Three steps
 
@@ -96,6 +104,75 @@ When adding a new panel:
 - Use the helpers if your control fits one of the standard patterns. Don't write a new inline `onchange` string from scratch.
 - If you need a new control type that doesn't fit, add a new `p*` helper rather than inlining JS in one render function. Future blocks will want the same control.
 - The `_setVis`, `_setVisClass`, `_setOverride`, `_setHeading`, `_toggleClass` runtime utilities exist so generated `onchange`/`oninput` strings stay narrow. Don't embed long expressions inline.
+
+## How to Add a Block to the Brand Kit Canvas
+
+The Brand Kit editor's canvas (`#bpCanvas`) uses the same `.cs-section` shell, but its controls work differently. A profile control mutates *content* (text, visibility) on one target id. A brand kit control applies a chosen *style value* to every instance of a block, and has to round-trip that choice when the panel re-renders. So instead of describing the control inline, you declare it once in a registry and both the renderer and the applier read it.
+
+### Four steps
+
+**1. Wrap the section in `cs-section`**, same shell as the profile canvas but calling `bkOpenPanel`:
+
+```html
+<div class="cs-section" id="bk-sec-NAME" onclick="bkOpenPanel('NAME')">
+  <div class="cs-section-tag">Section Display Name</div>
+  <div class="cs-chip"><svg>...</svg> Customize</div>
+  <!-- existing content here -->
+</div>
+```
+
+**2. Add IDs** to the elements the controls will style. Convention: `bp*` with a trailing page number, matching the ids already in that canvas (`bpH1`, `bpTitle1`, `bpPrice1`). If the block repeats on Checkout / Payment / Confirmation, give every instance an id and list them all in step 3.
+
+**3. Declare each control in `bkBlockControls`**, keyed `'block.control'`:
+
+```js
+'NAME.size': { targets: ['bpThing1'], prop: 'fontSize', def: '14px', options: [
+                 { label: 'S', value: '13px' },
+                 { label: 'M', value: '14px' },
+                 { label: 'L', value: '17px' } ] },
+```
+
+- `targets` + `prop` — the simple case: set one style property on each id.
+- `apply: function(v)` — replaces `targets`/`prop` when one property can't express it (the header alignment control also clears padding; the two cover-overlay controls compose one `rgba()`).
+- `def` — **must match what the markup or CSS already renders**, or the segmented control will show a state the canvas isn't in.
+- `type: 'color'` / `type: 'range'` (with `min`, `max`, `step`, `unit`) for the non-segmented controls.
+
+**4. Add a panel config** to `bkPanelConfigs`, reusing `pPanel` / `pGroup` for layout:
+
+```js
+'NAME': {
+  title: 'Section Display Name',
+  render: function() { return pPanel([
+    pGroup('Group label', [
+      bkSeg({ label: 'Size', control: 'NAME.size' }),
+      bkSeg({ label: 'Font', control: 'NAME.font', sublabel: 'Optional hint.' }),
+    ])
+  ]); }
+}
+```
+
+### Helper reference (brand kit blocks)
+
+- **`bkSeg({ label, control, sublabel? })`** — segmented picker over the control's declared `options`. Reads the active option back from `bkBlockStyles`, so reopening a panel shows what is actually applied. Options pass their **index** to `bkSetStyle`, not their value, so font stacks full of quotes never have to survive an inline attribute string.
+- **`bkColor({ label, control, sublabel? })`** — hex readout + swatch, using the account-level `.bk-color-field` markup so a color control looks the same in either panel state.
+- **`bkRange({ label, control, sublabel? })`** — slider with a live readout, for a degree rather than a choice. Reads `min` / `max` / `step` / `unit` from the registry.
+- **`bkField(label, controlHtml, sublabel?)`** — the `.pfield` wrapper the three above share. Use it if you add a fourth.
+
+`pPanel` and `pGroup` are shared with the profile panels; everything below them is not.
+
+### Runtime reference
+
+- **`bkBlockStyles`** — the active overrides, keyed `'block.control'`. An absent key means the control's declared default.
+- **`bkSetStyle(control, value, el)`** — store and apply one control. Segmented callers pass an option index; color and range callers pass the raw value.
+- **`bkApplyStyle(control)`** / **`bkApplyBlockStyles()`** — re-apply one or all. Call `bkApplyStyle` from anything that changes an input a control reads (`bkUpdateLinkColor` does this for the At a Glance icon tint).
+- **`bkResetBlockStyles()`** — clear every override and write the defaults back. Called from `bkPopulateSettings`, so entering a kit starts from that kit's baseline instead of the last kit's blocks.
+- **`bkOpenPanel(key)`** / **`bkReturnToGlobal()`** — the two panel states. `bkReturnToGlobal` is what `navigate('brand-editor-*')` calls on entry.
+
+### Don't drift
+
+- A new control means a new `bkBlockControls` entry, not new inline JS in a render function. If it needs a control type the three helpers don't cover, add a fourth `bk*` helper.
+- Anything that would apply across blocks goes in the home state (architecture rule 11).
+- If a click target inside a block does its own thing (a `<select>`, a "More" link), give it `event.stopPropagation()` at the call site so it acts on the preview instead of opening the block panel.
 
 ## Inline Decision Comments — Required Behavior
 

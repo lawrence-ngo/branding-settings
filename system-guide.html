@@ -702,6 +702,21 @@ code {
       </tbody>
     </table>
 
+    <p>Those five are the kit's <strong>account-level settings</strong>: they apply everywhere the kit is used, so they live in the panel's home state. On top of them, each block of the booking page carries visual detail that only makes sense for that block, reached by clicking the block on the canvas:</p>
+    <table class="compare-table">
+      <thead>
+        <tr><th>Block</th><th>Block-level settings</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Header</td><td>Bar height, content alignment, brand name size</td></tr>
+        <tr><td>Cover</td><td>Image height, overlay color, overlay opacity</td></tr>
+        <tr><td>Experience Info</td><td>Title font + size, subtitle font + size, description size</td></tr>
+        <tr><td>At a Glance</td><td>Section label font + size, icon tint (neutral or brand)</td></tr>
+        <tr><td>Booking Widget</td><td>Price font + size, button corners, button text size</td></tr>
+      </tbody>
+    </table>
+    <p>A block-level setting is still kit-wide: changing the header height changes every header bar in the flow, and changing the button corners changes every booking button. The block is where the setting is found, not the extent of what it changes.</p>
+
     <h3>Brand Kit Cards</h3>
     <p>Brand kits are listed in Branding Settings as cards. Each card shows the kit name, a preview of the header color swatch, and whether it's the account default. A three-dot menu on each card exposes <strong>Edit</strong> and <strong>Archive</strong> actions.</p>
 
@@ -715,9 +730,9 @@ code {
     </div>
 
     <h3>The Brand Kit Editor</h3>
-    <p>The brand kit editor uses a split-panel layout: a live canvas preview on the left (switchable between mobile and desktop viewports) and a settings panel on the right. The canvas is divided into three tabs: <strong>Details</strong>, <strong>Checkout</strong>, and <strong>Confirmation</strong> — mirroring the actual booking flow steps.</p>
+    <p>The brand kit editor uses a split-panel layout: a live canvas preview on the left (switchable between mobile and desktop viewports) and a settings panel on the right. The canvas is divided into four tabs: <strong>Experience Details</strong>, <strong>Checkout</strong>, <strong>Payment</strong>, and <strong>Confirmation</strong> — mirroring the actual booking flow steps.</p>
 
-    <p>The settings panel is a single accordion of Brand Kit settings: kit name and brand name, header color and logo, button color, link color. There is no section-level navigation inside the brand kit editor — all controls live in the one panel.</p>
+    <p>The panel has two states, in one panel element. Its <strong>home state</strong> is the accordion of account-level Brand Kit settings: kit name and brand name, header color and logo, button color, link color. Clicking a block on the canvas swaps the same panel to that block's settings, with a back link to the home state in the panel header. The two sets never overlap: the home state holds what applies everywhere, and a block panel holds only what is specific to that block. See <em>Block-Level Customization for Brand Kits</em> in the Design Decisions chapter.</p>
   </section>
 
   <!-- ③ Content Profiles -->
@@ -1060,8 +1075,20 @@ eeProfile.customName = profileName;
       <div class="glossary-def">Handles the modal confirm action. Auto-generates a profile name and description, registers the new profile in <code>profileConfigs</code>, inserts a card into the profile switcher, sets <code>eeProfile.customized = true</code>, calls <code>eeUpdateProfileUI()</code>.</div>
     </div>
     <div class="glossary-item">
-      <div class="glossary-term">kitReturnToGlobal()</div>
-      <div class="glossary-def">Renders the "Profile Settings" panel in the profile editor — name field, description textarea. Reads from <code>profileCurrentCfg</code>. Called on profile editor load and when navigating back from a section panel.</div>
+      <div class="glossary-term">profileReturnToGlobal()</div>
+      <div class="glossary-def">Renders the "Profile Settings" home state in the profile editor — name field, description textarea. Reads from <code>profileCurrentCfg</code>. Called on profile editor load and when navigating back from a block panel.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">bkOpenPanel(key) / bkReturnToGlobal()</div>
+      <div class="glossary-def">The Brand Kit editor's two panel states. <code>bkOpenPanel</code> highlights the clicked block, hides <code>#bkPanelHome</code>, and renders <code>bkPanelConfigs[key].render()</code> into <code>#bkPanelBody</code>. <code>bkReturnToGlobal</code> reverses it, and is what <code>navigate('brand-editor-*')</code> calls on entry so the editor always opens on the account-level settings.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">bkSetStyle(control, value, el)</div>
+      <div class="glossary-def">Stores one block-level value in <code>bkBlockStyles</code> and applies it to every target the control declares in <code>bkBlockControls</code>. Segmented controls pass an option index rather than the value itself, so font stacks containing quotes never have to survive an inline attribute string.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">bkResetBlockStyles()</div>
+      <div class="glossary-def">Clears every block-level override and writes the declared defaults back to the canvas. Called from <code>bkPopulateSettings()</code>, so entering a brand kit starts from that kit's baseline rather than inheriting the blocks of the kit last edited.</div>
     </div>
     <div class="glossary-item">
       <div class="glossary-term">eeSelectProfile(el, id)</div>
@@ -1172,6 +1199,15 @@ eeProfile.customName = profileName;
   <p><strong>Decision (Option 4 — hybrid picker):</strong> A "Previewing: [▾]" control in the Content Profile editor's preview topbar lets the operator choose what the canvas renders. It offers built-in <strong>type samples</strong> (Paid ticketed tour, Free ticketed event, RSVP / onsite event) — which cover the empty state on day one — and, below them, the operator's <strong>real experiences</strong> (each labelled with its type). It is explicitly <strong>preview-only</strong> (a caption states the settings apply to every experience using the profile); it never changes scope. The samples are labelled Paid Ticketed Experience, Free Ticketed Experience, and RSVP/On-Site Event. Switching a fixture drives the type-dependent surface: the <strong>Payment</strong> tab + separator show only for paid experiences, the price reads "Free" vs "$45", and the experience name/subtitle/host swap (<code>profileApplyFixture()</code> / <code>previewFixtures</code>).</p>
   <p><strong>Final CTA:</strong> The last button before the confirmation page is a single profile customization. The Confirmation Area block (message + final button + subtext) physically moves to wherever the last step is — it stays on the Payment page for paid experiences and relocates to the end of the Checkout page for free/RSVP (which have no payment step, so the "Proceed to payment" button is hidden). One "Final CTA" label field therefore always lands on the correct button; it is empty-by-default and falls back to the active type's default (Confirm Purchase / Reserve Your Spot / RSVP). Driven by <code>profileApplyFinalCta()</code> and the <code>profileFinalCta</code> override.</p>
   <p><strong>Scope &amp; follow-ups:</strong> Brand Kits are the type-agnostic visual layer (logo, colors, fonts), so they don't need the full switcher — a single representative sample suffices; the picker lives on the Content Profile editor for now. Prototype limitations: real experiences are mapped to a type heuristically (production would read the experience's real type), and the long description / At-a-Glance details aren't yet swapped per fixture. A heavier future option is to make content profiles themselves type-aware so the preview derives its structure with no manual selection.</p>
+
+  <h3>Block-Level Customization for Brand Kits</h3>
+  <p><strong>Problem:</strong> A brand kit had exactly five controls (kit name, brand name, header background, logo, button color, link color), all of them global. That is enough to make the booking page recognisably the operator's, but not enough to make it feel like theirs. The detail that carries a brand — how the title is set, how heavy the cover overlay sits, whether buttons are square or pill — had nowhere to live. Adding those to the same flat panel would have produced a long undifferentiated list with no indication of what each control touches.</p>
+  <p><strong>Decision:</strong> Bring the Content Profile editor's block pattern to the Brand Kit editor, with a strict division of labour between the two panel states. The five existing tokens stay in the <strong>home state</strong>, because they apply to every block and repeating them inside a block would imply they could differ per block. Clicking a block opens a panel of settings that exist <strong>only</strong> for that block and have no account-level equivalent: typography for the text blocks, cover height and overlay, header layout, widget shape. Five blocks on the Experience Details page: Header, Cover, Experience Info, At a Glance, Booking Widget.</p>
+  <p><strong>Why not per-block overrides:</strong> The tempting version is letting each block override a global token — a different button color just in the booking widget. We deliberately did not: a brand kit exists to carry one visual identity, and a kit that can disagree with itself is a kit that stops being useful as a shared account-level object. So a block setting is scoped by <em>kind</em>, not by <em>instance</em>: changing the header height changes all three header bars, and changing the button corners changes every booking button in the flow. The block is the place you find the setting, not the extent of what it changes.</p>
+  <p><strong>Two block sets, one shell:</strong> Both editors use the same <code>.cs-section</code> shell, hover outline, "Customize" chip, reveal and coachmark, and the same back-link panel header, so the interaction is learned once. What differs is the block set, and it differs by layer: the Brand Kit editor adds <strong>Header</strong> and <strong>Cover</strong> (visual surfaces that are not content-profile settings at all), while the Content Profile editor keeps the checkout and confirmation blocks that have no brand styling to speak of. Neither editor shows the other's blocks.</p>
+  <p><strong>How:</strong> Every control is declared once in <code>bkBlockControls</code>, keyed <code>'block.control'</code>, with its targets and either a style property or a custom <code>apply</code> function. The panel renderer (<code>bkSeg</code> / <code>bkColor</code> / <code>bkRange</code>) and the applier (<code>bkApplyStyle</code>) both read that registry, so a control cannot render one state and apply another, and reopening a panel reads the applied value back out of <code>bkBlockStyles</code>. Overrides are cleared and defaults rewritten by <code>bkResetBlockStyles()</code> on entering a kit, so switching kits never leaks the previous kit's blocks. Each control's declared default matches what the markup already renders, so a freshly opened panel tells the truth about the canvas.</p>
+  <p><strong>Typography choices:</strong> The font pickers offer Sans, Serif, and Mono rather than named typefaces. The booking-page canvases deliberately render in a system stack so they preview what a guest actually sees, where AnyRoad's Soleil is not loaded; a picker offering "Playfair Display" would load nothing, silently render its fallback, and misrepresent the result. Production would list the fonts the account has uploaded. The header's brand name gets a size control but no font picker, because the wordmark is deliberately kept plain (see <em>Brand Kit Wordmark Styling</em>).</p>
+  <p><strong>Prototype limitations:</strong> Blocks are wrapped on the Experience Details page only; the Checkout, Payment, and Confirmation canvases receive block settings but have no clickable blocks of their own yet. Block values live in one in-memory store rather than on each kit's config, so they are not persisted per kit across a reload. The cover image itself is still a fixed gradient placeholder, so only its height and overlay are adjustable.</p>
 </section>
 
   <!-- ⑦ Glossary -->
@@ -1197,6 +1233,14 @@ eeProfile.customName = profileName;
     <div class="glossary-item">
       <div class="glossary-term">Custom profile</div>
       <div class="glossary-def">An experience-scoped content profile created from the Experience Editor. Only affects the experience it belongs to. Does not appear in the account-level list.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Block</div>
+      <div class="glossary-def">One customizable section of an editor canvas, wrapped in <code>.cs-section</code>. Clicking a block opens its settings in the right panel. Both editors use the pattern, with a block set specific to their layer.</div>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Home state</div>
+      <div class="glossary-def">The panel's default content in an editor: Brand Kit settings in the Brand Kit editor, Profile Settings in the Content Profile editor. Holds the settings that apply across every block; a block panel never repeats them.</div>
     </div>
     <div class="glossary-item">
       <div class="glossary-term">Preview mode</div>
