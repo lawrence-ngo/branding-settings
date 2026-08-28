@@ -370,9 +370,11 @@ button, input, select, textarea { font-family: inherit; }
 
 /* DECISION: Canvases (booking page / checkout previews) keep the system / Inter font
    stack instead of Soleil — these mock the public-facing guest experience, where the
-   operator's brand kit controls typography rather than the AnyRoad app's typeface. */
-.preview-canvas,
-#bpCanvas {
+   operator's brand kit controls typography rather than the AnyRoad app's typeface.
+   #bpCanvas is deliberately NOT in this list: the brand kit editor's canvas takes its type
+   from the --bk-font-heading / --bk-font-body role variables further down, and declaring
+   font-family for it twice would leave the winner up to source order. */
+.preview-canvas {
   font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
   position: relative; /* positioning context for the click-to-edit coachmark */
 }
@@ -997,6 +999,69 @@ button, input, select, textarea { font-family: inherit; }
 .prange::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 15px; height: 15px; border-radius: 50%; background: #3D57FF; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); cursor: pointer; }
 .prange::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: #3D57FF; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); cursor: pointer; }
 .prange-val { font-size: 12px; color: #697386; font-family: 'SF Mono','Monaco','Menlo',monospace; min-width: 40px; text-align: right; flex-shrink: 0; }
+
+/* ── Brand kit typography: two roles, applied through custom properties ──────────
+   DECISION: font FAMILY is an account-level setting with exactly two roles (heading and
+   body), so it is applied once as two custom properties on the canvas root rather than as a
+   target list per element. Blocks then only set font SIZE, which cannot collide with family.
+   Adding a new text element means tagging it heading or body below - not touching any JS.
+   Scoped to #bpCanvas because every other brand kit setting in this prototype is (see
+   bkUpdateHeaderBg / bkUpdateLinkColor). */
+:root {
+  --bk-font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --bk-font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+#bpCanvas {
+  font-family: var(--bk-font-body);
+  position: relative; /* positioning context for the click-to-edit coachmark */
+}
+#bpCanvas input, #bpCanvas select, #bpCanvas textarea, #bpCanvas button { font-family: var(--bk-font-body); }
+/* Heading role: the display type. Titles, section labels, prices, totals, and the wordmark. */
+#bpCanvas .bk-title,
+#bpCanvas .bk-subtitle,
+#bpCanvas .bk-ataglance-title,
+#bpCanvas .bk-widget-header-price,
+#bpCanvas .co-review-title,
+#bpCanvas .co-section-title,
+#bpCanvas .co-step-name,
+#bpCanvas .co-conf-heading,
+#bpCanvas .co-summary-name,
+#bpCanvas .co-sum-name,
+#bpCanvas .co-price-total,
+#bpCanvas .co-sum-total,
+#bpCanvas .bk-wordmark { font-family: var(--bk-font-heading); }
+
+/* ── Font pickers (home state) ── */
+.bk-font-role { border: 1.5px solid #d1d5db; border-radius: 8px; margin-bottom: 10px; overflow: hidden; background: #fff; }
+.bk-font-role.open { border-color: #3D57FF; }
+.bk-font-current { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 11px; cursor: pointer; }
+.bk-font-current:hover { background: #f8f9fc; }
+.bk-font-role-name { font-size: 10px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: #9aa5b4; }
+.bk-font-value { font-size: 15px; color: #1a1f36; line-height: 1.25; }
+.bk-font-src-label { font-size: 11px; color: #9aa5b4; margin-top: 1px; }
+.bk-font-chev { flex-shrink: 0; color: #9aa5b4; transition: transform 0.2s; }
+.bk-font-role.open .bk-font-chev { transform: rotate(180deg); }
+.bk-font-picker { display: none; border-top: 1px solid #e3e8ee; padding: 11px; background: #fbfcfe; }
+.bk-font-role.open .bk-font-picker { display: block; }
+.bk-font-list { max-height: 214px; overflow-y: auto; margin-top: 10px; }
+.bk-font-opt { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; }
+.bk-font-opt:hover { background: #eef0fd; }
+.bk-font-opt.sel { background: #fff; border-color: #3D57FF; }
+.bk-font-opt-name { font-size: 15px; color: #1a1f36; line-height: 1.3; }
+.bk-font-opt-check { color: #3D57FF; opacity: 0; flex-shrink: 0; }
+.bk-font-opt.sel .bk-font-opt-check { opacity: 1; }
+.bk-font-note { font-size: 11.5px; color: #9aa5b4; line-height: 1.5; margin-top: 9px; }
+.bk-font-status { font-size: 11.5px; margin-top: 9px; display: flex; align-items: center; gap: 5px; }
+.bk-font-status.ok { color: #16a34a; }
+.bk-font-status.warn { color: #d97706; }
+.bk-font-drop { border: 1.5px dashed #c7cfdb; border-radius: 8px; padding: 16px 12px; text-align: center; cursor: pointer; background: #fff; margin-top: 10px; }
+.bk-font-drop:hover { border-color: #3D57FF; background: #f8f9fc; }
+.bk-font-drop-plus { font-size: 20px; color: #3D57FF; font-weight: 300; line-height: 1; }
+.bk-font-drop-hint { font-size: 11.5px; color: #9aa5b4; margin-top: 5px; line-height: 1.45; }
+.bk-kit-row { display: flex; gap: 6px; margin-top: 10px; }
+.bk-kit-row .bk-settings-input { flex: 1; }
+.bk-kit-btn { border: 1.5px solid #3D57FF; background: #fff; color: #3D57FF; border-radius: 7px; padding: 0 12px; font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; white-space: nowrap; }
+.bk-kit-btn:hover { background: #eef0fd; }
 .pinput:focus { border-color: #3D57FF; box-shadow: 0 0 0 3px rgba(67,97,238,0.1); }
 .color-pick-row { display: flex; align-items: center; gap: 10px; }
 .color-swatch { width: 32px; height: 32px; border-radius: 8px; border: 2px solid #dde2ec; overflow: hidden; position: relative; cursor: pointer; flex-shrink: 0; transition: border-color 0.15s; }
@@ -2195,7 +2260,7 @@ button, input, select, textarea { font-family: inherit; }
                   <div class="cs-section-tag">Header</div>
                   <div class="cs-chip"><svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M7.5 1.5L8.5 2.5 3 8H2V7L7.5 1.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Customize</div>
                   <div id="bpH1" style="background:#1a1a2e;height:44px;display:flex;align-items:center;justify-content:center;">
-                    <span id="bpW1" style="font-weight:800;font-size:12px;letter-spacing:0.06em;color:#fff">ACME CORP</span>
+                    <span class="bk-wordmark" id="bpW1" style="font-weight:800;font-size:12px;letter-spacing:0.06em;color:#fff">ACME CORP</span>
                   </div>
                 </div>
                 <!-- Hero -->
@@ -2304,7 +2369,7 @@ button, input, select, textarea { font-family: inherit; }
             <div class="bpp" id="bpp-checkout" style="display:none;width:100%;">
               <div id="bpCheckoutInner" style="background:#fff;overflow:hidden;">
                 <div id="bpH2" style="background:#1a1a2e;height:44px;display:flex;align-items:center;justify-content:center;">
-                  <span id="bpW2" style="font-weight:800;font-size:12px;letter-spacing:0.06em;color:#fff">ACME CORP</span>
+                  <span class="bk-wordmark" id="bpW2" style="font-weight:800;font-size:12px;letter-spacing:0.06em;color:#fff">ACME CORP</span>
                 </div>
                 <!-- DECISION: Same numbered "Review and Book" layout as eeCheckoutPage so the
                      brand kit editor preview canvas shows how the operator's brand kit colors
@@ -2512,7 +2577,7 @@ button, input, select, textarea { font-family: inherit; }
             <div class="bpp" id="bpp-confirm" style="display:none;width:100%;">
               <div id="bpConfirmInner" style="background:#fff;min-height:100%;">
                 <div id="bpH3" style="background:#1a1a2e;height:44px;display:flex;align-items:center;justify-content:center;">
-                  <span id="bpW3" style="font-weight:800;font-size:12px;letter-spacing:0.06em;color:#fff">ACME CORP</span>
+                  <span class="bk-wordmark" id="bpW3" style="font-weight:800;font-size:12px;letter-spacing:0.06em;color:#fff">ACME CORP</span>
                 </div>
                 <div style="max-width:860px;margin:0 auto;padding:52px 40px 60px;display:flex;gap:52px;align-items:flex-start;">
                   <!-- Left: confirmation message — bp-conf-* ids let the Content Profile / Experience
@@ -2617,6 +2682,21 @@ button, input, select, textarea { font-family: inherit; }
                       <span class="bk-logo-plus">+</span>
                     </div>
                     <a class="bk-remove-link">Remove</a>
+                  </div>
+
+                  <div class="bk-settings-divider"></div>
+
+                  <!-- Fonts: account-level, two roles.
+                       DECISION: font family is set ONCE per role (heading / body) at the account
+                       level, not per block. A brand has a typeface, not a typeface per section, and
+                       per-block families would let one kit disagree with itself. Blocks keep font
+                       SIZE, which is genuinely per block. The four sources sit behind one picker
+                       because "which font" and "where it comes from" are the same decision to the
+                       operator: they are choosing a typeface, not a hosting method. -->
+                  <div class="bk-settings-block">
+                    <div class="bk-settings-label">Fonts <span class="bk-help-icon">?</span></div>
+                    <div class="bk-settings-sublabel">Two roles for the whole booking page. Sizes are set per section on the canvas.</div>
+                    <div id="bkFontRoles"></div>
                   </div>
 
                   <div class="bk-settings-divider"></div>
@@ -4065,8 +4145,9 @@ function bkPopulateSettings(cfg, isDefault) {
   // Header preview text
   var prevText = document.getElementById('bkHeaderPreviewText');
   if (prevText) prevText.textContent = cfg.name.toUpperCase();
-  // Block-level settings are per kit, so entering a kit starts from its baseline.
+  // Block-level settings and fonts are per kit, so entering a kit starts from its baseline.
   bkResetBlockStyles();
+  bkResetFonts();
 }
 
 function bkUpdateHeaderBg(val) {
@@ -4536,6 +4617,12 @@ function summaryVisGroup() {
   ]);
 }
 
+// pNote — a line of explanatory text inside a group, for signposting a setting that lives
+// somewhere else. Not a control; takes no target.
+function pNote(text) {
+  return '<div class="psublabel" style="margin:-2px 0 2px;line-height:1.5">' + text + '</div>';
+}
+
 // pClassToggle — checkbox that adds/removes a CSS class on the target element.
 //   opts: { label, target, className, sublabel?, invert? }
 //     invert — when true, checked = class removed (e.g., "Auto-expand" removes .is-truncated)
@@ -4891,27 +4978,300 @@ function profileSwitchPage(page) {
 }
 
 // ── Brand Kit Editor: Block-Level Customization ────────────────────────────────
-// DECISION: A brand kit carries ONE visual identity, so the account-level tokens (kit name,
-// brand name, header background, logo, button color, link color) stay in the panel's home
-// state and are never repeated inside a block panel. What a block panel adds is the visual
-// detail that only makes sense for that block and has no account-level equivalent —
-// typography per text block, cover treatment, header layout, widget shape. Editing one still
-// applies to every instance of that block across the booking flow (all three header bars,
-// every CTA): a brand kit setting is kit-wide, and the block is just where you find it.
-// This is what separates it from the Content Profile editor, where a block panel edits the
-// copy and field visibility of that one section.
+// DECISION: A brand kit carries ONE visual identity, so everything that reads as part of that
+// identity - kit name, brand name, header background, logo, button and link color, and the two
+// font roles - stays in the panel's home state and is never repeated inside a block panel.
+// What a block panel adds is what genuinely varies BY block: text sizes, cover treatment,
+// header layout, widget shape. The dividing line is "would this differ between two sections of
+// the same page?" - a typeface would not, a heading size would.
+// Editing a block setting still applies to every instance of that block across the booking
+// flow (all three header bars, every CTA): a brand kit setting is kit-wide, and the block is
+// just where you find it. This is what separates it from the Content Profile editor, where a
+// block panel edits the copy and field visibility of that one section.
 
-// DECISION: three system font stacks (Sans / Serif / Mono), not named webfonts. The booking
-// page canvases deliberately render in a system stack so they preview what a guest actually
-// sees, where AnyRoad's Soleil isn't loaded - see the Typekit decision at the top of this
-// file. A picker offering "Playfair Display" would load nothing, silently render its
-// fallback, and lie about what it does; these three resolve everywhere. Real font selection
-// would read the fonts the account has uploaded.
-var BK_FONTS = {
-  sans:  "-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif",
-  serif: "Georgia, 'Times New Roman', serif",
-  mono:  "'SF Mono', 'Monaco', 'Menlo', monospace"
+// ── Brand Kit typography: account-level fonts, two roles, four sources ─────────
+// DECISION: An operator picking type is making ONE decision ("what typeface does my brand
+// use"), not two ("what typeface" plus "how is it hosted"). So the four sources live behind a
+// single picker per role rather than as four separate settings. Upload-only, which the first
+// pass shipped, forces every operator to go find a font file even when they just want a
+// well-set default or the Google font their marketing site already uses.
+//   curated — system stacks. No request, always renders, the sane default.
+//   google  — a shortlist from Google Fonts, loaded on demand from fonts.googleapis.com.
+//   adobe   — families from a connected Adobe Fonts (Typekit) kit, loaded by kit id.
+//   upload  — WOFF2/WOFF/TTF/OTF registered in the browser via the FontFace API.
+// DECISION: the prototype LOADS these for real (rather than faking the preview with a
+// lookalike) so a design review sees the actual face, and so the fallback case is visible
+// when a font cannot be fetched. bkFontStatus reports which of the two happened.
+
+// DECISION: a curated shortlist, not the full Google catalog. Production would search the
+// real API; a prototype needs enough range to judge the feature (workhorse sans, geometric
+// sans, editorial serif, readable serif, expressive display) without becoming a font browser.
+var bkFontCatalog = {
+  curated: [
+    { id: 'sys-sans',  name: 'System Sans',  stack: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" },
+    { id: 'sys-serif', name: 'System Serif', stack: "Georgia, 'Times New Roman', serif" },
+    { id: 'sys-mono',  name: 'System Mono',  stack: "'SF Mono', Monaco, Menlo, monospace" }
+  ],
+  google: [
+    { id: 'g-inter',    name: 'Inter',            stack: "'Inter', sans-serif",         g: 'Inter:wght@400;500;600;700' },
+    { id: 'g-dmsans',   name: 'DM Sans',          stack: "'DM Sans', sans-serif",       g: 'DM+Sans:wght@400;500;700' },
+    { id: 'g-space',    name: 'Space Grotesk',    stack: "'Space Grotesk', sans-serif", g: 'Space+Grotesk:wght@400;500;700' },
+    { id: 'g-playfair', name: 'Playfair Display', stack: "'Playfair Display', serif",   g: 'Playfair+Display:wght@400;600;700' },
+    { id: 'g-lora',     name: 'Lora',             stack: "'Lora', serif",               g: 'Lora:wght@400;600;700' },
+    { id: 'g-fraunces', name: 'Fraunces',         stack: "'Fraunces', serif",           g: 'Fraunces:wght@400;600;700' }
+  ],
+  // DECISION: the Adobe source starts with the kit this app already loads (Soleil, AnyRoad's
+  // own typeface - see the Typekit decision at the top of the file), so the connected-kit
+  // state is real rather than mocked. Production would read the kit's family list from the
+  // Adobe Fonts API; here connecting another kit injects its CSS and adds a placeholder row
+  // the operator names, which is enough to review the flow.
+  adobe: [
+    { id: 'a-soleil', name: 'Soleil', stack: "'soleil', sans-serif", kit: 'yfq6nad' }
+  ],
+  upload: []
 };
+
+var BK_FONT_SOURCES = [
+  { id: 'curated', label: 'Curated' },
+  { id: 'google',  label: 'Google' },
+  { id: 'adobe',   label: 'Adobe' },
+  { id: 'upload',  label: 'Upload' }
+];
+var BK_FONT_ROLES = [
+  { id: 'heading', label: 'Heading', prop: '--bk-font-heading', hint: 'Titles, section labels, prices, and the brand name.' },
+  { id: 'body',    label: 'Body',    prop: '--bk-font-body',    hint: 'Descriptions, form labels, inputs, links, and buttons.' }
+];
+
+// bkFonts — the active selection per role. bkFontOpenRole is which picker is expanded (only
+// one at a time, so the panel stays a readable column instead of four stacked lists).
+var bkFonts = { heading: { source: 'curated', id: 'sys-sans' }, body: { source: 'curated', id: 'sys-sans' } };
+var bkFontOpenRole = null;
+var bkFontSrcTab = { heading: 'curated', body: 'curated' };
+var bkGoogleLoaded = {};
+var bkAdobeKits = { 'yfq6nad': true };
+var bkUploadSeq = 0;
+
+function bkFontFind(source, id) {
+  var list = bkFontCatalog[source] || [];
+  for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+  return null;
+}
+function bkFontActive(role) {
+  var sel = bkFonts[role];
+  return bkFontFind(sel.source, sel.id) || bkFontCatalog.curated[0];
+}
+
+// bkLoadGoogleFont — inject the stylesheet for one family the first time it is chosen.
+// DECISION: load on demand, not all six up front. It matches what production would do and
+// keeps the failure visible per family instead of hiding behind one big request.
+function bkLoadGoogleFont(f) {
+  if (!f.g || bkGoogleLoaded[f.id]) return;
+  bkGoogleLoaded[f.id] = true;
+  var link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=' + f.g + '&display=swap';
+  document.head.appendChild(link);
+}
+
+function bkConnectAdobeKit(inputId) {
+  var input = document.getElementById(inputId);
+  if (!input) return;
+  var kit = (input.value || '').trim();
+  if (!/^[a-z0-9]{3,20}$/i.test(kit)) { bkFontRenderRoles(); return; }
+  if (!bkAdobeKits[kit]) {
+    bkAdobeKits[kit] = true;
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://use.typekit.net/' + kit + '.css';
+    document.head.appendChild(link);
+    // Production reads the family list from the kit; the prototype adds one row named after
+    // the kit so the operator can select and preview whatever that CSS provides.
+    bkFontCatalog.adobe.push({ id: 'a-' + kit, name: 'Kit ' + kit, stack: "'" + kit + "', sans-serif", kit: kit });
+  }
+  input.value = '';
+  bkFontRenderRoles();
+}
+
+// bkUploadFont — register a real font file in the browser. DECISION: the FontFace API means
+// the upload path actually works in a static prototype, so a reviewer can drop in the brand's
+// own file and see the booking page in it rather than imagining it.
+function bkUploadFont(input, role) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+  var family = 'bkUpload' + (++bkUploadSeq);
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var face = new FontFace(family, 'url(' + e.target.result + ')');
+      face.load().then(function(loaded) {
+        document.fonts.add(loaded);
+        bkFontCatalog.upload.push({ id: 'u-' + family, name: file.name.replace(/\.(woff2?|ttf|otf)$/i, ''), stack: "'" + family + "', sans-serif", uploaded: true });
+        bkSetFont(role, 'upload', 'u-' + family);
+      }).catch(function() { bkFontUploadError(role, file.name); });
+    } catch (err) { bkFontUploadError(role, file.name); }
+  };
+  reader.readAsDataURL(file);
+}
+function bkFontUploadError(role, name) {
+  var el = document.getElementById('bkFontStatus-' + role);
+  if (el) { el.className = 'bk-font-status warn'; el.textContent = 'Could not read ' + name + '. Use WOFF2, WOFF, TTF, or OTF.'; }
+}
+
+// bkApplyFonts — write both roles to the canvas as custom properties. One assignment per
+// role; the CSS role map decides which elements follow which.
+function bkApplyFonts() {
+  var canvas = document.getElementById('bpCanvas');
+  if (!canvas) return;
+  BK_FONT_ROLES.forEach(function(r) {
+    canvas.style.setProperty(r.prop, bkFontActive(r.id).stack);
+  });
+  bkFontCheckStatus();
+}
+
+// bkFontRendered — does this family actually render, or is the browser quietly substituting a
+// fallback? DECISION: measured by metrics, not document.fonts.check(). check() returns TRUE
+// for a family the page has never heard of (with nothing to match, every character still
+// "renders" via fallback), so it reports success for a font that failed to load - the exact
+// case this needs to catch. Rendering a probe string against two very different generics and
+// comparing widths detects the real face instead.
+function bkFontRendered(name) {
+  var probe = 'MMMWWWiiilll0123456789';
+  function width(stack) {
+    var el = document.createElement('span');
+    el.style.cssText = 'position:absolute;left:-9999px;top:-9999px;font-size:72px;white-space:nowrap;font-family:' + stack;
+    el.textContent = probe;
+    document.body.appendChild(el);
+    var w = el.offsetWidth;
+    el.parentNode.removeChild(el);
+    return w;
+  }
+  var q = '"' + name + '",';
+  return width(q + 'monospace') !== width('monospace')
+      || width(q + 'serif')     !== width('serif');
+}
+
+// bkFontCheckStatus — say whether the chosen face actually rendered. A picker that silently
+// falls back is a picker that lies; this reports the fallback instead of hiding it.
+function bkFontCheckStatus() {
+  BK_FONT_ROLES.forEach(function(r) {
+    var el = document.getElementById('bkFontStatus-' + r.id);
+    if (!el) return;
+    var f = bkFontActive(r.id);
+    // Curated stacks are system faces: nothing to load, nothing to report.
+    if (bkFonts[r.id].source === 'curated') { el.className = 'bk-font-status'; el.textContent = ''; return; }
+    var first = f.stack.split(',')[0].replace(/['"]/g, '').trim();
+    el.className = 'bk-font-status';
+    el.textContent = 'Loading ' + f.name + '...';
+    var done = function() {
+      var ok = bkFontRendered(first);
+      el.className = 'bk-font-status ' + (ok ? 'ok' : 'warn');
+      el.textContent = ok ? f.name + ' is loaded' : 'Could not load ' + f.name + '. The page is showing a fallback face.';
+    };
+    if (document.fonts && document.fonts.load) {
+      document.fonts.load('16px "' + first + '"').then(done, done);
+    } else { setTimeout(done, 400); }
+  });
+}
+
+function bkSetFont(role, source, id) {
+  var f = bkFontFind(source, id);
+  if (!f) return;
+  if (source === 'google') bkLoadGoogleFont(f);
+  bkFonts[role] = { source: source, id: id };
+  bkFontRenderRoles();
+  bkApplyFonts();
+}
+function bkFontToggleRole(role) {
+  bkFontOpenRole = (bkFontOpenRole === role) ? null : role;
+  if (bkFontOpenRole) bkFontPreloadSource(bkFontSrcTab[role]);
+  bkFontRenderRoles();
+}
+// DECISION: opening the Google tab preloads the whole shortlist, because each row previews
+// itself in its own face and a row that renders in the fallback defeats the point. Six
+// families is cheap; a production picker over the full catalog would request name-only glyph
+// subsets for the list (the API's text= parameter) and the full family only on selection.
+function bkFontPreloadSource(src) {
+  if (src !== 'google') return;
+  bkFontCatalog.google.forEach(bkLoadGoogleFont);
+}
+function bkFontSetSrc(role, src) {
+  bkFontSrcTab[role] = src;
+  bkFontPreloadSource(src);
+  bkFontRenderRoles();
+}
+
+// bkFontRenderRoles — the two role rows. Each shows its current font SET IN THAT FONT, which
+// is the whole affordance: the operator reads the typeface instead of its name.
+function bkFontRenderRoles() {
+  var host = document.getElementById('bkFontRoles');
+  if (!host) return;
+  host.innerHTML = BK_FONT_ROLES.map(function(r) {
+    var f = bkFontActive(r.id);
+    var open = bkFontOpenRole === r.id;
+    var srcLabel = BK_FONT_SOURCES.filter(function(x) { return x.id === bkFonts[r.id].source; })[0];
+    return '<div class="bk-font-role' + (open ? ' open' : '') + '">'
+      + '<div class="bk-font-current" onclick="bkFontToggleRole(\'' + r.id + '\')">'
+      +   '<div><div class="bk-font-role-name">' + r.label + '</div>'
+      +   '<div class="bk-font-value" style="font-family:' + _esc(f.stack) + '">' + _esc(f.name) + '</div>'
+      +   '<div class="bk-font-src-label">' + _esc(srcLabel ? srcLabel.label : '') + '</div></div>'
+      +   '<svg class="bk-font-chev" width="12" height="12" fill="none" viewBox="0 0 12 12"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      + '</div>'
+      + '<div class="bk-font-picker">' + bkFontPickerBody(r) + '</div>'
+      + '<div class="bk-font-status" id="bkFontStatus-' + r.id + '"></div>'
+      + '</div>';
+  }).join('');
+  bkFontCheckStatus();
+}
+
+function bkFontPickerBody(r) {
+  var src = bkFontSrcTab[r.id];
+  var tabs = '<div class="ke-seg">' + BK_FONT_SOURCES.map(function(sc) {
+    return '<button class="ke-seg-opt' + (sc.id === src ? ' on' : '') + '"'
+         + ' onclick="event.stopPropagation();bkFontSetSrc(\'' + r.id + '\',\'' + sc.id + '\')">' + sc.label + '</button>';
+  }).join('') + '</div>';
+
+  var body = '';
+  if (src === 'adobe') {
+    body += '<div class="bk-kit-row" onclick="event.stopPropagation()">'
+         +  '<input class="bk-settings-input" id="bkKitInput-' + r.id + '" type="text" placeholder="Adobe Fonts kit ID" />'
+         +  '<button class="bk-kit-btn" onclick="bkConnectAdobeKit(\'bkKitInput-' + r.id + '\')">Connect</button></div>';
+  }
+  if (src === 'upload') {
+    body += '<div class="bk-font-drop" onclick="event.stopPropagation();document.getElementById(\'bkFontFile-' + r.id + '\').click()">'
+         +  '<div class="bk-font-drop-plus">+</div>'
+         +  '<div class="bk-font-drop-hint">WOFF2, WOFF, TTF, or OTF up to 2 MB. Only upload fonts you have permission to host.</div></div>'
+         +  '<input type="file" id="bkFontFile-' + r.id + '" accept=".woff2,.woff,.ttf,.otf" style="display:none"'
+         +  ' onchange="bkUploadFont(this,\'' + r.id + '\')" />';
+  }
+
+  var list = bkFontCatalog[src] || [];
+  if (list.length) {
+    body += '<div class="bk-font-list" onclick="event.stopPropagation()">' + list.map(function(f) {
+      var sel = (bkFonts[r.id].source === src && bkFonts[r.id].id === f.id);
+      return '<div class="bk-font-opt' + (sel ? ' sel' : '') + '"'
+        + ' onclick="bkSetFont(\'' + r.id + '\',\'' + src + '\',\'' + f.id + '\')">'
+        + '<span class="bk-font-opt-name" style="font-family:' + _esc(f.stack) + '">' + _esc(f.name) + '</span>'
+        + '<svg class="bk-font-opt-check" width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M3 7.5L6 10.5 11 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        + '</div>';
+    }).join('') + '</div>';
+  } else if (src === 'upload') {
+    body += '<div class="bk-font-note">No uploaded fonts yet.</div>';
+  }
+
+  body += '<div class="bk-font-note">' + r.hint + '</div>';
+  return tabs + body;
+}
+
+// bkResetFonts — fonts are per kit, so entering a kit starts from its baseline. Uploaded
+// faces stay registered in the browser (removing them would break any kit already using one)
+// but the selection resets.
+function bkResetFonts() {
+  bkFonts = { heading: { source: 'curated', id: 'sys-sans' }, body: { source: 'curated', id: 'sys-sans' } };
+  bkFontSrcTab = { heading: 'curated', body: 'curated' };
+  bkFontOpenRole = null;
+  bkFontRenderRoles();
+  bkApplyFonts();
+}
 
 // bkBlockStyles — the block-level overrides for the brand kit being edited, keyed
 // 'block.control'. Absent key = the control's declared default. Cleared per kit by
@@ -4966,18 +5326,10 @@ var bkBlockControls = {
                             apply: function() { bkApplyHeroOverlay(); } },
 
   // Experience Info
-  'info.titleFont':   { targets: ['bpTitle1'], prop: 'fontFamily', def: BK_FONTS.sans, options: [
-                          { label: 'Sans',  value: BK_FONTS.sans },
-                          { label: 'Serif', value: BK_FONTS.serif },
-                          { label: 'Mono',  value: BK_FONTS.mono } ] },
   'info.titleSize':   { targets: ['bpTitle1'], prop: 'fontSize', def: '22px', options: [
                           { label: 'S', value: '18px' },
                           { label: 'M', value: '22px' },
                           { label: 'L', value: '28px' } ] },
-  'info.subFont':     { targets: ['bpSub1'], prop: 'fontFamily', def: BK_FONTS.sans, options: [
-                          { label: 'Sans',  value: BK_FONTS.sans },
-                          { label: 'Serif', value: BK_FONTS.serif },
-                          { label: 'Mono',  value: BK_FONTS.mono } ] },
   'info.subSize':     { targets: ['bpSub1'], prop: 'fontSize', def: '16px', options: [
                           { label: 'S', value: '14px' },
                           { label: 'M', value: '16px' },
@@ -4988,10 +5340,6 @@ var bkBlockControls = {
                           { label: 'L', value: '15px' } ] },
 
   // At a Glance
-  'glance.labelFont': { targets: ['bpGlanceTitle1'], prop: 'fontFamily', def: BK_FONTS.sans, options: [
-                          { label: 'Sans',  value: BK_FONTS.sans },
-                          { label: 'Serif', value: BK_FONTS.serif },
-                          { label: 'Mono',  value: BK_FONTS.mono } ] },
   'glance.labelSize': { targets: ['bpGlanceTitle1'], prop: 'fontSize', def: '11px', options: [
                           { label: 'S', value: '10px' },
                           { label: 'M', value: '11px' },
@@ -5011,10 +5359,6 @@ var bkBlockControls = {
                         } },
 
   // Booking Widget
-  'widget.priceFont': { targets: ['bpPrice1'], prop: 'fontFamily', def: BK_FONTS.sans, options: [
-                          { label: 'Sans',  value: BK_FONTS.sans },
-                          { label: 'Serif', value: BK_FONTS.serif },
-                          { label: 'Mono',  value: BK_FONTS.mono } ] },
   'widget.priceSize': { targets: ['bpPrice1'], prop: 'fontSize', def: '18px', options: [
                           { label: 'S', value: '16px' },
                           { label: 'M', value: '18px' },
@@ -5151,7 +5495,7 @@ var bkPanelConfigs = {
         bkSeg({ label: 'Alignment', control: 'header.align', sublabel: 'Where the logo or brand name sits in the bar.' })
       ]),
       pGroup('Brand name', [
-        bkSeg({ label: 'Size', control: 'header.markSize', sublabel: 'Applies to the wordmark shown when no logo is uploaded.' })
+        bkSeg({ label: 'Size', control: 'header.markSize', sublabel: 'Applies to the wordmark shown when no logo is uploaded. It uses the heading font.' })
       ])
     ]); }
   },
@@ -5170,25 +5514,20 @@ var bkPanelConfigs = {
   'info': {
     title: 'Experience Info',
     render: function() { return pPanel([
-      pGroup('Title', [
-        bkSeg({ label: 'Font', control: 'info.titleFont' }),
-        bkSeg({ label: 'Size', control: 'info.titleSize' })
-      ]),
-      pGroup('Subtitle', [
-        bkSeg({ label: 'Font', control: 'info.subFont' }),
-        bkSeg({ label: 'Size', control: 'info.subSize' })
-      ]),
-      pGroup('Description', [
-        bkSeg({ label: 'Size', control: 'info.descSize' })
+      pGroup('Text sizes', [
+        pNote('Font family is set for the whole page in Brand Kit settings.'),
+        bkSeg({ label: 'Title',       control: 'info.titleSize' }),
+        bkSeg({ label: 'Subtitle',    control: 'info.subSize' }),
+        bkSeg({ label: 'Description', control: 'info.descSize' })
       ])
     ]); }
   },
   'glance': {
     title: 'At a Glance',
     render: function() { return pPanel([
-      pGroup('Section label', [
-        bkSeg({ label: 'Font', control: 'glance.labelFont' }),
-        bkSeg({ label: 'Size', control: 'glance.labelSize' })
+      pGroup('Text sizes', [
+        pNote('Font family is set for the whole page in Brand Kit settings.'),
+        bkSeg({ label: 'Section label', control: 'glance.labelSize' })
       ]),
       pGroup('Icons', [
         bkSeg({ label: 'Tint', control: 'glance.iconTint', sublabel: 'Brand uses the link color from this kit.' })
@@ -5199,7 +5538,7 @@ var bkPanelConfigs = {
     title: 'Booking Widget',
     render: function() { return pPanel([
       pGroup('Price', [
-        bkSeg({ label: 'Font', control: 'widget.priceFont' }),
+        pNote('Font family is set for the whole page in Brand Kit settings.'),
         bkSeg({ label: 'Size', control: 'widget.priceSize' })
       ]),
       pGroup('Button', [
@@ -6655,7 +6994,7 @@ var TUT_STEPS = [
     title: 'Branding',
     body: '<p style="font-size:14px;color:#697386;line-height:1.7;margin-bottom:16px">This tour walks through AnyRoad\'s Branding system. We\'ll start in account-level settings to see how Brand Kits and Content Profiles are built, then jump into an experience to see them applied.</p>',
     checklist: [
-      'Brand Kits: the visual layer (logo, colors, font)',
+      'Brand Kits: the visual layer (logo, colors, fonts)',
       'Content Profiles: the structural layer (flow, fields, CTA)',
       'How the Experience Editor Design Bar applies both layers',
       'Creating a custom profile scoped to one experience'
@@ -6735,7 +7074,7 @@ var TUT_STEPS = [
   },
   {
     title: 'The Brand Kit Editor',
-    body: 'The right panel opens on the kit\'s account-level settings: brand kit name, header background color, logo, button color, and link color. These apply everywhere the kit is used, so they live here rather than on any one section. Every change previews instantly on the canvas.',
+    body: 'The right panel opens on the kit\'s account-level settings: brand kit name, header background color, logo, <strong>fonts</strong>, button color, and link color. These apply everywhere the kit is used, so they live here rather than on any one section. Every change previews instantly on the canvas.',
     navPath: ['Settings', 'Branding', 'Brand Kits', 'Edit kit'],
     // DECISION: Target #bkPanel (right settings panel) with position 'left' so the card
     // appears to the left of the panel. before() handles backward navigation.
@@ -6746,8 +7085,25 @@ var TUT_STEPS = [
     before: function() { navigate('brand-editor-acme'); bkReturnToGlobal(); }
   },
   {
+    title: 'Fonts',
+    body: 'A brand kit sets two typefaces for the whole booking page: a <strong>heading</strong> font for titles, section labels, prices, and the brand name, and a <strong>body</strong> font for everything else. Each role can come from the curated system faces, Google Fonts, a connected Adobe Fonts kit, or a font file you upload. Font family is set here, once. Font <em>sizes</em> are set per section, in the next step.',
+    navPath: ['Settings', 'Branding', 'Brand Kits', 'Edit kit'],
+    // DECISION: before() opens the heading picker so the card lands on the four sources rather
+    // than a collapsed row, and target2 lights the canvas title that the heading role drives,
+    // so the setting and its effect are visible together.
+    target: '#bkFontRoles',
+    target2: '#bk-sec-info',
+    position: 'left',
+    before: function() {
+      navigate('brand-editor-acme');
+      bkReturnToGlobal();
+      bkFontOpenRole = 'heading';
+      bkFontSetSrc('heading', 'google');
+    }
+  },
+  {
     title: 'Block Customizations',
-    body: 'Click any section on the canvas to open settings for that block alone: typography for the title and subtitle, cover height and overlay, header layout, button shape. These are visual details with no account-level equivalent, so the panel never repeats the colors above. A block setting still applies to that block everywhere it appears in the booking flow.',
+    body: 'Click any section on the canvas to open settings for that block alone: text sizes, cover height and overlay, header layout, button shape. These are the visual details with no account-level equivalent, so a block panel never repeats the colors or fonts above. A block setting still applies to that block everywhere it appears in the booking flow.',
     navPath: ['Settings', 'Branding', 'Brand Kits', 'Edit kit'],
     // DECISION: mirrors the Content Profile editor's "Section Customizations" step. before()
     // calls bkOpenPanel('info') so the card lands on real block controls instead of the home
@@ -6756,7 +7112,7 @@ var TUT_STEPS = [
     target: '#bkPanel',
     target2: '#bk-sec-info',
     position: 'left',
-    before: function() { navigate('brand-editor-acme'); bkOpenPanel('info'); }
+    before: function() { navigate('brand-editor-acme'); bkFontOpenRole = null; bkOpenPanel('info'); }
   },
   {
     title: 'Live Preview Tabs',
@@ -7015,7 +7371,7 @@ var TUT_STEPS = [
     title: 'You\'ve seen the full system',
     body: '<p style="font-size:14px;color:#697386;line-height:1.7;margin-bottom:4px">You covered the key flows. Here\'s a quick summary:</p>',
     checklist: [
-      'Brand Kits control the visual layer (logo, colors, font, button shape)',
+      'Brand Kits control the visual layer: colors and fonts account-wide, sizes and shape per block',
       'Content Profiles control the structural layer (flow, fields, CTA)',
       'Both are set up in Branding Settings and applied per experience',
       'Shared profiles are locked in the canvas and edited via the profile editor',

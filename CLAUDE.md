@@ -14,12 +14,14 @@ This folder contains the prototype and documentation for AnyRoad's **Branding** 
 
 Every booking page is shaped by two independent layers:
 
-- **Brand Kit** — the visual layer: logo, brand name (wordmark fallback), header color, button color, link color. Account-level, shared across experiences. Lives in Branding Settings > Brand Kits.
+- **Brand Kit** — the visual layer: logo, brand name (wordmark fallback), header color, button color, link color, and the heading + body fonts. Account-level, shared across experiences. Lives in Branding Settings > Brand Kits.
 - **Content Profile** — the structural layer: CTA label, field visibility, layout, checkout behavior. Can be shared (account-level) or custom (experience-scoped). Lives in Branding Settings > Content Profiles.
 
 These layers are completely independent. Changing a Brand Kit does not affect Content Profiles and vice versa.
 
 Both editors expose their layer **block by block**: clicking a section of the canvas opens a panel of settings for that block. The two block sets differ by layer, and neither editor shows the other's blocks. The Content Profile editor's blocks edit copy and field visibility; the Brand Kit editor's blocks edit visual treatment, and add Header and Cover, which are not profile settings at all.
+
+Inside the Brand Kit editor there is a second split, between the panel's two states. Ask: **would this differ between two sections of the same page?** A typeface would not, so font family is account-level and lives in the home state. A heading size would, so sizes are block-level. Getting this wrong in either direction is the most common way to break the feature: a per-block typeface lets one kit disagree with itself, and an account-level heading size makes the whole page move when you wanted one section to.
 
 ## Key Terminology
 
@@ -29,6 +31,8 @@ Both editors expose their layer **block by block**: clicking a section of the ca
 - **Shared profile** — a Content Profile that can be assigned to multiple experiences. Account-level. A new account starts with one blank default profile; the operator can create additional shared profiles as needed. Prototype examples like "Classic," "Premium," and "Minimal" are illustrative, not shipped defaults.
 - **Branding Settings** — the account-level settings page. Contains Brand Kits tab and Content Profiles tab
 - **Design Bar** — the control bar at the top of the Experience Editor Design tab
+- **Heading font / Body font** — the two type roles a Brand Kit sets. Say "role", not "level" or "slot". Heading covers titles, section labels, prices, and the brand name; body covers everything else. The CSS role map in `#bpCanvas` is what decides which is which
+- **Font source** — where a font comes from: Curated, Google, Adobe, or Upload. A source is not a setting of its own; it is how the operator finds the typeface they want
 - **Block** — one customizable section of a canvas, wrapped in `.cs-section`. Say "block" for the canvas region and "block panel" for the controls it opens. In the Brand Kit editor the panel's other state is the **home state** (the account-level Brand Kit settings)
 - No em-dashes in any UI copy or tutorial text
 
@@ -42,10 +46,12 @@ Both editors expose their layer **block by block**: clicking a section of the ca
 6. **"Customize for this experience" lives in the profile switcher** — in `#eeSwitcherCustomizeRow`, not in the design bar.
 7. **Custom profile naming** — always `'Custom'`, never derived from the experience name.
 8. **Topbar layout** — viewport toggle left, hint text right, no "Open full preview" link. Matches account-level profile editor exactly.
-9. **Brand kit wordmark** — plain `font-weight: 600` only when no logo. No italic, uppercase, letter-spacing, or decorative fonts. Size is adjustable from the Header block; family, weight, and case are not, which is why the Header panel has a size picker and no font picker.
+9. **Brand kit wordmark** — plain `font-weight: 600` only when no logo. No italic, uppercase, letter-spacing, or decorative treatment, and no font picker of its own. It carries the `bk-wordmark` class so it renders in the kit's **heading font** — the operator's own typeface on their own name is the point; what the rule forbids is decoration for its own sake, not the brand's face. Size is adjustable from the Header block; family, weight, and case are not.
 10. **One panel element, in the brand kit editor too** — `#bkPanel` serves both the home state (`#bkPanelHome`, the static account-level settings) and block editing (`#bkPanelBody`). Never add a second panel. `#bkPanelHead` is hidden in the home state and only appears in block state, where the back link is the way out.
-11. **Block panels never repeat account-level settings** — a Brand Kit block panel holds only settings that have no account-level equivalent. Colors, logo, brand name, and kit name stay in the home state. If a new setting would apply across blocks, it belongs in the home state, not in a block.
+11. **Block panels never repeat account-level settings** — a Brand Kit block panel holds only settings that have no account-level equivalent. Colors, logo, brand name, kit name, and font family stay in the home state. If a new setting would apply across blocks, it belongs in the home state, not in a block.
 12. **Brand kit block settings are kit-wide** — a block control targets every instance of that block across the canvas pages (all three header bars, every booking button), not just the Experience Details one that was clicked. The block is where you find the setting, not the scope of it. Declare the extra targets in `bkBlockControls`.
+13. **Font family is account-level, font size is block-level** — never add a font-family picker to a block panel, and never add a text size to the home state. Family is applied once per role as `--bk-font-heading` / `--bk-font-body` on `#bpCanvas`; blocks set `fontSize` only, so the two can never collide. A new text element joins a role by being added to the CSS role map, not by any JS change.
+14. **A font picker must not lie about what loaded** — `document.fonts.check()` returns `true` for a family the page has never heard of, so it reports success for a font that failed to fetch. Detection goes through `bkFontRendered()`, which compares probe-string metrics against two generics. If a face did not load, say so in the status line rather than showing a fallback silently.
 
 ## Making Changes
 
@@ -95,6 +101,7 @@ The Brand Kit editor uses the same `.cs-section` shell but a different control m
 - **`pToggle({ label, target, sublabel?, invert? })`** — checkbox that shows/hides one or more elements via `display:none`. `target` can be a string id or an array. `invert: true` flips the semantics (checked = hidden — use for "Required" or "Disabled" labels).
 - **`pToggleAll({ label, group, sublabel? })`** — checkbox that shows/hides **every** element carrying a marker class (`group`, no leading dot) via `_setVisClass`. Use when one setting must control many instances at once — e.g. the booking summary card that repeats on Checkout, Payment, Confirmation, and the previews. Tag each instance's element with the shared class (`sumImg`, `sumHost`, `sumDate`, `sumTime`, `sumGuests` for the summary). `summaryVisGroup()` is the shared control set both summary panels render so they stay identical.
 - **`pClassToggle({ label, target, className, sublabel?, invert? })`** — checkbox that adds/removes a CSS class on the target.
+- **`pNote(text)`** — a line of explanatory text inside a group, for signposting a setting that lives elsewhere (the block panels use it to point at account-level fonts). Not a control; takes no target.
 
 Render functions can drop to raw template-literal HTML when they need behavior the helpers don't cover. The placeholder "Show price header" toggle in the Booking Widget panel is an example.
 
@@ -104,6 +111,57 @@ When adding a new panel:
 - Use the helpers if your control fits one of the standard patterns. Don't write a new inline `onchange` string from scratch.
 - If you need a new control type that doesn't fit, add a new `p*` helper rather than inlining JS in one render function. Future blocks will want the same control.
 - The `_setVis`, `_setVisClass`, `_setOverride`, `_setHeading`, `_toggleClass` runtime utilities exist so generated `onchange`/`oninput` strings stay narrow. Don't embed long expressions inline.
+
+## How Brand Kit Typography Works
+
+Font **family** is account-level with exactly two roles; font **size** is block-level. That split is architecture rule 13 and the reason the two never fight each other.
+
+### Applying a family
+
+Both roles are applied as custom properties on the canvas root, once per role:
+
+```js
+canvas.style.setProperty('--bk-font-heading', stack);
+canvas.style.setProperty('--bk-font-body', stack);
+```
+
+Which elements follow which role is decided entirely in CSS, in the role map near the top of the stylesheet:
+
+```css
+#bpCanvas { font-family: var(--bk-font-body); }        /* body is the default */
+#bpCanvas .bk-title,
+#bpCanvas .co-review-title,
+#bpCanvas .bk-wordmark { font-family: var(--bk-font-heading); }
+```
+
+**To put a new text element on a role**, add its selector to that map. Do not add a target list to any JS. Body is the default, so only heading needs listing.
+
+Heading covers titles, section labels, prices, totals, and the wordmark. Body covers descriptions, form labels, inputs, links, and buttons.
+
+### The four sources
+
+`bkFontCatalog` holds one array per source, and every entry needs `id`, `name`, and `stack`:
+
+| Source | Entry shape | Loading |
+|--------|-------------|---------|
+| `curated` | `{ id, name, stack }` | none, system faces |
+| `google` | `+ g: 'Family+Name:wght@400;700'` | `bkLoadGoogleFont()` injects a `fonts.googleapis.com` link |
+| `adobe` | `+ kit: '<kit id>'` | `bkConnectAdobeKit()` injects a `use.typekit.net/<id>.css` link |
+| `upload` | `+ uploaded: true` | `bkUploadFont()` registers the file via the `FontFace` API |
+
+**To add a source**, add its array to `bkFontCatalog`, an entry to `BK_FONT_SOURCES`, and — only if it needs UI beyond the family list (a kit field, a dropzone) — a branch in `bkFontPickerBody`. Anything that needs fetching before the list can preview itself belongs in `bkFontPreloadSource`.
+
+### Reporting what actually loaded
+
+`document.fonts.check()` is not usable here: with no matching family it still returns `true`, so it reports success for a font that failed to load. `bkFontRendered(name)` measures a probe string against two generics instead, and `bkFontCheckStatus()` writes the result into the role's status line — green when the face is really there, amber when the page is showing a fallback. Keep that honest; a picker that hides a failed load is worse than one with fewer options.
+
+### Runtime reference
+
+- **`bkFonts`** — `{ heading: { source, id }, body: { source, id } }`, the active selection per role.
+- **`bkSetFont(role, source, id)`** — select, load if needed, re-render, apply.
+- **`bkApplyFonts()`** — write both role variables to the canvas.
+- **`bkFontRenderRoles()`** — redraw the two role rows. Each row previews its font **in that font**, which is the whole affordance; a row rendering in the fallback means the face has not loaded.
+- **`bkResetFonts()`** — back to the curated default for both roles. Called from `bkPopulateSettings`, so fonts are per kit like block styles. Uploaded faces stay registered in the browser; only the selection resets.
 
 ## How to Add a Block to the Brand Kit Canvas
 
