@@ -14,7 +14,7 @@ This folder contains the prototype and documentation for AnyRoad's **Branding** 
 
 Every booking page is shaped by two independent layers:
 
-- **Brand Kit** — the visual layer: logo, brand name (wordmark fallback), header color, button color, link color, and the heading + body fonts. Account-level, shared across experiences. Lives in Branding Settings > Brand Kits.
+- **Brand Kit** — the visual layer: logo, brand name (wordmark fallback), header color, button color, link color, and three font roles (heading, body, button). Account-level, shared across experiences. Lives in Branding Settings > Brand Kits.
 - **Content Profile** — the structural layer: CTA label, field visibility, layout, checkout behavior. Can be shared (account-level) or custom (experience-scoped). Lives in Branding Settings > Content Profiles.
 
 These layers are completely independent. Changing a Brand Kit does not affect Content Profiles and vice versa.
@@ -31,9 +31,9 @@ Inside the Brand Kit editor there is a second split, between the panel's two sta
 - **Shared profile** — a Content Profile that can be assigned to multiple experiences. Account-level. A new account starts with one blank default profile; the operator can create additional shared profiles as needed. Prototype examples like "Classic," "Premium," and "Minimal" are illustrative, not shipped defaults.
 - **Branding Settings** — the account-level settings page. Contains Brand Kits tab and Content Profiles tab
 - **Design Bar** — the control bar at the top of the Experience Editor Design tab
-- **Heading font / Body font** — the two type roles a Brand Kit sets. Say "role", not "level" or "slot". Heading covers titles, section labels, prices, and the brand name; body covers everything else. The CSS role map in `#bpCanvas` is what decides which is which
+- **Heading / Body / Button font** — the three type roles a Brand Kit sets. Say "role", not "level" or "slot". Heading covers titles, section labels, prices, and the brand name; button covers every button a guest can press; body covers everything else, and is the default. The CSS role map in `#bpCanvas` is what decides which is which
+- **Soleil / Proxima Nova** — two typefaces, two audiences, never interchangeable. **Soleil** (Adobe Typekit) is the platform's *internal* face and dresses this operator dashboard only. **Proxima Nova** is the default on the *public* pages a guest sees, so it is what every canvas previews and what a brand kit starts from. Its stack lives once, in `--bk-platform-sans`. Soleil is never offered as a brand kit font
 - **Font source** — where a font comes from: System, Google, Adobe, or Upload. A source is not a setting of its own; it is how the operator finds the typeface they want. **System** leads with Proxima Nova, AnyRoad's application standard, and everything else in it is a face the device already has
-- **Pairing** — a named heading + body combination that sets both roles in one click ("Classic", "Editorial"). Not a font source. It lives above the two role rows, never inside a per-role picker, because it changes both roles
 - **Block** — one customizable section of a canvas, wrapped in `.cs-section`. Say "block" for the canvas region and "block panel" for the controls it opens. In the Brand Kit editor the panel's other state is the **home state** (the account-level Brand Kit settings)
 - No em-dashes in any UI copy or tutorial text
 
@@ -51,9 +51,8 @@ Inside the Brand Kit editor there is a second split, between the panel's two sta
 10. **One panel element, in the brand kit editor too** — `#bkPanel` serves both the home state (`#bkPanelHome`, the static account-level settings) and block editing (`#bkPanelBody`). Never add a second panel. `#bkPanelHead` is hidden in the home state and only appears in block state, where the back link is the way out.
 11. **Block panels never repeat account-level settings** — a Brand Kit block panel holds only settings that have no account-level equivalent. Colors, logo, brand name, kit name, and font family stay in the home state. If a new setting would apply across blocks, it belongs in the home state, not in a block.
 12. **Brand kit block settings are kit-wide** — a block control targets every instance of that block across the canvas pages (all three header bars, every booking button), not just the Experience Details one that was clicked. The block is where you find the setting, not the scope of it. Declare the extra targets in `bkBlockControls`.
-13. **Font family is account-level, font size is block-level** — never add a font-family picker to a block panel, and never add a text size to the home state. Family is applied once per role as `--bk-font-heading` / `--bk-font-body` on `#bpCanvas`; blocks set `fontSize` only, so the two can never collide. A new text element joins a role by being added to the CSS role map, not by any JS change.
-14. **Curated is a pairing, not a source** — anything that sets both type roles at once belongs above the role rows, never inside a per-role picker, which would move the other role behind the operator's back. Overriding one role must drop the pairing display to Custom.
-15. **A font picker must not lie about what loaded** — `document.fonts.check()` returns `true` for a family the page has never heard of, so it reports success for a font that failed to fetch. Detection goes through `bkFontRendered()`, which compares probe-string metrics against two generics. If a face did not load, say so in the status line rather than showing a fallback silently.
+13. **Font family is account-level, font size is block-level** — never add a font-family picker to a block panel, and never add a text size to the home state. Family is applied once per role as `--bk-font-heading` / `--bk-font-body` / `--bk-font-button` on `#bpCanvas`; blocks set `fontSize` only, so the two can never collide. A new text element joins a role by being added to the CSS role map, not by any JS change.
+14. **A font picker must not lie about what loaded** — `document.fonts.check()` returns `true` for a family the page has never heard of, so it reports success for a font that failed to fetch. Detection goes through `bkFontRendered()`, which compares probe-string metrics against two generics. If a face did not load, say so in the status line rather than showing a fallback silently.
 
 ## Making Changes
 
@@ -116,15 +115,15 @@ When adding a new panel:
 
 ## How Brand Kit Typography Works
 
-Font **family** is account-level with exactly two roles; font **size** is block-level. That split is architecture rule 13 and the reason the two never fight each other.
+Font **family** is account-level with exactly three roles; font **size** is block-level. That split is architecture rule 13 and the reason the two never fight each other.
 
 ### Applying a family
 
 Both roles are applied as custom properties on the canvas root, once per role:
 
 ```js
-canvas.style.setProperty('--bk-font-heading', stack);
-canvas.style.setProperty('--bk-font-body', stack);
+// bkApplyFonts loops BK_FONT_ROLES, so adding a role is one entry, not new code here
+canvas.style.setProperty(role.prop, stack);   // --bk-font-heading | -body | -button
 ```
 
 Which elements follow which role is decided entirely in CSS, in the role map near the top of the stylesheet:
@@ -134,11 +133,15 @@ Which elements follow which role is decided entirely in CSS, in the role map nea
 #bpCanvas .bk-title,
 #bpCanvas .co-review-title,
 #bpCanvas .bk-wordmark { font-family: var(--bk-font-heading); }
+#bpCanvas button,
+#bpCanvas .bk-cta-btn { font-family: var(--bk-font-button); }
 ```
 
-**To put a new text element on a role**, add its selector to that map. Do not add a target list to any JS. Body is the default, so only heading needs listing.
+**To put a new text element on a role**, add its selector to that map. Do not add a target list to any JS. Body is the default, so only heading and button need listing.
 
-Heading covers titles, section labels, prices, totals, and the wordmark. Body covers descriptions, form labels, inputs, links, and buttons.
+Heading covers titles, section labels, prices, totals, and the wordmark. Button covers every button a guest can press, including the two styled as links rather than `<button>` elements. Body covers everything else: descriptions, form labels, inputs, links.
+
+**To add a role**, add one entry to `BK_FONT_ROLES` (`{ id, label, prop, hint }`), one `:root` default, and its selectors to the role map. `bkApplyFonts`, `bkFontCheckStatus`, `bkFontRenderRoles` and `bkResetFonts` all loop the list, so none of them need touching.
 
 ### The four sources
 
@@ -148,21 +151,14 @@ Heading covers titles, section labels, prices, totals, and the wordmark. Body co
 |--------|-------------|---------|
 | `system` | `{ id, name, stack }`, plus `verify` on a platform-served face | none |
 | `google` | `+ g: 'Family+Name:wght@400;700'` | `bkLoadGoogleFont()` injects a `fonts.googleapis.com` link |
-| `adobe` | `+ kit: '<kit id>'` | `bkConnectAdobeKit()` injects a `use.typekit.net/<id>.css` link |
+| `adobe` | `+ kit: '<kit id>'` | `bkConnectAdobeKit()` injects a `use.typekit.net/<id>.css` link. Starts **empty** — no kit connected |
 | `upload` | `+ uploaded: true` | `bkUploadFont()` registers the file via the `FontFace` API |
 
 **To add a source**, add its array to `bkFontCatalog`, an entry to `BK_FONT_SOURCES`, and — only if it needs UI beyond the family list (a kit field, a dropzone) — a branch in `bkFontPickerBody`. Anything that needs fetching before the list can preview itself belongs in `bkFontPreloadSource`.
 
-`system` is the floor: it must render with no Adobe kit, no Google request, and no upload. Proxima Nova sits first in its sans stack because the platform serves it (the Typekit alias `proxima-nova` is listed ahead of the desktop name so a hosted copy wins), and it carries `verify: 'proxima-nova'` because platform-served is not the same as universal — if it is missing, the operator is told. The serif and mono entries have universal fallbacks and stay silent. Do not add a face to `system` that needs fetching.
+`system` is the floor: it must render with no Adobe kit, no Google request, and no upload. Its sans entry **is** the platform stack — `stack: 'var(--bk-platform-sans)'`, pointing at the one definition rather than restating it, so the canvases, the role defaults, and the picker can never disagree about what Proxima Nova resolves to. It carries `verify: 'proxima-nova'` because platform-served is not the same as universal: if it is missing, the operator is told. The serif and mono entries have universal fallbacks and stay silent. Do not add a face to `system` that needs fetching.
 
-### Pairings
-
-**Curated is not a source.** It is `bkFontPairings`, a list of named heading + body combinations that set both roles in one click, rendered above the two role rows by `bkFontRenderPairings()`. Two reasons it lives there and not in the picker:
-
-- A pairing changes **both** roles. Offering it inside the Heading picker would silently move Body too.
-- The two-role model creates a pairing problem — an operator choosing each role independently can land on a combination no designer would ship. A pairing is the one-click answer to "give me good type".
-
-Each entry is `{ id, name, note, heading: { source, id }, body: { source, id } }`. The `note` states the requirement, because a pairing that quietly depends on Google is a pairing that quietly fails on a locked-down network; keep at least the first two resolvable with no external request. `bkActivePairing()` returns the pairing the two roles currently match, or `null` — which the UI renders as **Custom**, so an overridden role never leaves a stale pairing lit.
+Do not add Soleil to any source. It is the dashboard's own face; offering it would invite an operator to dress their public pages in AnyRoad's typeface.
 
 ### Reporting what actually loaded
 
@@ -171,11 +167,10 @@ Each entry is `{ id, name, note, heading: { source, id }, body: { source, id } }
 ### Runtime reference
 
 - **`bkFonts`** — `{ heading: { source, id }, body: { source, id } }`, the active selection per role.
-- **`bkSetFont(role, source, id)`** — select one role, load if needed, re-render, apply.
-- **`bkSetPairing(id)`** — set both roles from a pairing. `bkActivePairing()` reports which pairing (if any) the current selection matches; `BK_PAIRING_DEFAULT` is what a new kit starts on.
+- **`bkSetFont(role, source, id)`** — select one role, load if needed, re-render, apply. The roles are set independently; there is no combined control.
 - **`bkApplyFonts()`** — write both role variables to the canvas.
 - **`bkFontRenderRoles()`** — redraw the two role rows. Each row previews its font **in that font**, which is the whole affordance; a row rendering in the fallback means the face has not loaded.
-- **`bkResetFonts()`** — back to the default pairing. Called from `bkPopulateSettings`, so fonts are per kit like block styles. Uploaded faces stay registered in the browser; only the selection resets.
+- **`bkResetFonts()`** — both roles back to the platform default (Proxima Nova). Called from `bkPopulateSettings`, so fonts are per kit like block styles. Uploaded faces stay registered in the browser; only the selection resets.
 
 ## How to Add a Block to the Brand Kit Canvas
 

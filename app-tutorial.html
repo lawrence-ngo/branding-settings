@@ -4,9 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AnyRoad — Branding</title>
-<!-- DECISION: Soleil (via Adobe Typekit) is AnyRoad's native app typeface. The booking
-     page / checkout canvases intentionally keep a system / Inter stack so they preview
-     what guests actually see in production (where Soleil isn't loaded). -->
+<!-- DECISION: two different typefaces, two different audiences, and they must not be
+     confused. Soleil (via Adobe Typekit) is the platform's INTERNAL typeface: it dresses this
+     operator dashboard and nothing else. Proxima Nova is the default on the PUBLIC-facing
+     pages a guest sees - experience page, checkout, payment, confirmation - which is exactly
+     what the editor canvases preview and what a brand kit starts from.
+     So: `body` below is Soleil (the dashboard), every canvas is Proxima Nova
+     (--bk-platform-sans), and Soleil is deliberately NOT offered as a brand kit font, since
+     it is AnyRoad's own face rather than something a customer's brand should wear. -->
 <link rel="stylesheet" href="https://use.typekit.net/yfq6nad.css">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -368,14 +373,22 @@ button, input, select, textarea { font-family: inherit; }
   font-family: "soleil", -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
 }
 
-/* DECISION: Canvases (booking page / checkout previews) keep the system / Inter font
-   stack instead of Soleil — these mock the public-facing guest experience, where the
-   operator's brand kit controls typography rather than the AnyRoad app's typeface.
+/* DECISION: --bk-platform-sans is defined ONCE and is the single source of truth for the
+   public pages' default typeface. The Typekit alias 'proxima-nova' leads so a
+   platform-hosted copy wins; the desktop name follows for a machine that has it installed;
+   then universal fallbacks. The brand kit's System source and the role defaults both point
+   at this same variable, so there is no second copy of the stack to drift.
+   These canvases mock the guest-facing experience, so they default to it rather than to
+   Soleil (the dashboard's own face) or to a bare system stack, which is what they used to
+   show and what made them misrepresent the real default.
    #bpCanvas is deliberately NOT in this list: the brand kit editor's canvas takes its type
    from the --bk-font-heading / --bk-font-body role variables further down, and declaring
    font-family for it twice would leave the winner up to source order. */
+:root {
+  --bk-platform-sans: 'proxima-nova', 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
 .preview-canvas {
-  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  font-family: var(--bk-platform-sans);
   position: relative; /* positioning context for the click-to-edit coachmark */
 }
 #page-experience-edit.active, #page-profile-editor.active, #page-brand-editor.active { display: flex !important; }
@@ -1000,22 +1013,35 @@ button, input, select, textarea { font-family: inherit; }
 .prange::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: #3D57FF; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); cursor: pointer; }
 .prange-val { font-size: 12px; color: #697386; font-family: 'SF Mono','Monaco','Menlo',monospace; min-width: 40px; text-align: right; flex-shrink: 0; }
 
-/* ── Brand kit typography: two roles, applied through custom properties ──────────
-   DECISION: font FAMILY is an account-level setting with exactly two roles (heading and
-   body), so it is applied once as two custom properties on the canvas root rather than as a
-   target list per element. Blocks then only set font SIZE, which cannot collide with family.
+/* ── Brand kit typography: three roles, applied through custom properties ─────────
+   DECISION: font FAMILY is an account-level setting with exactly three roles (heading, body,
+   button), so it is applied once as three custom properties on the canvas root rather than as
+   a target list per element. Blocks then only set font SIZE, which cannot collide with family.
    Adding a new text element means tagging it heading or body below - not touching any JS.
    Scoped to #bpCanvas because every other brand kit setting in this prototype is (see
    bkUpdateHeaderBg / bkUpdateLinkColor). */
 :root {
-  --bk-font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --bk-font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --bk-font-heading: var(--bk-platform-sans);
+  --bk-font-body: var(--bk-platform-sans);
+  --bk-font-button: var(--bk-platform-sans);
 }
 #bpCanvas {
   font-family: var(--bk-font-body);
   position: relative; /* positioning context for the click-to-edit coachmark */
 }
-#bpCanvas input, #bpCanvas select, #bpCanvas textarea, #bpCanvas button { font-family: var(--bk-font-body); }
+/* Form controls default to the browser's UI font, so they need naming explicitly to follow
+   the body role. Buttons are pulled out into their own role below. */
+#bpCanvas input, #bpCanvas select, #bpCanvas textarea { font-family: var(--bk-font-body); }
+/* Button role: every button a guest can press in the booking flow. `button` covers the
+   element; the classes cover the two that are styled links rather than <button> elements. */
+#bpCanvas button,
+#bpCanvas .bk-cta-btn,
+#bpCanvas .bk-contact-btn,
+#bpCanvas .co-submit-btn,
+#bpCanvas .co-confirm-btn,
+#bpCanvas .co-promo-apply,
+#bpCanvas .co-pay-wallet,
+#bpCanvas .co-nps-btn { font-family: var(--bk-font-button); }
 /* Heading role: the display type. Titles, section labels, prices, totals, and the wordmark. */
 #bpCanvas .bk-title,
 #bpCanvas .bk-subtitle,
@@ -1032,21 +1058,6 @@ button, input, select, textarea { font-family: inherit; }
 #bpCanvas .bk-wordmark { font-family: var(--bk-font-heading); }
 
 /* ── Font pickers (home state) ── */
-/* ── Font pairings: set both roles at once, so they sit above the role rows ── */
-.bk-pair-head { font-size: 10px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: #9aa5b4; margin: 4px 0 7px; }
-.bk-pair-list { border: 1.5px solid #d1d5db; border-radius: 8px; background: #fff; overflow: hidden; }
-.bk-pair { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 11px; cursor: pointer; border-bottom: 1px solid #eef0f5; }
-.bk-pair:last-child { border-bottom: none; }
-.bk-pair:hover { background: #f8f9fc; }
-.bk-pair.sel { background: #eef0fd; }
-.bk-pair-main { min-width: 0; }
-.bk-pair-name { font-size: 14.5px; color: #1a1f36; line-height: 1.25; }
-.bk-pair-faces { font-size: 12px; color: #697386; margin-top: 2px; line-height: 1.3; }
-.bk-pair-sep { color: #c7cfdb; margin: 0 4px; }
-.bk-pair-note { font-size: 11px; color: #9aa5b4; margin-top: 2px; }
-.bk-pair-check { color: #3D57FF; opacity: 0; flex-shrink: 0; }
-.bk-pair.sel .bk-pair-check { opacity: 1; }
-.bk-pair-caption { font-size: 11.5px; color: #9aa5b4; line-height: 1.5; margin: 8px 0 14px; }
 .bk-font-role { border: 1.5px solid #d1d5db; border-radius: 8px; margin-bottom: 10px; overflow: hidden; background: #fff; }
 .bk-font-role.open { border-color: #3D57FF; }
 .bk-font-current { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 11px; cursor: pointer; }
@@ -1069,6 +1080,8 @@ button, input, select, textarea { font-family: inherit; }
 .bk-font-status { font-size: 11.5px; margin-top: 9px; display: flex; align-items: center; gap: 5px; }
 .bk-font-status.ok { color: #16a34a; }
 .bk-font-status.warn { color: #d97706; }
+#bkFontPlatformStatus { margin-bottom: 4px; }
+#bkFontPlatformStatus:empty { display: none; }
 .bk-font-drop { border: 1.5px dashed #c7cfdb; border-radius: 8px; padding: 16px 12px; text-align: center; cursor: pointer; background: #fff; margin-top: 10px; }
 .bk-font-drop:hover { border-color: #3D57FF; background: #f8f9fc; }
 .bk-font-drop-plus { font-size: 20px; color: #3D57FF; font-weight: 300; line-height: 1; }
@@ -2701,16 +2714,17 @@ button, input, select, textarea { font-family: inherit; }
 
                   <div class="bk-settings-divider"></div>
 
-                  <!-- Fonts: account-level, two roles.
-                       DECISION: font family is set ONCE per role (heading / body) at the account
-                       level, not per block. A brand has a typeface, not a typeface per section, and
+                  <!-- Fonts: account-level, three roles.
+                       DECISION: font family is set ONCE per role (heading / body / button) at the
+                       account level, not per block. A brand has a typeface, not a typeface per section, and
                        per-block families would let one kit disagree with itself. Blocks keep font
                        SIZE, which is genuinely per block. The four sources sit behind one picker
                        because "which font" and "where it comes from" are the same decision to the
                        operator: they are choosing a typeface, not a hosting method. -->
                   <div class="bk-settings-block">
                     <div class="bk-settings-label">Fonts <span class="bk-help-icon">?</span></div>
-                    <div class="bk-settings-sublabel">A pairing sets both roles at once, or set each role on its own. Sizes are set per section on the canvas.</div>
+                    <div class="bk-settings-sublabel">Three roles for the whole booking page. Sizes are set per section on the canvas.</div>
+                    <div class="bk-font-status" id="bkFontPlatformStatus"></div>
                     <div id="bkFontRoles"></div>
                   </div>
 
@@ -5004,7 +5018,7 @@ function profileSwitchPage(page) {
 // just where you find it. This is what separates it from the Content Profile editor, where a
 // block panel edits the copy and field visibility of that one section.
 
-// ── Brand Kit typography: account-level fonts, two roles, four sources ─────────
+// ── Brand Kit typography: account-level fonts, three roles, four sources ───────
 // DECISION: An operator picking type is making ONE decision ("what typeface does my brand
 // use"), not two ("what typeface" plus "how is it hosted"). So the four sources live behind a
 // single picker per role rather than as four separate settings. Upload-only, which the first
@@ -5014,8 +5028,6 @@ function profileSwitchPage(page) {
 //   google  — a shortlist from Google Fonts, loaded on demand from fonts.googleapis.com.
 //   adobe   — families from a connected Adobe Fonts (Typekit) kit, loaded by kit id.
 //   upload  — WOFF2/WOFF/TTF/OTF registered in the browser via the FontFace API.
-// A fifth tab is deliberately absent: Curated is not a source. It is a set of PAIRINGS that
-// set both roles at once, and it lives above the two role rows - see bkFontPairings.
 // DECISION: the prototype LOADS these for real (rather than faking the preview with a
 // lookalike) so a design review sees the actual face, and so the fallback case is visible
 // when a font cannot be fetched. bkFontStatus reports which of the two happened.
@@ -5036,7 +5048,7 @@ function profileSwitchPage(page) {
 var bkFontCatalog = {
   system: [
     { id: 'sys-proxima', name: 'Proxima Nova', platform: true, verify: 'proxima-nova',
-      stack: "'proxima-nova', 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" },
+      stack: 'var(--bk-platform-sans)' },
     { id: 'sys-serif',   name: 'System Serif', stack: "Georgia, 'Times New Roman', Times, serif" },
     { id: 'sys-mono',    name: 'System Mono',  stack: "'SF Mono', Consolas, Monaco, Menlo, monospace" }
   ],
@@ -5048,14 +5060,13 @@ var bkFontCatalog = {
     { id: 'g-lora',     name: 'Lora',             stack: "'Lora', serif",               g: 'Lora:wght@400;600;700' },
     { id: 'g-fraunces', name: 'Fraunces',         stack: "'Fraunces', serif",           g: 'Fraunces:wght@400;600;700' }
   ],
-  // DECISION: the Adobe source starts with the kit this app already loads (Soleil, AnyRoad's
-  // own typeface - see the Typekit decision at the top of the file), so the connected-kit
-  // state is real rather than mocked. Production would read the kit's family list from the
-  // Adobe Fonts API; here connecting another kit injects its CSS and adds a placeholder row
-  // the operator names, which is enough to review the flow.
-  adobe: [
-    { id: 'a-soleil', name: 'Soleil', stack: "'soleil', sans-serif", kit: 'yfq6nad' }
-  ],
+  // DECISION: Adobe starts EMPTY, with no kit connected. The obvious shortcut was to seed it
+  // with the kit this app already loads, but that kit serves Soleil - the dashboard's own
+  // internal typeface - and offering AnyRoad's face as a brand kit option would invite an
+  // operator to dress their public pages in it. Empty is also the truthful starting state:
+  // the operator has not connected their Adobe account yet. Connecting a kit injects its CSS
+  // and adds a row; production would read the kit's family list from the Adobe Fonts API.
+  adobe: [],
   upload: []
 };
 
@@ -5065,42 +5076,24 @@ var BK_FONT_SOURCES = [
   { id: 'adobe',   label: 'Adobe' },
   { id: 'upload',  label: 'Upload' }
 ];
-// bkFontPairings — DECISION: "Curated" is not a font source, it is a set of PAIRINGS, and it
-// sets BOTH roles in one click. The two-role model quietly creates a pairing problem: an
-// operator choosing a heading face and a body face independently can land on a combination no
-// designer would ship, and most operators are not typographers. A pairing is the answer to
-// "give me good type" in a single decision.
-// It deliberately does NOT live in the per-role picker: a pairing changes both roles, so
-// offering it inside the Heading picker would silently move Body too. It sits above the two
-// role rows instead, where a control that affects both belongs.
-// DECISION: the first two pairings resolve with no external request at all, so the operator
-// who needs type that always renders has real choices rather than one. The rest name their
-// requirement in the row, because a pairing that quietly depends on Google is a pairing that
-// quietly fails on a locked-down network.
-var bkFontPairings = [
-  { id: 'p-platform', name: 'Platform standard', note: 'AnyRoad default',
-    heading: { source: 'system', id: 'sys-proxima' }, body: { source: 'system', id: 'sys-proxima' } },
-  { id: 'p-classic',  name: 'Classic', note: 'No external fonts',
-    heading: { source: 'system', id: 'sys-serif' },   body: { source: 'system', id: 'sys-proxima' } },
-  { id: 'p-refined',  name: 'Refined', note: 'Needs Google Fonts',
-    heading: { source: 'google', id: 'g-playfair' },  body: { source: 'system', id: 'sys-proxima' } },
-  { id: 'p-editorial', name: 'Editorial', note: 'Needs Google Fonts',
-    heading: { source: 'google', id: 'g-playfair' },  body: { source: 'google', id: 'g-lora' } },
-  { id: 'p-modern',   name: 'Modern', note: 'Needs Google Fonts',
-    heading: { source: 'google', id: 'g-space' },     body: { source: 'google', id: 'g-inter' } }
-];
-var BK_PAIRING_DEFAULT = 'p-platform';
-
 var BK_FONT_ROLES = [
   { id: 'heading', label: 'Heading', prop: '--bk-font-heading', hint: 'Titles, section labels, prices, and the brand name.' },
-  { id: 'body',    label: 'Body',    prop: '--bk-font-body',    hint: 'Descriptions, form labels, inputs, links, and buttons.' }
+  { id: 'body',    label: 'Body',    prop: '--bk-font-body',    hint: 'Descriptions, form labels, inputs, and links.' },
+  // DECISION: buttons get a role of their own rather than riding the body font. They are the
+  // one place a brand's voice is loudest and the one element operators most often want set
+  // apart, and plenty of type systems pair a quiet body face with a deliberate button face.
+  { id: 'button',  label: 'Button',  prop: '--bk-font-button',  hint: 'Every button in the booking flow.' }
 ];
 
 // bkFonts — the active selection per role. bkFontOpenRole is which picker is expanded (only
 // one at a time, so the panel stays a readable column instead of four stacked lists).
-var bkFonts = { heading: { source: 'system', id: 'sys-proxima' }, body: { source: 'system', id: 'sys-proxima' } };
+var bkFonts = {
+  heading: { source: 'system', id: 'sys-proxima' },
+  body:    { source: 'system', id: 'sys-proxima' },
+  button:  { source: 'system', id: 'sys-proxima' }
+};
 var bkFontOpenRole = null;
-var bkFontSrcTab = { heading: 'system', body: 'system' };
+var bkFontSrcTab = { heading: 'system', body: 'system', button: 'system' };
 var bkGoogleLoaded = {};
 var bkAdobeKits = { 'yfq6nad': true };
 var bkUploadSeq = 0;
@@ -5207,6 +5200,7 @@ function bkFontRendered(name) {
 // bkFontCheckStatus — say whether the chosen face actually rendered. A picker that silently
 // falls back is a picker that lies; this reports the fallback instead of hiding it.
 function bkFontCheckStatus() {
+  bkCheckPlatformFont();
   BK_FONT_ROLES.forEach(function(r) {
     var el = document.getElementById('bkFontStatus-' + r.id);
     if (!el) return;
@@ -5215,12 +5209,20 @@ function bkFontCheckStatus() {
     // entries have universal fallbacks and nothing to report, but Proxima Nova is
     // platform-served rather than universal, so it is checked like any fetched face. Entries
     // outside System are always fetched, so they are always checked.
+    // DECISION: the platform face reports ONCE, above the roles, not on each row. Whether
+    // Proxima Nova is being served is a fact about the platform, not a property of the
+    // heading role, and a default kit the operator has not touched should not greet them with
+    // the same warning three times.
+    if (f.platform) { el.className = 'bk-font-status'; el.textContent = ''; return; }
     var target = f.verify || (bkFonts[r.id].source === 'system' ? null : f.stack.split(',')[0].replace(/['"]/g, '').trim());
     if (!target) { el.className = 'bk-font-status'; el.textContent = ''; return; }
     var first = target;
     el.className = 'bk-font-status';
     el.textContent = 'Loading ' + f.name + '...';
     var done = function() {
+      // Same race as the platform notice: only write if this role is still on this face.
+      var now = bkFontActive(r.id);
+      if (now !== f) return;
       var ok = bkFontRendered(first);
       el.className = 'bk-font-status ' + (ok ? 'ok' : 'warn');
       el.textContent = ok ? f.name + ' is loaded' : 'Could not load ' + f.name + '. The page is showing a fallback face.';
@@ -5231,33 +5233,28 @@ function bkFontCheckStatus() {
   });
 }
 
-// bkActivePairing — which pairing, if any, the two roles currently match. Returns null when
-// the operator has overridden a role individually; the UI then reads "Custom" rather than
-// keeping a pairing lit that no longer describes the page.
-function bkActivePairing() {
-  for (var i = 0; i < bkFontPairings.length; i++) {
-    var p = bkFontPairings[i];
-    if (p.heading.source === bkFonts.heading.source && p.heading.id === bkFonts.heading.id &&
-        p.body.source    === bkFonts.body.source    && p.body.id    === bkFonts.body.id) return p;
-  }
-  return null;
-}
-
-// bkSetPairing — apply both roles at once, loading whatever each side needs first.
-function bkSetPairing(id) {
-  var p = null;
-  bkFontPairings.forEach(function(x) { if (x.id === id) p = x; });
-  if (!p) return;
-  ['heading', 'body'].forEach(function(role) {
-    var ref = p[role];
-    var f = bkFontFind(ref.source, ref.id);
-    if (!f) return;
-    if (ref.source === 'google') bkLoadGoogleFont(f);
-    bkFonts[role] = { source: ref.source, id: ref.id };
-    bkFontSrcTab[role] = ref.source;
-  });
-  bkFontRenderRoles();
-  bkApplyFonts();
+// bkCheckPlatformFont — one notice covering however many roles are on the platform face.
+// Silent when it renders (the expected case) and when no role is using it.
+function bkCheckPlatformFont() {
+  var el = document.getElementById('bkFontPlatformStatus');
+  if (!el) return;
+  var entry = null;
+  BK_FONT_ROLES.forEach(function(r) { var f = bkFontActive(r.id); if (f.platform) entry = f; });
+  if (!entry) { el.className = 'bk-font-status'; el.textContent = ''; return; }
+  var probe = entry.verify || entry.name;
+  var done = function() {
+    // Re-check: this resolves asynchronously, and by now every role may have moved off the
+    // platform face, in which case the notice must not be written back.
+    var still = false;
+    BK_FONT_ROLES.forEach(function(r) { if (bkFontActive(r.id).platform) still = true; });
+    if (!still) { el.className = 'bk-font-status'; el.textContent = ''; return; }
+    var ok = bkFontRendered(probe);
+    el.className = 'bk-font-status' + (ok ? '' : ' warn');
+    el.textContent = ok ? '' : entry.name + ' is not loading, so roles using it are showing a fallback face.';
+  };
+  if (document.fonts && document.fonts.load) {
+    document.fonts.load('16px "' + probe + '"').then(done, done);
+  } else { setTimeout(done, 400); }
 }
 
 function bkSetFont(role, source, id) {
@@ -5289,44 +5286,10 @@ function bkFontSetSrc(role, src) {
 
 // bkFontRenderRoles — the two role rows. Each shows its current font SET IN THAT FONT, which
 // is the whole affordance: the operator reads the typeface instead of its name.
-// bkFontRenderPairings — each row previews itself: the pairing name set in its heading face,
-// the two family names beneath it in their own faces. Reading the type is the whole point, so
-// a Google-backed pairing preloads on render rather than on selection.
-function bkFontRenderPairings() {
-  var active = bkActivePairing();
-  var rows = bkFontPairings.map(function(p) {
-    var h = bkFontFind(p.heading.source, p.heading.id) || bkFontCatalog.system[0];
-    var b = bkFontFind(p.body.source, p.body.id) || bkFontCatalog.system[0];
-    var sel = active && active.id === p.id;
-    return '<div class="bk-pair' + (sel ? ' sel' : '') + '" onclick="bkSetPairing(\'' + p.id + '\')">'
-      + '<div class="bk-pair-main">'
-      +   '<div class="bk-pair-name" style="font-family:' + _esc(h.stack) + '">' + _esc(p.name) + '</div>'
-      +   '<div class="bk-pair-faces">'
-      +     '<span style="font-family:' + _esc(h.stack) + '">' + _esc(h.name) + '</span>'
-      +     '<span class="bk-pair-sep">/</span>'
-      +     '<span style="font-family:' + _esc(b.stack) + '">' + _esc(b.name) + '</span>'
-      +   '</div>'
-      +   '<div class="bk-pair-note">' + _esc(p.note) + '</div>'
-      + '</div>'
-      + '<svg class="bk-pair-check" width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M3 7.5L6 10.5 11 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-      + '</div>';
-  }).join('');
-  var caption = active
-    ? 'Sets both roles at once. Change either one below to depart from it.'
-    : '<strong>Custom.</strong> The two roles below no longer match a pairing.';
-  return '<div class="bk-pair-head">Pairings</div>'
-       + '<div class="bk-pair-list">' + rows + '</div>'
-       + '<div class="bk-pair-caption">' + caption + '</div>';
-}
-
 function bkFontRenderRoles() {
   var host = document.getElementById('bkFontRoles');
   if (!host) return;
-  // Any Google-backed pairing needs its faces present for the rows to preview themselves.
-  if (bkFontPairings.some(function(p) { return p.heading.source === 'google' || p.body.source === 'google'; })) {
-    bkFontPreloadSource('google');
-  }
-  host.innerHTML = bkFontRenderPairings() + BK_FONT_ROLES.map(function(r) {
+  host.innerHTML = BK_FONT_ROLES.map(function(r) {
     var f = bkFontActive(r.id);
     var open = bkFontOpenRole === r.id;
     var srcLabel = BK_FONT_SOURCES.filter(function(x) { return x.id === bkFonts[r.id].source; })[0];
@@ -5377,6 +5340,8 @@ function bkFontPickerBody(r) {
     }).join('') + '</div>';
   } else if (src === 'upload') {
     body += '<div class="bk-font-note">No uploaded fonts yet.</div>';
+  } else if (src === 'adobe') {
+    body += '<div class="bk-font-note">No Adobe Fonts kit connected yet. Paste a kit ID above to load its families.</div>';
   }
 
   body += '<div class="bk-font-note">' + r.hint + '</div>';
@@ -5387,9 +5352,15 @@ function bkFontPickerBody(r) {
 // faces stay registered in the browser (removing them would break any kit already using one)
 // but the selection resets.
 function bkResetFonts() {
+  bkFonts = {};
+  bkFontSrcTab = {};
+  BK_FONT_ROLES.forEach(function(r) {
+    bkFonts[r.id] = { source: 'system', id: 'sys-proxima' };
+    bkFontSrcTab[r.id] = 'system';
+  });
   bkFontOpenRole = null;
-  bkFontSrcTab = { heading: 'system', body: 'system' };
-  bkSetPairing(BK_PAIRING_DEFAULT);
+  bkFontRenderRoles();
+  bkApplyFonts();
 }
 
 // bkBlockStyles — the block-level overrides for the brand kit being edited, keyed
@@ -7205,7 +7176,7 @@ var TUT_STEPS = [
   },
   {
     title: 'Fonts',
-    body: 'A brand kit sets two typefaces for the whole booking page: a <strong>heading</strong> font for titles, section labels, prices, and the brand name, and a <strong>body</strong> font for everything else. Pick a <strong>pairing</strong> to set both at once, or set either role on its own from System (Proxima Nova and the faces every device has), Google Fonts, a connected Adobe Fonts kit, or a file you upload. Font family is set here, once. Font <em>sizes</em> are set per section, in the next step.',
+    body: 'A brand kit sets three typefaces for the whole booking page: <strong>heading</strong> for titles, section labels, prices, and the brand name, <strong>button</strong> for every button a guest can press, and <strong>body</strong> for everything else. Each role is set on its own, from System (Proxima Nova, the public pages\' default, plus the faces every device has), Google Fonts, a connected Adobe Fonts kit, or a file you upload. Font family is set here, once. Font <em>sizes</em> are set per section, in the next step.',
     navPath: ['Settings', 'Branding', 'Brand Kits', 'Edit kit'],
     // DECISION: before() opens the heading picker so the card lands on the four sources rather
     // than a collapsed row, and target2 lights the canvas title that the heading role drives,
@@ -7216,8 +7187,8 @@ var TUT_STEPS = [
     before: function() {
       navigate('brand-editor-acme');
       bkReturnToGlobal();
-      bkFontOpenRole = null;
-      bkSetPairing('p-editorial');
+      bkFontOpenRole = 'heading';
+      bkFontSetSrc('heading', 'google');
     }
   },
   {
